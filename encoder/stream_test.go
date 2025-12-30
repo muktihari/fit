@@ -222,7 +222,7 @@ func TestStreamEncoderUnhappyFlow(t *testing.T) {
 
 	// Protocol validation error
 	streamEnc, _ = NewStream(mockWriterAt{})
-	streamEnc.enc.protocolValidator.ProtocolVersion = proto.V1
+	streamEnc.fileHeader.ProtocolVersion = proto.V1
 	err = streamEnc.WriteMessage(&proto.Message{Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordSpeed1S).WithValue(make([]uint8, 256)),
 	}, DeveloperFields: []proto.DeveloperField{{}}})

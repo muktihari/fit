@@ -68,8 +68,7 @@ func TestValidateMessageDefinition(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			validator := proto.NewValidator(tc.protocolVersion)
-			err := validator.ValidateMessageDefinition(&tc.mesgDef)
+			err := proto.Validator.ValidateMessageDefinition(&tc.mesgDef, tc.protocolVersion)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected err: %v, git: %v", tc.err, err)
 			}
@@ -132,8 +131,7 @@ func TestValidateMessage(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			v := proto.NewValidator(tc.protocolVersion)
-			err := v.ValidateMessage(&tc.mesg)
+			err := proto.Validator.ValidateMessage(&tc.mesg, tc.protocolVersion)
 			if !errors.Is(err, tc.err) {
 				t.Fatalf("expected error: %v, got: %v", tc.err, err)
 			}

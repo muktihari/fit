@@ -47,10 +47,8 @@ type Encoder struct {
 	n                 int64       // Total bytes written to w, will keep counting for every Encode invocation.
 	lastFileHeaderPos int64       // The byte position of the last header.
 	crc16             hash.Hash16 // Calculate the CRC-16 checksum for ensuring header and message integrity.
-
-	options           options          // Encoder's options.
-	protocolValidator *proto.Validator // Validates message's properties should match the targeted protocol version requirements.
-	localMesgNumLRU   *lru             // LRU cache for writing local message definition
+	options           options     // Encoder's options.
+	localMesgNumLRU   *lru        // LRU cache for writing local message definition
 
 	dataSize uint32 // Data size of messages in bytes for a single FIT file.
 
@@ -174,10 +172,9 @@ func WithWriteBufferSize(size int) Option {
 // Encoder to do so using WithWriteBufferSize(0).
 func New(w io.Writer, opts ...Option) *Encoder {
 	e := &Encoder{
-		crc16:             crc16.New(),
-		protocolValidator: new(proto.Validator),
-		localMesgNumLRU:   new(lru),
-		buf:               make([]byte, 0, 1536),
+		crc16:           crc16.New(),
+		localMesgNumLRU: new(lru),
+		buf:             make([]byte, 0, 1536),
 	}
 	e.Reset(w, opts...)
 	return e
@@ -236,7 +233,7 @@ func (e *Encoder) reset() {
 // Encode chooses which strategy to use for encoding the data based on given writer.
 func (e *Encoder) Encode(fit *proto.FIT) (err error) {
 	e.selectProtocolVersion(&fit.FileHeader)
-	if err = e.validateMessages(fit.Messages); err != nil {
+	if err = e.validate(fit); err != nil {
 		return err
 	}
 	switch e.w.(type) {
@@ -263,25 +260,24 @@ func (e *Encoder) selectProtocolVersion(fileHeader *proto.FileHeader) {
 	} else if fileHeader.ProtocolVersion == 0 { // Default when not specified in FileHeader.
 		fileHeader.ProtocolVersion = proto.V1
 	}
-	e.protocolValidator.ProtocolVersion = fileHeader.ProtocolVersion
 }
 
-func (e *Encoder) validateMessages(messages []proto.Message) (err error) {
-	if len(messages) == 0 {
+func (e *Encoder) validate(fit *proto.FIT) (err error) {
+	if len(fit.Messages) == 0 {
 		return errEmptyMessages
 	}
 
-	for i := range messages {
-		mesg := &messages[i]
-		mesg.Header = proto.MesgNormalHeaderMask
-		if err = e.protocolValidator.ValidateMessage(mesg); err != nil {
+	for i := range fit.Messages {
+		mesg := &fit.Messages[i]
+		if err = proto.Validator.ValidateMessage(mesg, fit.FileHeader.ProtocolVersion); err != nil {
 			return fmt.Errorf("protocol validation: message index: %d, num: %d (%s): %w",
 				i, mesg.Num, mesg.Num.String(), err)
 		}
 	}
 
-	for i := range messages {
-		mesg := &messages[i] // Must use pointer reference since message validator may update the message.
+	for i := range fit.Messages {
+		mesg := &fit.Messages[i] // Must use pointer reference since message validator may update the message.
+		mesg.Header = proto.MesgNormalHeaderMask
 		if err = e.options.messageValidator.Validate(mesg); err != nil {
 			e.options.messageValidator.Reset()
 			return fmt.Errorf("message validation: message index: %d, num: %d (%s): %w",
@@ -565,7 +561,7 @@ func (e *Encoder) encodeCRC() error {
 // EncodeWithContext is similar to Encode but with respect to context propagation.
 func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err error) {
 	e.selectProtocolVersion(&fit.FileHeader)
-	if err = e.validateMessages(fit.Messages); err != nil {
+	if err = e.validate(fit); err != nil {
 		return err
 	}
 	switch e.w.(type) {
