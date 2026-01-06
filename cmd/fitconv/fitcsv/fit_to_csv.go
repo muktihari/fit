@@ -391,26 +391,28 @@ func (c *FITToCSVConv) writeMesg(mesg proto.Message) {
 		field := &mesg.Fields[i]
 
 		value := field.Value
-		if c.options.printOnlyValidValue && !field.Value.Valid(field.BaseType) {
+		if c.options.printOnlyValidValue && !value.Valid(field.BaseType) {
 			continue
 		}
 
 		name, units := field.Name, field.Units
+		scale, offset := field.Scale, field.Offset
 		if c.options.verbose && field.Name == factory.NameUnknown {
 			name = formatUnknown(int(field.Num))
 			units = field.BaseType.String()
 		}
 		if subField := field.SubFieldSubstitution(&mesg); subField != nil {
 			name, units = subField.Name, subField.Units
+			scale, offset = subField.Scale, subField.Offset
 		}
 
 		c.buf.WriteString(name)
 
 		if !c.options.printRawValue {
-			value = scaleoffset.ApplyValue(field.Value, field.Scale, field.Offset)
+			value = scaleoffset.ApplyValue(value, scale, offset)
 		}
 
-		if c.options.printGPSPositionInDegrees && field.Units == "semicircles" {
+		if c.options.printGPSPositionInDegrees && units == "semicircles" {
 			value = proto.Float64(semicircles.ToDegrees(value.Int32()))
 			units = "degrees"
 		}
