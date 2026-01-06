@@ -420,11 +420,11 @@ func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dyn
 				if smap.RefFieldValue == valRef {
 					fieldRef.Value, err = parseValue(
 						ref.value,
-						fieldRef.BaseType,
-						fieldRef.Type,
-						fieldRef.Scale,
-						fieldRef.Offset,
-						fieldRef.Units,
+						subField.Type.BaseType(),
+						subField.Type,
+						subField.Scale,
+						subField.Offset,
+						subField.Units,
 					)
 					if err != nil {
 						return err
