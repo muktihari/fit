@@ -131,6 +131,7 @@ type Session struct {
 	EnhancedMaxRespirationRate    uint16 // Scale: 100; Units: Breaths/min
 	EnhancedMinRespirationRate    uint16 // Scale: 100
 	JumpCount                     uint16
+	MetabolicCalories             uint16            // Units: kcal
 	AvgCoreTemperature            uint16            // Scale: 100; Units: C
 	MinCoreTemperature            uint16            // Scale: 100; Units: C
 	MaxCoreTemperature            uint16            // Scale: 100; Units: C
@@ -203,7 +204,7 @@ func (m *Session) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{18446742974197919743, 18446678103011623167, 932252819858127487, 6917529027641541103}
+		knownNums := [4]uint64{18446742974197919743, 18446678103011623167, 932252819858127487, 6917529027641541119}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -374,6 +375,7 @@ func (m *Session) Reset(mesg *proto.Message) {
 		WorkoutRpe:                    vals[193].Uint8(),
 		AvgSpo2:                       vals[194].Uint8(),
 		AvgStress:                     vals[195].Uint8(),
+		MetabolicCalories:             vals[196].Uint16(),
 		SdrrHrv:                       vals[197].Uint8(),
 		RmssdHrv:                      vals[198].Uint8(),
 		TotalFractionalAscent:         vals[199].Uint8(),
@@ -395,7 +397,7 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 156)
+	fields := make([]proto.Field, 0, 157)
 	mesg := proto.Message{Num: typedef.MesgNumSession}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -1165,6 +1167,11 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 	if m.AvgStress != basetype.Uint8Invalid {
 		field := factory.CreateField(mesg.Num, 195)
 		field.Value = proto.Uint8(m.AvgStress)
+		fields = append(fields, field)
+	}
+	if m.MetabolicCalories != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 196)
+		field.Value = proto.Uint16(m.MetabolicCalories)
 		fields = append(fields, field)
 	}
 	if m.SdrrHrv != basetype.Uint8Invalid {
@@ -4537,6 +4544,14 @@ func (m *Session) SetAvgSpo2(v uint8) *Session {
 // Units: percent; Average stress for the monitoring session
 func (m *Session) SetAvgStress(v uint8) *Session {
 	m.AvgStress = v
+	return m
+}
+
+// SetMetabolicCalories sets MetabolicCalories value.
+//
+// Units: kcal
+func (m *Session) SetMetabolicCalories(v uint16) *Session {
+	m.MetabolicCalories = v
 	return m
 }
 
