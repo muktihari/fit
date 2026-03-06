@@ -780,6 +780,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		193: {Name: "workout_rpe", Num: 193, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 1},
 		194: {Name: "avg_spo2", Num: 194, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 1, Units: "percent"},
 		195: {Name: "avg_stress", Num: 195, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 1, Units: "percent"},
+		196: {Name: "metabolic_calories", Num: 196, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1, Units: "kcal"},
 		197: {Name: "sdrr_hrv", Num: 197, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 1, Units: "mS"},
 		198: {Name: "rmssd_hrv", Num: 198, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 1, Units: "mS"},
 		199: {Name: "total_fractional_ascent", Num: 199, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 100, Units: "m"},

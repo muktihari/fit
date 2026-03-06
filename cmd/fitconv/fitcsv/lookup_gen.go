@@ -13,7 +13,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21188] }
+func _() { _ = [1]struct{}{}[profile.Version-21195] }
 
 var mesgNumLookup = map[string]typedef.MesgNum{
 	"file_id":                             0,
@@ -463,6 +463,7 @@ var fieldNumLookup = [...]map[string]byte{
 		"workout_rpe":                      193,
 		"avg_spo2":                         194,
 		"avg_stress":                       195,
+		"metabolic_calories":               196,
 		"sdrr_hrv":                         197,
 		"rmssd_hrv":                        198,
 		"total_fractional_ascent":          199,
