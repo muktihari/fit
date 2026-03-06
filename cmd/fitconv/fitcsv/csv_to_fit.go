@@ -420,8 +420,10 @@ func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dyn
 				if smap.RefFieldValue == valRef {
 					fieldRef.Value, err = parseValue(
 						ref.value,
-						subField.Type.BaseType(),
-						subField.Type,
+						// Use Field's BaseType and ProfileType since we are reverting SubField into Field.
+						fieldRef.BaseType,
+						fieldRef.Type,
+						// When converting FIT to CSV, we are using SubField's Scale, Offset and Units.
 						subField.Scale,
 						subField.Offset,
 						subField.Units,
@@ -471,11 +473,11 @@ func removeExpandedComponents(mesg *proto.Message) {
 	}
 }
 
-func parseValue(strValue string, baseType basetype.BaseType, profileType profile.ProfileType, scale, offset float64, units string) (value proto.Value, err error) {
+func parseValue(strValue string, baseType basetype.BaseType, profileType profile.ProfileType, scale, offset float64, units string) (proto.Value, error) {
 	if units == "degrees" && baseType == basetype.Sint32 { // Special case
 		degrees, err := strconv.ParseFloat(strValue, 64)
 		if err != nil {
-			return value, err
+			return proto.Value{}, err
 		}
 		return proto.Int32(semicircles.ToSemicircles(degrees)), nil
 	}
@@ -483,128 +485,92 @@ func parseValue(strValue string, baseType basetype.BaseType, profileType profile
 	if profileType == profile.Bool {
 		v, err := strconv.ParseUint(strValue, 0, 8)
 		if err != nil {
-			return value, err
+			return proto.Value{}, err
 		}
 		return proto.Bool(typedef.Bool(v)), nil
 	}
 
-	var scaledValue float64
 	var isScaled bool = baseType != basetype.String && strings.Contains(strValue, ".")
 	if isScaled {
-		scaledValue, err = strconv.ParseFloat(strValue, 64)
+		scaledValue, err := strconv.ParseFloat(strValue, 64)
 		if err != nil {
-			return value, fmt.Errorf("try")
+			return proto.Value{}, fmt.Errorf("parse as scaled value: %v", err)
 		}
-		scaledValue = scaleoffset.Discard(scaledValue, scale, offset)
+		return scaleoffset.DiscardValue(
+			proto.Float64(scaledValue),
+			baseType,
+			scale,
+			offset,
+		), nil
 	}
 
 	switch baseType {
 	case basetype.Enum, basetype.Byte,
 		basetype.Uint8, basetype.Uint8z:
-		if isScaled {
-			return proto.Uint8(uint8(scaledValue)), nil
-		}
-		var v uint64
-		v, err = strconv.ParseUint(strValue, 0, 8)
+		v, err := strconv.ParseUint(strValue, 0, 8)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Uint8(uint8(v)), nil
 	case basetype.Sint8:
-		if isScaled {
-			return proto.Int8(int8(scaledValue)), nil
-		}
-		var v int64
-		v, err = strconv.ParseInt(strValue, 0, 8)
+		v, err := strconv.ParseInt(strValue, 0, 8)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Int8(int8(v)), nil
 	case basetype.Sint16:
-		if isScaled {
-			return proto.Int16(int16(scaledValue)), nil
-		}
-		var v int64
-		v, err = strconv.ParseInt(strValue, 0, 16)
+		v, err := strconv.ParseInt(strValue, 0, 16)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Int16(int16(v)), nil
 	case basetype.Uint16, basetype.Uint16z:
-		if isScaled {
-			return proto.Uint16(uint16(scaledValue)), nil
-		}
-		var v uint64
-		v, err = strconv.ParseUint(strValue, 0, 16)
+		v, err := strconv.ParseUint(strValue, 0, 16)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Uint16(uint16(v)), nil
 	case basetype.Sint32:
-		if isScaled {
-			return proto.Int32(int32(scaledValue)), nil
-		}
-		var v int64
-		v, err = strconv.ParseInt(strValue, 0, 32)
+		v, err := strconv.ParseInt(strValue, 0, 32)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Int32(int32(v)), nil
 	case basetype.Uint32, basetype.Uint32z:
-		if isScaled {
-			return proto.Uint32(uint32(scaledValue)), nil
-		}
-		var v uint64
-		v, err = strconv.ParseUint(strValue, 0, 32)
+		v, err := strconv.ParseUint(strValue, 0, 32)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Uint32(uint32(v)), nil
 	case basetype.String:
 		return proto.String(strValue), nil
 	case basetype.Float32:
-		if isScaled {
-			return proto.Float32(float32(scaledValue)), nil
-		}
-		var v float64
-		v, err = strconv.ParseFloat(strValue, 32)
+		v, err := strconv.ParseFloat(strValue, 32)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Float32(float32(v)), nil
 	case basetype.Float64:
-		if isScaled {
-			return proto.Float64(scaledValue), nil
-		}
-		var v float64
-		v, err = strconv.ParseFloat(strValue, 64)
+		v, err := strconv.ParseFloat(strValue, 64)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Float64(v), nil
 	case basetype.Sint64:
-		if isScaled {
-			return proto.Int64(int64(scaledValue)), nil
-		}
-		var v int64
-		v, err = strconv.ParseInt(strValue, 0, 64)
+		v, err := strconv.ParseInt(strValue, 0, 64)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Int64(v), nil
 	case basetype.Uint64, basetype.Uint64z:
-		if isScaled {
-			return proto.Uint64(uint64(scaledValue)), nil
-		}
-		var v uint64
-		v, err = strconv.ParseUint(strValue, 0, 64)
+		v, err := strconv.ParseUint(strValue, 0, 64)
 		if err != nil {
-			return
+			return proto.Value{}, err
 		}
 		return proto.Uint64(v), nil
 	}
 
-	return
+	return proto.Value{}, nil
 }
 
 func packValues(vals []proto.Value) proto.Value {
