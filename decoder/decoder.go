@@ -187,11 +187,7 @@ func WithReadBufferSize(size int) Option {
 // Note: Decoder already implements efficient io.Reader buffering, so there's no need to wrap 'r' using *bufio.Reader;
 // doing so will only reduce performance.
 func New(r io.Reader, opts ...Option) *Decoder {
-	d := &Decoder{
-		readBuffer:  new(readBuffer),
-		accumulator: NewAccumulator(),
-		crc16:       crc16.New(),
-	}
+	d := new(Decoder)
 	d.Reset(r, opts...)
 	return d
 }
@@ -201,6 +197,12 @@ func New(r io.Reader, opts ...Option) *Decoder {
 // It is similar to New() but it retains the underlying storage for use by
 // future decode to reduce memory allocs.
 func (d *Decoder) Reset(r io.Reader, opts ...Option) {
+	if d.readBuffer == nil {
+		d.readBuffer = new(readBuffer)
+		d.accumulator = NewAccumulator()
+		d.crc16 = crc16.New()
+	}
+
 	d.reset()
 	d.n = 0 // Must reset bytes counter since it's a full reset.
 
