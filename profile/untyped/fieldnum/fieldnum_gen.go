@@ -719,6 +719,16 @@ const (
 	MonitoringInfoCyclesToDistance                    = 3   // [ MonitoringInfo ] [Type: Uint16, Base: uint16, Array: [N], Scale: 5000, Offset: 0, Units: m/cycle]; Indexed by activity_type
 	MonitoringInfoCyclesToCalories                    = 4   // [ MonitoringInfo ] [Type: Uint16, Base: uint16, Array: [N], Scale: 5000, Offset: 0, Units: kcal/cycle]; Indexed by activity_type
 	MonitoringInfoRestingMetabolicRate                = 5   // [ MonitoringInfo ] [Type: Uint16, Base: uint16, Units: kcal / day];
+	NapEventMessageIndex                              = 254 // [ NapEvent ] [Type: MessageIndex, Base: uint16];
+	NapEventTimestamp                                 = 253 // [ NapEvent ] [Type: DateTime, Base: uint32];
+	NapEventStartTime                                 = 0   // [ NapEvent ] [Type: DateTime, Base: uint32, Units: seconds];
+	NapEventStartTimezoneOffset                       = 1   // [ NapEvent ] [Type: Sint16, Base: sint16, Units: minutes];
+	NapEventEndTime                                   = 2   // [ NapEvent ] [Type: DateTime, Base: uint32, Units: seconds];
+	NapEventEndTimezoneOffset                         = 3   // [ NapEvent ] [Type: Sint16, Base: sint16, Units: minutes];
+	NapEventFeedback                                  = 4   // [ NapEvent ] [Type: NapPeriodFeedback, Base: enum];
+	NapEventIsDeleted                                 = 5   // [ NapEvent ] [Type: Bool, Base: bool | enum];
+	NapEventSource                                    = 6   // [ NapEvent ] [Type: NapSource, Base: enum];
+	NapEventUpdateTimestamp                           = 7   // [ NapEvent ] [Type: DateTime, Base: uint32]; The timestamp representing when this nap event was last updated
 	NmeaSentenceTimestamp                             = 253 // [ NmeaSentence ] [Type: DateTime, Base: uint32, Units: s]; Timestamp message was output
 	NmeaSentenceTimestampMs                           = 0   // [ NmeaSentence ] [Type: Uint16, Base: uint16, Units: ms]; Fractional part of timestamp, added to timestamp
 	NmeaSentenceSentence                              = 1   // [ NmeaSentence ] [Type: String, Base: string]; NMEA sentence

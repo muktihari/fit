@@ -135,6 +135,7 @@ const (
 	DiveApneaAlarm                   = 393
 	SkinTempOvernight                = 398
 	HsaWristTemperatureData          = 409 // Message number for the HSA wrist temperature data message
+	NapEvent                         = 412
 	SleepDisruptionSeverityPeriod    = 470
 	SleepDisruptionOvernightSeverity = 471
 	MfgRangeMin                      = 0xFF00 // 0xFF00 - 0xFFFE reserved for manufacturer specific messages

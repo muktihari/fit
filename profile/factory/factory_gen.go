@@ -2482,6 +2482,18 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		253: {Name: "timestamp", Num: 253, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1},
 		0:   {Name: "severity", Num: 0, Type: profile.SleepDisruptionSeverity, BaseType: basetype.Enum, Scale: 1},
 	},
+	mesgnum.NapEvent: {
+		254: {Name: "message_index", Num: 254, Type: profile.MessageIndex, BaseType: basetype.Uint16, Scale: 1},
+		253: {Name: "timestamp", Num: 253, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1},
+		0:   {Name: "start_time", Num: 0, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1, Units: "seconds"},
+		1:   {Name: "start_timezone_offset", Num: 1, Type: profile.Sint16, BaseType: basetype.Sint16, Scale: 1, Units: "minutes"},
+		2:   {Name: "end_time", Num: 2, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1, Units: "seconds"},
+		3:   {Name: "end_timezone_offset", Num: 3, Type: profile.Sint16, BaseType: basetype.Sint16, Scale: 1, Units: "minutes"},
+		4:   {Name: "feedback", Num: 4, Type: profile.NapPeriodFeedback, BaseType: basetype.Enum, Scale: 1},
+		5:   {Name: "is_deleted", Num: 5, Type: profile.Bool, BaseType: basetype.Enum, Scale: 1},
+		6:   {Name: "source", Num: 6, Type: profile.NapSource, BaseType: basetype.Enum, Scale: 1},
+		7:   {Name: "update_timestamp", Num: 7, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1},
+	},
 	mesgnum.SkinTempOvernight: {
 		253: {Name: "timestamp", Num: 253, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1},
 		0:   {Name: "local_timestamp", Num: 0, Type: profile.LocalDateTime, BaseType: basetype.Uint32, Scale: 1},
