@@ -20,6 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type BloodPressure struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp            time.Time            // Units: s
 	SystolicPressure     uint16               // Units: mmHg
 	DiastolicPressure    uint16               // Units: mmHg
@@ -31,9 +34,6 @@ type BloodPressure struct {
 	HeartRate            uint8                // Units: bpm
 	HeartRateType        typedef.HrType
 	Status               typedef.BpStatus
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewBloodPressure creates new BloodPressure struct based on given mesg.

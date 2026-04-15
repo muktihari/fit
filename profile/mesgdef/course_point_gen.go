@@ -22,17 +22,17 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type CoursePoint struct {
-	Timestamp    time.Time
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Name         string
+	Timestamp    time.Time
 	PositionLat  int32  // Units: semicircles
 	PositionLong int32  // Units: semicircles
 	Distance     uint32 // Scale: 100; Units: m
 	MessageIndex typedef.MessageIndex
 	Type         typedef.CoursePoint
 	Favorite     typedef.Bool
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewCoursePoint creates new CoursePoint struct based on given mesg.

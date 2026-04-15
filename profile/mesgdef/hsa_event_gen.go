@@ -20,11 +20,11 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaEvent struct {
-	Timestamp time.Time // Units: s
-	EventId   uint8     // Event ID. Health SDK use only
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Timestamp time.Time // Units: s
+	EventId   uint8     // Event ID. Health SDK use only
 }
 
 // NewHsaEvent creates new HsaEvent struct based on given mesg.

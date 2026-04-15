@@ -20,18 +20,18 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ObdiiData struct {
-	Timestamp        time.Time // Units: s; Timestamp message was output
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TimeOffset       []uint16  // Array: [N]; Units: ms; Offset of PID reading [i] from start_timestamp+start_timestamp_ms. Readings may span across seconds.
 	RawData          []byte    // Array: [N]; Raw parameter data
 	PidDataSize      []uint8   // Array: [N]; Optional, data size of PID[i]. If not specified refer to SAE J1979.
 	SystemTime       []uint32  // Array: [N]; System time associated with sample expressed in ms, can be used instead of time_offset. There will be a system_time value for each raw_data element. For multibyte pids the system_time is repeated.
+	Timestamp        time.Time // Units: s; Timestamp message was output
 	StartTimestamp   time.Time // Timestamp of first sample recorded in the message. Used with time_offset to generate time of each sample
 	TimestampMs      uint16    // Units: ms; Fractional part of timestamp, added to timestamp
 	StartTimestampMs uint16    // Units: ms; Fractional part of start_timestamp
 	Pid              byte      // Parameter ID
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewObdiiData creates new ObdiiData struct based on given mesg.

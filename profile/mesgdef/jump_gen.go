@@ -22,6 +22,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Jump struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp     time.Time // Units: s
 	Distance      float32   // Units: m
 	Height        float32   // Units: m
@@ -34,9 +37,6 @@ type Jump struct {
 	Rotations     uint8
 
 	state [2]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewJump creates new Jump struct based on given mesg.

@@ -22,8 +22,11 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type WeatherConditions struct {
-	Timestamp                time.Time // time of update for current conditions, else forecast time
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Location                 string    // string corresponding to GCS response location string
+	Timestamp                time.Time // time of update for current conditions, else forecast time
 	ObservedAtTime           time.Time
 	ObservedLocationLat      int32                 // Units: semicircles
 	ObservedLocationLong     int32                 // Units: semicircles
@@ -38,9 +41,6 @@ type WeatherConditions struct {
 	DayOfWeek                typedef.DayOfWeek
 	HighTemperature          int8 // Units: C
 	LowTemperature           int8 // Units: C
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewWeatherConditions creates new WeatherConditions struct based on given mesg.

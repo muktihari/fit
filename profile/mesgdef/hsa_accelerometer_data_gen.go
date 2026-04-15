@@ -21,16 +21,16 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaAccelerometerData struct {
-	Timestamp        time.Time // Units: s
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	AccelX           []int16   // Array: [N]; Scale: 1.024; Units: mG; X-Axis Measurement
 	AccelY           []int16   // Array: [N]; Scale: 1.024; Units: mG; Y-Axis Measurement
 	AccelZ           []int16   // Array: [N]; Scale: 1.024; Units: mG; Z-Axis Measurement
+	Timestamp        time.Time // Units: s
 	Timestamp32K     uint32    // 32 kHz timestamp
 	TimestampMs      uint16    // Units: ms; Millisecond resolution of the timestamp
 	SamplingInterval uint16    // Units: ms; Sampling Interval in Milliseconds
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaAccelerometerData creates new HsaAccelerometerData struct based on given mesg.

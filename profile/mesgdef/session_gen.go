@@ -22,13 +22,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Session struct {
-	Timestamp                     time.Time // Units: s
-	StartTime                     time.Time
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TimeInHrZone                  []uint32 // Array: [N]; Scale: 1000; Units: s
 	TimeInSpeedZone               []uint32 // Array: [N]; Scale: 1000; Units: s
 	TimeInCadenceZone             []uint32 // Array: [N]; Scale: 1000; Units: s
 	TimeInPowerZone               []uint32 // Array: [N]; Scale: 1000; Units: s
-	OpponentName                  string
 	StrokeCount                   []uint16 // Array: [N]; Units: counts; stroke_type enum used as the index
 	ZoneCount                     []uint16 // Array: [N]; Units: counts; zone number used as the index
 	AvgTotalHemoglobinConc        []uint16 // Array: [N]; Scale: 100; Units: g/dL; Avg saturated and unsaturated hemoglobin
@@ -37,7 +37,6 @@ type Session struct {
 	AvgSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Avg percentage of hemoglobin saturated with oxygen
 	MinSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Min percentage of hemoglobin saturated with oxygen
 	MaxSaturatedHemoglobinPercent []uint16 // Array: [N]; Scale: 10; Units: %; Max percentage of hemoglobin saturated with oxygen
-	SportProfileName              string   // Sport name from associated sport mesg
 	AvgLeftPowerPhase             []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Indexes defined by power_phase_type.
 	AvgLeftPowerPhasePeak         []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
 	AvgRightPowerPhase            []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
@@ -46,31 +45,35 @@ type Session struct {
 	MaxPowerPosition              []uint16 // Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
 	AvgCadencePosition            []uint8  // Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
 	MaxCadencePosition            []uint8  // Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
-	StartPositionLat              int32    // Units: semicircles
-	StartPositionLong             int32    // Units: semicircles
-	TotalElapsedTime              uint32   // Scale: 1000; Units: s; Time (includes pauses)
-	TotalTimerTime                uint32   // Scale: 1000; Units: s; Timer Time (excludes pauses)
-	TotalDistance                 uint32   // Scale: 100; Units: m
-	TotalCycles                   uint32   // Units: cycles
-	NecLat                        int32    // Units: semicircles; North east corner latitude
-	NecLong                       int32    // Units: semicircles; North east corner longitude
-	SwcLat                        int32    // Units: semicircles; South west corner latitude
-	SwcLong                       int32    // Units: semicircles; South west corner longitude
-	EndPositionLat                int32    // Units: semicircles
-	EndPositionLong               int32    // Units: semicircles
-	AvgStrokeCount                uint32   // Scale: 10; Units: strokes/lap
-	TotalWork                     uint32   // Units: J
-	TotalMovingTime               uint32   // Scale: 1000; Units: s
-	AvgLapTime                    uint32   // Scale: 1000; Units: s
-	TimeStanding                  uint32   // Scale: 1000; Units: s; Total time spend in the standing position
-	EnhancedAvgSpeed              uint32   // Scale: 1000; Units: m/s; total_distance / total_timer_time
-	EnhancedMaxSpeed              uint32   // Scale: 1000; Units: m/s
-	EnhancedAvgAltitude           uint32   // Scale: 5; Offset: 500; Units: m
-	EnhancedMinAltitude           uint32   // Scale: 5; Offset: 500; Units: m
-	EnhancedMaxAltitude           uint32   // Scale: 5; Offset: 500; Units: m
-	AvgDepth                      uint32   // Scale: 1000; Units: m; 0 if above water
-	MaxDepth                      uint32   // Scale: 1000; Units: m; 0 if above water
-	SurfaceInterval               uint32   // Units: s; Time since end of last dive
+	OpponentName                  string
+	SportProfileName              string    // Sport name from associated sport mesg
+	Timestamp                     time.Time // Units: s
+	StartTime                     time.Time
+	StartPositionLat              int32  // Units: semicircles
+	StartPositionLong             int32  // Units: semicircles
+	TotalElapsedTime              uint32 // Scale: 1000; Units: s; Time (includes pauses)
+	TotalTimerTime                uint32 // Scale: 1000; Units: s; Timer Time (excludes pauses)
+	TotalDistance                 uint32 // Scale: 100; Units: m
+	TotalCycles                   uint32 // Units: cycles
+	NecLat                        int32  // Units: semicircles; North east corner latitude
+	NecLong                       int32  // Units: semicircles; North east corner longitude
+	SwcLat                        int32  // Units: semicircles; South west corner latitude
+	SwcLong                       int32  // Units: semicircles; South west corner longitude
+	EndPositionLat                int32  // Units: semicircles
+	EndPositionLong               int32  // Units: semicircles
+	AvgStrokeCount                uint32 // Scale: 10; Units: strokes/lap
+	TotalWork                     uint32 // Units: J
+	TotalMovingTime               uint32 // Scale: 1000; Units: s
+	AvgLapTime                    uint32 // Scale: 1000; Units: s
+	TimeStanding                  uint32 // Scale: 1000; Units: s; Total time spend in the standing position
+	EnhancedAvgSpeed              uint32 // Scale: 1000; Units: m/s; total_distance / total_timer_time
+	EnhancedMaxSpeed              uint32 // Scale: 1000; Units: m/s
+	EnhancedAvgAltitude           uint32 // Scale: 5; Offset: 500; Units: m
+	EnhancedMinAltitude           uint32 // Scale: 5; Offset: 500; Units: m
+	EnhancedMaxAltitude           uint32 // Scale: 5; Offset: 500; Units: m
+	AvgDepth                      uint32 // Scale: 1000; Units: m; 0 if above water
+	MaxDepth                      uint32 // Scale: 1000; Units: m; 0 if above water
+	SurfaceInterval               uint32 // Units: s; Time since end of last dive
 	DiveNumber                    uint32
 	TrainingLoadPeak              int32                // Scale: 65536
 	TotalGrit                     float32              // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
@@ -181,9 +184,6 @@ type Session struct {
 	TotalFractionalDescent        uint8 // Scale: 100; Units: m; fractional part of total_descent
 
 	state [23]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSession creates new Session struct based on given mesg.

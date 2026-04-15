@@ -19,13 +19,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type MetZone struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	MessageIndex typedef.MessageIndex
 	Calories     uint16 // Scale: 10; Units: kcal / min
 	HighBpm      uint8
 	FatCalories  uint8 // Scale: 10; Units: kcal / min
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMetZone creates new MetZone struct based on given mesg.

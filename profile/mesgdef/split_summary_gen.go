@@ -19,6 +19,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SplitSummary struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TotalTimerTime  uint32 // Scale: 1000; Units: s
 	TotalDistance   uint32 // Scale: 100; Units: m
 	AvgSpeed        uint32 // Scale: 1000; Units: m/s
@@ -33,9 +36,6 @@ type SplitSummary struct {
 	SplitType       typedef.SplitType
 	AvgHeartRate    uint8 // Units: bpm
 	MaxHeartRate    uint8 // Units: bpm
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSplitSummary creates new SplitSummary struct based on given mesg.

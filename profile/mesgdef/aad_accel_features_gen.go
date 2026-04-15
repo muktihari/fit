@@ -21,15 +21,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type AadAccelFeatures struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp          time.Time
 	EnergyTotal        uint32 // Total accelerometer energy in the interval
 	Time               uint16 // Units: s; Time interval length in seconds
 	ZeroCrossCnt       uint16 // Count of zero crossings
 	TimeAboveThreshold uint16 // Scale: 25; Units: s; Total accelerometer time above threshold in the interval
 	Instance           uint8  // Instance ID of zero crossing algorithm
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewAadAccelFeatures creates new AadAccelFeatures struct based on given mesg.

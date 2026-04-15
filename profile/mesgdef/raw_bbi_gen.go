@@ -20,17 +20,17 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type RawBbi struct {
-	Timestamp   time.Time
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Data        []uint16 // Array: [N]; 1 bit for gap indicator, 1 bit for quality indicator, and 14 bits for Beat-to-Beat interval values in whole-integer millisecond resolution
 	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
 	Quality     []uint8  // Array: [N]; 1 = high confidence. 0 = low confidence. N/A when gap = 1
 	Gap         []uint8  // Array: [N]; 1 = gap (time represents ms gap length). 0 = BBI data
-	TimestampMs uint16   // Units: ms; Millisecond resolution of the timestamp
+	Timestamp   time.Time
+	TimestampMs uint16 // Units: ms; Millisecond resolution of the timestamp
 
 	state [1]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewRawBbi creates new RawBbi struct based on given mesg.

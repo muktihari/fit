@@ -19,6 +19,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type WorkoutSession struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	MessageIndex   typedef.MessageIndex
 	NumValidSteps  uint16
 	FirstStepIndex uint16
@@ -26,9 +29,6 @@ type WorkoutSession struct {
 	Sport          typedef.Sport
 	SubSport       typedef.SubSport
 	PoolLengthUnit typedef.DisplayMeasure
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewWorkoutSession creates new WorkoutSession struct based on given mesg.

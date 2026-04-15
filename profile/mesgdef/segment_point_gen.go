@@ -20,6 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SegmentPoint struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	LeaderTime       []uint32 // Array: [N]; Scale: 1000; Units: s; Accumualted time each leader board member required to reach the described point. This value is zero for all leader board members at the starting point of the segment.
 	PositionLat      int32    // Units: semicircles
 	PositionLong     int32    // Units: semicircles
@@ -29,9 +32,6 @@ type SegmentPoint struct {
 	Altitude         uint16 // Scale: 5; Offset: 500; Units: m; Accumulated altitude along the segment at the described point
 
 	state [1]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSegmentPoint creates new SegmentPoint struct based on given mesg.

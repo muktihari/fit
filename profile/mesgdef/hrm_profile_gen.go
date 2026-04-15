@@ -18,14 +18,14 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HrmProfile struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	MessageIndex      typedef.MessageIndex
 	HrmAntId          uint16 // Base: uint16z
 	Enabled           typedef.Bool
 	LogHrv            typedef.Bool
 	HrmAntIdTransType uint8 // Base: uint8z
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHrmProfile creates new HrmProfile struct based on given mesg.

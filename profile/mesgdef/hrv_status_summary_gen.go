@@ -21,6 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HrvStatusSummary struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp             time.Time
 	WeeklyAverage         uint16 // Scale: 128; Units: ms; 7 day RMSSD average over sleep
 	LastNightAverage      uint16 // Scale: 128; Units: ms; Last night RMSSD average over sleep
@@ -29,9 +32,6 @@ type HrvStatusSummary struct {
 	BaselineBalancedLower uint16 // Scale: 128; Units: ms; 3 week baseline, lower boundary of balanced HRV status
 	BaselineBalancedUpper uint16 // Scale: 128; Units: ms; 3 week baseline, upper boundary of balanced HRV status
 	Status                typedef.HrvStatus
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHrvStatusSummary creates new HrvStatusSummary struct based on given mesg.

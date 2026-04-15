@@ -21,6 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ThreeDSensorCalibration struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
 	OffsetCal          [3]int32           // Array: [3]; Internal calibration factors, one for each: xy, yx, zx
 	OrientationMatrix  [9]int32           // Array: [9]; Scale: 65535; 3 x 3 rotation matrix (row major)
@@ -28,9 +31,6 @@ type ThreeDSensorCalibration struct {
 	CalibrationDivisor uint32             // Units: counts; Calibration factor divisor
 	LevelShift         uint32             // Level shift value used to shift the ADC value back into range
 	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewThreeDSensorCalibration creates new ThreeDSensorCalibration struct based on given mesg.

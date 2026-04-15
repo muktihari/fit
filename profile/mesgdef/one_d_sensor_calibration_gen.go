@@ -20,15 +20,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type OneDSensorCalibration struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp          time.Time          // Units: s; Whole second part of the timestamp
 	CalibrationFactor  uint32             // Calibration factor used to convert from raw ADC value to degrees, g, etc.
 	CalibrationDivisor uint32             // Units: counts; Calibration factor divisor
 	LevelShift         uint32             // Level shift value used to shift the ADC value back into range
 	OffsetCal          int32              // Internal Calibration factor
 	SensorType         typedef.SensorType // Indicates which sensor the calibration is for
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewOneDSensorCalibration creates new OneDSensorCalibration struct based on given mesg.

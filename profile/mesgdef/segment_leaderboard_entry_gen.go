@@ -19,6 +19,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SegmentLeaderboardEntry struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Name             string // Friendly name assigned to leader
 	ActivityIdString string // String version of the activity_id. 21 characters long, express in decimal
 	GroupPrimaryKey  uint32 // Primary user ID of this leader
@@ -26,9 +29,6 @@ type SegmentLeaderboardEntry struct {
 	SegmentTime      uint32 // Scale: 1000; Units: s; Segment Time (includes pauses)
 	MessageIndex     typedef.MessageIndex
 	Type             typedef.SegmentLeaderboardType // Leader classification
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSegmentLeaderboardEntry creates new SegmentLeaderboardEntry struct based on given mesg.

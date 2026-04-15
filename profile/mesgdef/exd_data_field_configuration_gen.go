@@ -18,6 +18,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ExdDataFieldConfiguration struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Title        [32]string // Array: [32]
 	ScreenIndex  uint8
 	ConceptField byte
@@ -26,9 +29,6 @@ type ExdDataFieldConfiguration struct {
 	DisplayType  typedef.ExdDisplayType
 
 	state [1]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewExdDataFieldConfiguration creates new ExdDataFieldConfiguration struct based on given mesg.

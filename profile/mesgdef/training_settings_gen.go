@@ -19,13 +19,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type TrainingSettings struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TargetDistance     uint32 // Scale: 100; Units: m
 	TargetTime         uint32 // Units: s
 	PreciseTargetSpeed uint32 // Scale: 1e+06; Units: m/s; A more precise target speed field
 	TargetSpeed        uint16 // Scale: 1000; Units: m/s
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTrainingSettings creates new TrainingSettings struct based on given mesg.

@@ -21,8 +21,11 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type DiveSettings struct {
-	Timestamp                 time.Time
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Name                      string
+	Timestamp                 time.Time
 	WaterDensity              float32 // Units: kg/m^3; Fresh water is usually 1000; salt water is usually 1025
 	BottomDepth               float32
 	BottomTime                uint32
@@ -56,9 +59,6 @@ type DiveSettings struct {
 	DiveSounds                typedef.Tone                   // Sounds and vibration enabled or disabled in-dive
 	LastStopMultiple          uint8                          // Scale: 10; Usually 1.0/1.5/2.0 representing 3/4.5/6m or 10/15/20ft
 	NoFlyTimeMode             typedef.NoFlyTimeMode          // Indicates which guidelines to use for no-fly surface interval.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewDiveSettings creates new DiveSettings struct based on given mesg.

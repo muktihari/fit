@@ -20,14 +20,14 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type CameraEvent struct {
-	Timestamp         time.Time // Units: s; Whole second part of the timestamp.
-	CameraFileUuid    string
-	TimestampMs       uint16 // Units: ms; Millisecond part of the timestamp.
-	CameraEventType   typedef.CameraEventType
-	CameraOrientation typedef.CameraOrientationType
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	CameraFileUuid    string
+	Timestamp         time.Time // Units: s; Whole second part of the timestamp.
+	TimestampMs       uint16    // Units: ms; Millisecond part of the timestamp.
+	CameraEventType   typedef.CameraEventType
+	CameraOrientation typedef.CameraOrientationType
 }
 
 // NewCameraEvent creates new CameraEvent struct based on given mesg.

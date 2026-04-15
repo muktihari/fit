@@ -19,10 +19,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type BikeProfile struct {
-	Name                     string
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	FrontGear                []uint8 // Base: uint8z; Array: [N]; Number of teeth on each gear 0 is innermost
 	RearGear                 []uint8 // Base: uint8z; Array: [N]; Number of teeth on each gear 0 is innermost
-	Odometer                 uint32  // Scale: 100; Units: m
+	Name                     string
+	Odometer                 uint32 // Scale: 100; Units: m
 	MessageIndex             typedef.MessageIndex
 	BikeSpdAntId             uint16 // Base: uint16z
 	BikeCadAntId             uint16 // Base: uint16z
@@ -51,9 +54,6 @@ type BikeProfile struct {
 	FrontGearNum             uint8 // Base: uint8z; Number of front gears
 	RearGearNum              uint8 // Base: uint8z; Number of rear gears
 	ShimanoDi2Enabled        typedef.Bool
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewBikeProfile creates new BikeProfile struct based on given mesg.

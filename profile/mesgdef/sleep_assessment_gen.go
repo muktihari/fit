@@ -19,6 +19,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SleepAssessment struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	AverageStressDuringSleep uint16 // Scale: 100; Excludes stress during awake periods in the sleep window
 	CombinedAwakeScore       uint8  // Average of awake_time_score and awakenings_count_score. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 	AwakeTimeScore           uint8  // Score that evaluates the total time spent awake between sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
@@ -33,9 +36,6 @@ type SleepAssessment struct {
 	SleepRestlessnessScore   uint8  // Score that evaluates the amount of restlessness during sleep. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
 	AwakeningsCount          uint8  // The number of awakenings during sleep.
 	InterruptionsScore       uint8  // Score that evaluates the sleep interruptions. If valid: 0 (worst) to 100 (best). If unknown: FIT_UINT8_INVALID.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSleepAssessment creates new SleepAssessment struct based on given mesg.

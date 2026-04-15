@@ -20,12 +20,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type VideoFrame struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp   time.Time // Units: s; Whole second part of the timestamp
 	FrameNumber uint32    // Number of the frame that the timestamp and timestamp_ms correlate to
 	TimestampMs uint16    // Units: ms; Millisecond part of the timestamp.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewVideoFrame creates new VideoFrame struct based on given mesg.

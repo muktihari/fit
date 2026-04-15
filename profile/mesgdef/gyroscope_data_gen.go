@@ -20,7 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type GyroscopeData struct {
-	Timestamp        time.Time // Units: s; Whole second part of the timestamp
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the gyro sample with the corresponding index was taken. Limited to 30 samples in each message. The samples may span across seconds. Array size must match the number of samples in gyro_x and gyro_y and gyro_z
 	GyroX            []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
 	GyroY            []uint16  // Array: [N]; Units: counts; These are the raw ADC reading. Maximum number of samples is 30 in each message. The samples may span across seconds. A conversion will need to be done on this data once read.
@@ -28,10 +30,8 @@ type GyroscopeData struct {
 	CalibratedGyroX  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
 	CalibratedGyroY  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
 	CalibratedGyroZ  []float32 // Array: [N]; Units: deg/s; Calibrated gyro reading
+	Timestamp        time.Time // Units: s; Whole second part of the timestamp
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewGyroscopeData creates new GyroscopeData struct based on given mesg.

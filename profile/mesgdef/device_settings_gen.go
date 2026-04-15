@@ -22,12 +22,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type DeviceSettings struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TimeOffset                          []uint32                   // Array: [N]; Units: s; Offset from system time.
 	TimeMode                            []typedef.TimeMode         // Array: [N]; Display mode for the time
 	TimeZoneOffset                      []int8                     // Array: [N]; Scale: 4; Units: hr; timezone offset in 1/4 hour increments
-	ClockTime                           time.Time                  // UTC timestamp used to set the devices clock and date
 	PagesEnabled                        []uint16                   // Array: [N]; Bitfield to configure enabled screens for each supported loop
 	DefaultPage                         []uint16                   // Array: [N]; Bitfield to indicate one page as default for each supported loop
+	ClockTime                           time.Time                  // UTC timestamp used to set the devices clock and date
 	UtcOffset                           uint32                     // Offset from system time. Required to convert timestamp from system time to UTC.
 	AutoActivityDetect                  typedef.AutoActivityDetect // Allows setting specific activities auto-activity detect enabled/disabled settings
 	AutosyncMinSteps                    uint16                     // Units: steps; Minimum steps before an autosync can occur
@@ -46,9 +49,6 @@ type DeviceSettings struct {
 	SmartNotificationDisplayOrientation typedef.DisplayOrientation // Smart Notification display orientation
 	TapInterface                        typedef.Switch
 	TapSensitivity                      typedef.TapSensitivity // Used to hold the tap threshold setting
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewDeviceSettings creates new DeviceSettings struct based on given mesg.

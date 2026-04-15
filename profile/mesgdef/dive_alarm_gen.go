@@ -20,6 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type DiveAlarm struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	DiveTypes        []typedef.SubSport    // Array: [N]; Dive types the alarm will trigger on
 	Depth            uint32                // Scale: 1000; Units: m; Depth setting (m) for depth type alarms
 	Time             int32                 // Units: s; Time setting (s) for time type alarms
@@ -33,9 +36,6 @@ type DiveAlarm struct {
 	TriggerOnDescent typedef.Bool          // Trigger the alarm on descent
 	TriggerOnAscent  typedef.Bool          // Trigger the alarm on ascent
 	Repeating        typedef.Bool          // Repeat alarm each time threshold is crossed?
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewDiveAlarm creates new DiveAlarm struct based on given mesg.

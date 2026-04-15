@@ -21,11 +21,11 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HrvValue struct {
-	Timestamp time.Time
-	Value     uint16 // Scale: 128; Units: ms; 5 minute RMSSD
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Timestamp time.Time
+	Value     uint16 // Scale: 128; Units: ms; 5 minute RMSSD
 }
 
 // NewHrvValue creates new HrvValue struct based on given mesg.

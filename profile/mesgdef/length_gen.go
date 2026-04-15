@@ -21,12 +21,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Length struct {
-	Timestamp                  time.Time
-	StartTime                  time.Time
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	StrokeCount                []uint16 // Array: [N]; Units: counts; stroke_type enum used as the index
 	ZoneCount                  []uint16 // Array: [N]; Units: counts; zone number used as the index
-	TotalElapsedTime           uint32   // Scale: 1000; Units: s
-	TotalTimerTime             uint32   // Scale: 1000; Units: s
+	Timestamp                  time.Time
+	StartTime                  time.Time
+	TotalElapsedTime           uint32 // Scale: 1000; Units: s
+	TotalTimerTime             uint32 // Scale: 1000; Units: s
 	MessageIndex               typedef.MessageIndex
 	TotalStrokes               uint16 // Units: strokes
 	AvgSpeed                   uint16 // Scale: 1000; Units: m/s
@@ -45,9 +48,6 @@ type Length struct {
 	MaxRespirationRate         uint8
 
 	state [3]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewLength creates new Length struct based on given mesg.

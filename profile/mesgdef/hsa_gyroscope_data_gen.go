@@ -21,16 +21,16 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaGyroscopeData struct {
-	Timestamp        time.Time // Units: s
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	GyroX            []int16   // Array: [N]; Scale: 28.57143; Units: deg/s; X-Axis Measurement
 	GyroY            []int16   // Array: [N]; Scale: 28.57143; Units: deg/s; Y-Axis Measurement
 	GyroZ            []int16   // Array: [N]; Scale: 28.57143; Units: deg/s; Z-Axis Measurement
+	Timestamp        time.Time // Units: s
 	Timestamp32K     uint32    // Units: 1/32768 s; 32 kHz timestamp
 	TimestampMs      uint16    // Units: ms; Millisecond resolution of the timestamp
 	SamplingInterval uint16    // Units: 1/32768 s; Sampling Interval in 32 kHz timescale
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaGyroscopeData creates new HsaGyroscopeData struct based on given mesg.

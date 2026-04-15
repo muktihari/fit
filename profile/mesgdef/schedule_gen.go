@@ -20,6 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Schedule struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TimeCreated   time.Time // Corresponds to file_id of scheduled workout / course.
 	ScheduledTime time.Time
 	SerialNumber  uint32               // Base: uint32z; Corresponds to file_id of scheduled workout / course.
@@ -27,9 +30,6 @@ type Schedule struct {
 	Product       uint16               // Corresponds to file_id of scheduled workout / course.
 	Completed     typedef.Bool         // TRUE if this activity has been started
 	Type          typedef.Schedule
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSchedule creates new Schedule struct based on given mesg.

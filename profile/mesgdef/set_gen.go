@@ -22,10 +22,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Set struct {
-	Timestamp         time.Time                  // Timestamp of the set
-	StartTime         time.Time                  // Start time of the set
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Category          []typedef.ExerciseCategory // Array: [N]
 	CategorySubtype   []uint16                   // Array: [N]; Based on the associated category, see [category]_exercise_names
+	Timestamp         time.Time                  // Timestamp of the set
+	StartTime         time.Time                  // Start time of the set
 	Duration          uint32                     // Scale: 1000; Units: s
 	Repetitions       uint16                     // # of repitions of the movement
 	Weight            uint16                     // Scale: 16; Units: kg; Amount of weight applied for the set
@@ -33,9 +36,6 @@ type Set struct {
 	MessageIndex      typedef.MessageIndex
 	WktStepIndex      typedef.MessageIndex
 	SetType           typedef.SetType
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSet creates new Set struct based on given mesg.

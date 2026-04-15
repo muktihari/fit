@@ -21,6 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type DiveSummary struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp       time.Time // Units: s
 	AvgDepth        uint32    // Scale: 1000; Units: m; 0 if above water
 	MaxDepth        uint32    // Scale: 1000; Units: m; 0 if above water
@@ -44,9 +47,6 @@ type DiveSummary struct {
 	AvgRmv          uint16 // Scale: 100; Units: L/min; Average respiratory minute volume
 	StartCns        uint8  // Units: percent
 	EndCns          uint8  // Units: percent
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewDiveSummary creates new DiveSummary struct based on given mesg.
