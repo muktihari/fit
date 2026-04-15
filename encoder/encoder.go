@@ -171,11 +171,7 @@ func WithWriteBufferSize(size int) Option {
 // doing so will only reduce performance. If you don't want the Encoder to buffer the writing, please direct the
 // Encoder to do so using WithWriteBufferSize(0).
 func New(w io.Writer, opts ...Option) *Encoder {
-	e := &Encoder{
-		crc16:           crc16.New(),
-		localMesgNumLRU: new(lru),
-		buf:             make([]byte, 0, 1536),
-	}
+	e := new(Encoder)
 	e.Reset(w, opts...)
 	return e
 }
@@ -184,6 +180,12 @@ func New(w io.Writer, opts ...Option) *Encoder {
 // default options so any options needs to be inputed again. It is similar to New()
 // but it retains the underlying storage for use by future encode to reduce memory allocs.
 func (e *Encoder) Reset(w io.Writer, opts ...Option) {
+	if e.buf == nil {
+		e.buf = make([]byte, 0, 1536)
+		e.crc16 = crc16.New()
+		e.localMesgNumLRU = new(lru)
+	}
+
 	e.n = 0
 	e.lastFileHeaderPos = 0
 
