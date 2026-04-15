@@ -354,35 +354,29 @@ func (b *Builder) createDynamicField(mesgName string, field *Field, parserField 
 
 func (b *Builder) simpleMemoryAlignment(fields []Field) {
 	// In 64 bits machine, the layout is per 8 bytes.
-	// If the size is a multply of 8, set 8.
+
+	// We sort fields by field's size in bytes in descending order.
+	// Except for "pointer types" such as string, slice and array of string,
+	// they are placed at the beginning of the struct to reduce how many bytes GC needs to scan.
+	// We need this optimization because we have many instances of
+	// mesgdef's structs and they are typically heap-allocated.
+	//
+	// More on "pointer bytes":
+	// https://cs.opensource.google/go/x/tools/+/refs/tags/v0.44.0:go/analysis/passes/fieldalignment/fieldalignment.go;l=30-44
 	for i := range fields {
-		if strings.HasPrefix(fields[i].Type, "[]") { // Slice
-			fields[i].Size = 24 // pointer to array (8 bytes), len (8 bytes), cap (8 bytes)
-		} else if strings.HasPrefix(fields[i].Type, "[") { // Array
-			size := basetype.FromString(fields[i].BaseType).Size() * fields[i].FixedArraySize
-			rem := size % 8
-			if rem == 0 {
-				fields[i].Size = size
-			} else if rem%4 == 0 {
-				fields[i].Size = 4
-			} else if rem%2 == 0 {
-				fields[i].Size = 2
-			} else {
-				fields[i].Size = 1
-			}
-		} else if isTypeTime(fields[i].ProfileType) { // time.Time
+		switch {
+		case fields[i].BaseType == "string": // []string and [N]string are also included
+			fields[i].Size = 255 // Actual size 16: pointer to array (8 bytes) + len (8 bytes)
+		case strings.HasPrefix(fields[i].Type, "[]"): // Slice
+			fields[i].Size = 255 // Actual size 24: pointer to array (8 bytes), len (8 bytes), cap (8 bytes)
+		case isTypeTime(fields[i].ProfileType): // time.Time
 			fields[i].Size = 24 // wall (8 bytes), ext (8 bytes), *loc (8 bytes)
-		} else if fields[i].BaseType == "string" {
-			fields[i].Size = 16 // pointer to array (8 bytes) + len (8 bytes)
-		} else { // Everything else, 8 bytes or lower.
+		default: // Everything else: Array or single value order by its (element) size.
 			fields[i].Size = basetype.FromString(fields[i].BaseType).Size()
 		}
 	}
 	// Order by the size desc.
 	slices.SortStableFunc(fields, func(a, b Field) int {
-		if a.Size%8 == 0 && b.Size%8 == 0 {
-			return 0
-		}
 		if a.Size > b.Size {
 			return -1
 		} else if a.Size < b.Size {
