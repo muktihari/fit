@@ -21,12 +21,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaWristTemperatureData struct {
-	Timestamp          time.Time // Units: s
-	Value              []uint16  // Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
-	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Value              []uint16  // Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
+	Timestamp          time.Time // Units: s
+	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 }
 
 // NewHsaWristTemperatureData creates new HsaWristTemperatureData struct based on given mesg.

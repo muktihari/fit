@@ -19,6 +19,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Workout struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	WktName        string
 	WktDescription string                      // Description of the workout
 	Capabilities   typedef.WorkoutCapabilities // Base: uint32z
@@ -28,9 +31,6 @@ type Workout struct {
 	Sport          typedef.Sport
 	SubSport       typedef.SubSport
 	PoolLengthUnit typedef.DisplayMeasure
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewWorkout creates new Workout struct based on given mesg.

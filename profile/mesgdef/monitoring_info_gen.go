@@ -22,15 +22,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type MonitoringInfo struct {
-	Timestamp            time.Time              // Units: s
-	LocalTimestamp       time.Time              // Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	ActivityType         []typedef.ActivityType // Array: [N]
 	CyclesToDistance     []uint16               // Array: [N]; Scale: 5000; Units: m/cycle; Indexed by activity_type
 	CyclesToCalories     []uint16               // Array: [N]; Scale: 5000; Units: kcal/cycle; Indexed by activity_type
+	Timestamp            time.Time              // Units: s
+	LocalTimestamp       time.Time              // Units: s; Use to convert activity timestamps to local time if device does not support time zone and daylight savings time correction.
 	RestingMetabolicRate uint16                 // Units: kcal / day
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMonitoringInfo creates new MonitoringInfo struct based on given mesg.

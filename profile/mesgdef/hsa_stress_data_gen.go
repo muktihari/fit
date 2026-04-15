@@ -20,12 +20,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaStressData struct {
-	Timestamp          time.Time
-	StressLevel        []int8 // Array: [N]; Units: s; Stress Level: [0,100] Off wrist: -1 Excess motion: -2 Not enough data: -3 Recovering from exercise: -4 Unidentified: -5 Blank: -16
-	ProcessingInterval uint16 // Units: s; Processing interval length in seconds
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	StressLevel        []int8 // Array: [N]; Units: s; Stress Level: [0,100] Off wrist: -1 Excess motion: -2 Not enough data: -3 Recovering from exercise: -4 Unidentified: -5 Blank: -16
+	Timestamp          time.Time
+	ProcessingInterval uint16 // Units: s; Processing interval length in seconds
 }
 
 // NewHsaStressData creates new HsaStressData struct based on given mesg.

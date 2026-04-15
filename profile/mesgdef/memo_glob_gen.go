@@ -18,15 +18,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type MemoGlob struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Memo        []byte               // Array: [N]; Deprecated. Use data field.
 	Data        []uint8              // Base: uint8z; Array: [N]; Block of utf8 bytes. Note, mutltibyte characters may be split across adjoining memo_glob messages.
 	PartIndex   uint32               // Sequence number of memo blocks
 	MesgNum     typedef.MesgNum      // Message Number of the parent message
 	ParentIndex typedef.MessageIndex // Index of mesg that this glob is associated with.
 	FieldNum    uint8                // Field within the parent that this glob is associated with
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMemoGlob creates new MemoGlob struct based on given mesg.

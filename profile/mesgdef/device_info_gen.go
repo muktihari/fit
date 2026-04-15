@@ -21,9 +21,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type DeviceInfo struct {
-	Timestamp           time.Time // Units: s
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Descriptor          string    // Used to describe the sensor or location
 	ProductName         string    // Optional free form string to indicate the devices name or model
+	Timestamp           time.Time // Units: s
 	SerialNumber        uint32    // Base: uint32z
 	CumOperatingTime    uint32    // Units: s; Reset by new battery or charge.
 	Manufacturer        typedef.Manufacturer
@@ -40,9 +43,6 @@ type DeviceInfo struct {
 	AntNetwork          typedef.AntNetwork
 	SourceType          typedef.SourceType
 	BatteryLevel        uint8 // Units: %
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewDeviceInfo creates new DeviceInfo struct based on given mesg.

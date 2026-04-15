@@ -20,14 +20,14 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaBodyBatteryData struct {
-	Timestamp          time.Time // Units: s
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Level              []int8    // Array: [N]; Units: percent; Body battery level: [0,100] Blank: -16
 	Charged            []int16   // Array: [N]; Body battery charged value
 	Uncharged          []int16   // Array: [N]; Body battery uncharged value
+	Timestamp          time.Time // Units: s
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewHsaBodyBatteryData creates new HsaBodyBatteryData struct based on given mesg.

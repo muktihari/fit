@@ -21,6 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type MaxMetData struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	UpdateTime     time.Time // Time maxMET and vo2 were calculated
 	Vo2Max         uint16    // Scale: 10; Units: mL/kg/min
 	Sport          typedef.Sport
@@ -29,9 +32,6 @@ type MaxMetData struct {
 	CalibratedData typedef.Bool                  // Indicates if calibrated data was used in the calculation
 	HrSource       typedef.MaxMetHeartRateSource // Indicates if the estimate was obtained using a chest strap or wrist heart rate
 	SpeedSource    typedef.MaxMetSpeedSource     // Indidcates if the estimate was obtained using onboard GPS or connected GPS
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMaxMetData creates new MaxMetData struct based on given mesg.

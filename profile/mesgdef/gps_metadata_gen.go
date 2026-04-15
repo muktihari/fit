@@ -22,6 +22,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type GpsMetadata struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp.
 	UtcTimestamp     time.Time // Units: s; Used to correlate UTC to system time if the timestamp of the message is in system time. This UTC time is derived from the GPS data.
 	PositionLat      int32     // Units: semicircles
@@ -31,9 +34,6 @@ type GpsMetadata struct {
 	Velocity         [3]int16  // Array: [3]; Scale: 100; Units: m/s; velocity[0] is lon velocity. Velocity[1] is lat velocity. Velocity[2] is altitude velocity.
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 	Heading          uint16    // Scale: 100; Units: degrees
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewGpsMetadata creates new GpsMetadata struct based on given mesg.

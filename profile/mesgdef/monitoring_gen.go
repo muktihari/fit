@@ -21,15 +21,18 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Monitoring struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp                    time.Time           // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	LocalTimestamp               time.Time           // Must align to logging interval, for example, time must be 00:00:00 for daily log.
-	ActivityTime                 [8]uint16           // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
 	Distance                     uint32              // Scale: 100; Units: m; Accumulated distance. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 	Cycles                       uint32              // Scale: 2; Units: cycles; Accumulated cycles. Maintained by MonitoringReader for each activity_type. See SDK documentation.
 	ActiveTime                   uint32              // Scale: 1000; Units: s
 	Duration                     uint32              // Units: s
 	Ascent                       uint32              // Scale: 1000; Units: m
 	Descent                      uint32              // Scale: 1000; Units: m
+	ActivityTime                 [8]uint16           // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
 	Calories                     uint16              // Units: kcal; Accumulated total calories. Maintained by MonitoringReader for each activity_type. See SDK documentation
 	Distance16                   uint16              // Units: 100 * m
 	Cycles16                     uint16              // Units: 2 * cycles (steps)
@@ -52,9 +55,6 @@ type Monitoring struct {
 	Intensity                    uint8 // Scale: 10
 
 	state [4]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMonitoring creates new Monitoring struct based on given mesg.

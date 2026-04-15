@@ -20,13 +20,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type BarometerData struct {
-	Timestamp        time.Time // Units: s; Whole second part of the timestamp
-	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corresponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
-	BaroPres         []uint32  // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
-	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corresponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
+	BaroPres         []uint32  // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
+	Timestamp        time.Time // Units: s; Whole second part of the timestamp
+	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 }
 
 // NewBarometerData creates new BarometerData struct based on given mesg.

@@ -20,12 +20,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaConfigurationData struct {
-	Timestamp time.Time // Units: s; Encoded configuration data
-	Data      []byte    // Array: [N]; Encoded configuration data. Health SDK use only
-	DataSize  uint8     // Size in bytes of data field
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Data      []byte    // Array: [N]; Encoded configuration data. Health SDK use only
+	Timestamp time.Time // Units: s; Encoded configuration data
+	DataSize  uint8     // Size in bytes of data field
 }
 
 // NewHsaConfigurationData creates new HsaConfigurationData struct based on given mesg.

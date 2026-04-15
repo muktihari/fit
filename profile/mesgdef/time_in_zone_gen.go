@@ -21,7 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type TimeInZone struct {
-	Timestamp                time.Time // Units: s
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TimeInHrZone             []uint32  // Array: [N]; Scale: 1000; Units: s
 	TimeInSpeedZone          []uint32  // Array: [N]; Scale: 1000; Units: s
 	TimeInCadenceZone        []uint32  // Array: [N]; Scale: 1000; Units: s
@@ -30,6 +32,7 @@ type TimeInZone struct {
 	SpeedZoneHighBoundary    []uint16  // Array: [N]; Scale: 1000; Units: m/s
 	CadenceZoneHighBoundary  []uint8   // Array: [N]; Units: rpm
 	PowerZoneHighBoundary    []uint16  // Array: [N]; Units: watts
+	Timestamp                time.Time // Units: s
 	ReferenceMesg            typedef.MesgNum
 	ReferenceIndex           typedef.MessageIndex
 	FunctionalThresholdPower uint16
@@ -38,9 +41,6 @@ type TimeInZone struct {
 	RestingHeartRate         uint8
 	ThresholdHeartRate       uint8
 	PwrCalcType              typedef.PwrZoneCalc
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTimeInZone creates new TimeInZone struct based on given mesg.

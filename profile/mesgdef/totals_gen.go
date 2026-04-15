@@ -20,6 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Totals struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp    time.Time // Units: s
 	TimerTime    uint32    // Units: s; Excludes pauses
 	Distance     uint32    // Units: m
@@ -30,9 +33,6 @@ type Totals struct {
 	Sessions     uint16
 	Sport        typedef.Sport
 	SportIndex   uint8
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTotals creates new Totals struct based on given mesg.

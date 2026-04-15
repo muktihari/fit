@@ -18,13 +18,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Capabilities struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Languages             []uint8                          // Base: uint8z; Array: [N]; Use language_bits_x types where x is index of array.
 	Sports                []typedef.SportBits0             // Base: uint8z; Array: [N]; Use sport_bits_x types where x is index of array.
 	WorkoutsSupported     typedef.WorkoutCapabilities      // Base: uint32z
 	ConnectivitySupported typedef.ConnectivityCapabilities // Base: uint32z
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewCapabilities creates new Capabilities struct based on given mesg.

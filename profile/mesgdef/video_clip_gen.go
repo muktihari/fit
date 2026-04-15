@@ -20,6 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type VideoClip struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	StartTimestamp   time.Time
 	EndTimestamp     time.Time
 	ClipStart        uint32 // Units: ms; Start of clip in video time
@@ -27,9 +30,6 @@ type VideoClip struct {
 	ClipNumber       uint16
 	StartTimestampMs uint16
 	EndTimestampMs   uint16
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewVideoClip creates new VideoClip struct based on given mesg.

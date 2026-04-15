@@ -19,18 +19,18 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SegmentFile struct {
-	FileUuid               string                           // UUID of the segment file
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	LeaderType             []typedef.SegmentLeaderboardType // Array: [N]; Leader type of each leader in the segment file
 	LeaderGroupPrimaryKey  []uint32                         // Array: [N]; Group primary key of each leader in the segment file
 	LeaderActivityId       []uint32                         // Array: [N]; Activity ID of each leader in the segment file
 	LeaderActivityIdString []string                         // Array: [N]; String version of the activity ID of each leader in the segment file. 21 characters long for each ID, express in decimal
+	FileUuid               string                           // UUID of the segment file
 	UserProfilePrimaryKey  uint32                           // Primary key of the user that created the segment file
 	MessageIndex           typedef.MessageIndex
 	Enabled                typedef.Bool // Enabled state of the segment file
 	DefaultRaceLeader      uint8        // Index for the Leader Board entry selected as the default race participant
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSegmentFile creates new SegmentFile struct based on given mesg.

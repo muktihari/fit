@@ -20,12 +20,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type BeatIntervals struct {
-	Timestamp   time.Time
-	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
-	TimestampMs uint16   // Units: ms; Milliseconds past date_time
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Time        []uint16 // Array: [N]; Units: ms; Array of millisecond times between beats
+	Timestamp   time.Time
+	TimestampMs uint16 // Units: ms; Milliseconds past date_time
 }
 
 // NewBeatIntervals creates new BeatIntervals struct based on given mesg.

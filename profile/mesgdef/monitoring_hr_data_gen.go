@@ -20,12 +20,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type MonitoringHrData struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp                  time.Time // Units: s; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	RestingHeartRate           uint8     // Units: bpm; 7-day rolling average
 	CurrentDayRestingHeartRate uint8     // Units: bpm; RHR for today only. (Feeds into 7-day average)
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewMonitoringHrData creates new MonitoringHrData struct based on given mesg.

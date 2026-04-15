@@ -20,12 +20,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaStepData struct {
-	Timestamp          time.Time // Units: s
-	Steps              []uint32  // Array: [N]; Units: steps; Total step sum
-	ProcessingInterval uint16    // Units: s; Processing interval length in seconds. File start: 0xFFFFFFEF File stop: 0xFFFFFFEE
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Steps              []uint32  // Array: [N]; Units: steps; Total step sum
+	Timestamp          time.Time // Units: s
+	ProcessingInterval uint16    // Units: s; Processing interval length in seconds. File start: 0xFFFFFFEF File stop: 0xFFFFFFEE
 }
 
 // NewHsaStepData creates new HsaStepData struct based on given mesg.

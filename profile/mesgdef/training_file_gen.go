@@ -20,15 +20,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type TrainingFile struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp    time.Time
 	TimeCreated  time.Time
 	SerialNumber uint32 // Base: uint32z
 	Manufacturer typedef.Manufacturer
 	Product      uint16
 	Type         typedef.File
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTrainingFile creates new TrainingFile struct based on given mesg.

@@ -20,13 +20,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaSpo2Data struct {
-	Timestamp          time.Time // Units: s
-	ReadingSpo2        []uint8   // Array: [N]; Units: percent; SpO2 Reading: [70,100] Blank: 240
-	Confidence         []uint8   // Array: [N]; SpO2 Confidence: [0,254]
-	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	ReadingSpo2        []uint8   // Array: [N]; Units: percent; SpO2 Reading: [70,100] Blank: 240
+	Confidence         []uint8   // Array: [N]; SpO2 Confidence: [0,254]
+	Timestamp          time.Time // Units: s
+	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 }
 
 // NewHsaSpo2Data creates new HsaSpo2Data struct based on given mesg.

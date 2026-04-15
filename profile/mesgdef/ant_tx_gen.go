@@ -21,17 +21,17 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type AntTx struct {
-	Timestamp           time.Time // Units: s
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	MesgData            []byte    // Array: [N]
 	Data                []byte    // Array: [N]
+	Timestamp           time.Time // Units: s
 	FractionalTimestamp uint16    // Scale: 32768; Units: s
 	MesgId              byte
 	ChannelNumber       uint8
 
 	state [1]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewAntTx creates new AntTx struct based on given mesg.

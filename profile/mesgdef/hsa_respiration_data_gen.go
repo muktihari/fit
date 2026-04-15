@@ -21,12 +21,12 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaRespirationData struct {
-	Timestamp          time.Time // Units: s
-	RespirationRate    []int16   // Array: [N]; Scale: 100; Units: breaths/min; Breaths / min: [1,100] Invalid: 255 Excess motion: 254 Off wrist: 253 Not available: 252 Blank: 2.4
-	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	RespirationRate    []int16   // Array: [N]; Scale: 100; Units: breaths/min; Breaths / min: [1,100] Invalid: 255 Excess motion: 254 Off wrist: 253 Not available: 252 Blank: 2.4
+	Timestamp          time.Time // Units: s
+	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 }
 
 // NewHsaRespirationData creates new HsaRespirationData struct based on given mesg.

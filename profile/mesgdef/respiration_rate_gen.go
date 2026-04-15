@@ -21,11 +21,11 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type RespirationRate struct {
-	Timestamp       time.Time
-	RespirationRate int16 // Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Timestamp       time.Time
+	RespirationRate int16 // Scale: 100; Units: breaths/min; Breaths * 100 /min, -300 indicates invalid, -200 indicates large motion, -100 indicates off wrist
 }
 
 // NewRespirationRate creates new RespirationRate struct based on given mesg.

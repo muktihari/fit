@@ -18,14 +18,14 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type AntChannelId struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	DeviceNumber     uint16 // Base: uint16z
 	ChannelNumber    uint8
 	DeviceType       uint8 // Base: uint8z
 	TransmissionType uint8 // Base: uint8z
 	DeviceIndex      typedef.DeviceIndex
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewAntChannelId creates new AntChannelId struct based on given mesg.

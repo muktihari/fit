@@ -18,15 +18,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type FileCapabilities struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Directory    string
 	MaxSize      uint32 // Units: bytes
 	MessageIndex typedef.MessageIndex
 	MaxCount     uint16
 	Type         typedef.File
 	Flags        typedef.FileFlags // Base: uint8z
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewFileCapabilities creates new FileCapabilities struct based on given mesg.

@@ -19,11 +19,11 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SleepDisruptionOvernightSeverity struct {
-	Timestamp time.Time
-	Severity  typedef.SleepDisruptionSeverity
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Timestamp time.Time
+	Severity  typedef.SleepDisruptionSeverity
 }
 
 // NewSleepDisruptionOvernightSeverity creates new SleepDisruptionOvernightSeverity struct based on given mesg.

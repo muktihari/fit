@@ -18,6 +18,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SegmentId struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Name                  string                       // Friendly name assigned to segment
 	Uuid                  string                       // UUID of the segment
 	UserProfilePrimaryKey uint32                       // Primary key of the user that created the segment
@@ -27,9 +30,6 @@ type SegmentId struct {
 	DefaultRaceLeader     uint8                        // Index for the Leader Board entry selected as the default race participant
 	DeleteStatus          typedef.SegmentDeleteStatus  // Indicates if any segments should be deleted
 	SelectionType         typedef.SegmentSelectionType // Indicates how the segment was selected to be sent to the device
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSegmentId creates new SegmentId struct based on given mesg.

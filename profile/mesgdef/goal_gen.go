@@ -20,6 +20,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Goal struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	StartDate       time.Time
 	EndDate         time.Time
 	Value           uint32
@@ -33,9 +36,6 @@ type Goal struct {
 	Recurrence      typedef.GoalRecurrence
 	Enabled         typedef.Bool
 	Source          typedef.GoalSource
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewGoal creates new Goal struct based on given mesg.

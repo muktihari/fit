@@ -19,10 +19,10 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Hrv struct {
-	Time []uint16 // Array: [N]; Scale: 1000; Units: s; Time between beats
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	Time []uint16 // Array: [N]; Scale: 1000; Units: s; Time between beats
 }
 
 // NewHrv creates new Hrv struct based on given mesg.

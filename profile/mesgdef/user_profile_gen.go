@@ -19,16 +19,19 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type UserProfile struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	FriendlyName               string                   // Used for Morning Report greeting
 	WakeTime                   typedef.LocaltimeIntoDay // Typical wake time
 	SleepTime                  typedef.LocaltimeIntoDay // Typical bed time
 	DiveCount                  uint32
-	GlobalId                   [6]byte // Array: [6]
 	MessageIndex               typedef.MessageIndex
 	Weight                     uint16 // Scale: 10; Units: kg
 	LocalId                    typedef.UserLocalId
-	UserRunningStepLength      uint16 // Scale: 1000; Units: m; User defined running step length set to 0 for auto length
-	UserWalkingStepLength      uint16 // Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
+	UserRunningStepLength      uint16  // Scale: 1000; Units: m; User defined running step length set to 0 for auto length
+	UserWalkingStepLength      uint16  // Scale: 1000; Units: m; User defined walking step length set to 0 for auto length
+	GlobalId                   [6]byte // Array: [6]
 	Gender                     typedef.Gender
 	Age                        uint8 // Units: years
 	Height                     uint8 // Scale: 100; Units: m
@@ -48,9 +51,6 @@ type UserProfile struct {
 	TemperatureSetting         typedef.DisplayMeasure
 	HeightSetting              typedef.DisplayMeasure
 	DepthSetting               typedef.DisplayMeasure
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewUserProfile creates new UserProfile struct based on given mesg.

@@ -22,6 +22,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ClimbPro struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp     time.Time // Units: s
 	PositionLat   int32     // Units: semicircles
 	PositionLong  int32     // Units: semicircles
@@ -29,9 +32,6 @@ type ClimbPro struct {
 	ClimbNumber   uint16
 	ClimbProEvent typedef.ClimbProEvent
 	ClimbCategory uint8
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewClimbPro creates new ClimbPro struct based on given mesg.

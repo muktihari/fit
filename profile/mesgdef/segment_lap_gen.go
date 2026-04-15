@@ -22,14 +22,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type SegmentLap struct {
-	Timestamp                   time.Time // Units: s
-	StartTime                   time.Time
-	Name                        string
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	TimeInHrZone                []uint32 // Array: [N]; Scale: 1000; Units: s
 	TimeInSpeedZone             []uint32 // Array: [N]; Scale: 1000; Units: s
 	TimeInCadenceZone           []uint32 // Array: [N]; Scale: 1000; Units: s
 	TimeInPowerZone             []uint32 // Array: [N]; Scale: 1000; Units: s
-	Uuid                        string
 	AvgLeftPowerPhase           []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
 	AvgLeftPowerPhasePeak       []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
 	AvgRightPowerPhase          []uint8  // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
@@ -38,29 +37,33 @@ type SegmentLap struct {
 	MaxPowerPosition            []uint16 // Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
 	AvgCadencePosition          []uint8  // Array: [N]; Units: rpm; Average cadence by position. Data value indexes defined by rider_position_type.
 	MaxCadencePosition          []uint8  // Array: [N]; Units: rpm; Maximum cadence by position. Data value indexes defined by rider_position_type.
-	StartPositionLat            int32    // Units: semicircles
-	StartPositionLong           int32    // Units: semicircles
-	EndPositionLat              int32    // Units: semicircles
-	EndPositionLong             int32    // Units: semicircles
-	TotalElapsedTime            uint32   // Scale: 1000; Units: s; Time (includes pauses)
-	TotalTimerTime              uint32   // Scale: 1000; Units: s; Timer Time (excludes pauses)
-	TotalDistance               uint32   // Scale: 100; Units: m
-	TotalCycles                 uint32   // Units: cycles
-	NecLat                      int32    // Units: semicircles; North east corner latitude.
-	NecLong                     int32    // Units: semicircles; North east corner longitude.
-	SwcLat                      int32    // Units: semicircles; South west corner latitude.
-	SwcLong                     int32    // Units: semicircles; South west corner latitude.
-	TotalWork                   uint32   // Units: J
-	TotalMovingTime             uint32   // Scale: 1000; Units: s
-	ActiveTime                  uint32   // Scale: 1000; Units: s
-	TimeStanding                uint32   // Scale: 1000; Units: s; Total time spent in the standing position
-	TotalGrit                   float32  // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
-	TotalFlow                   float32  // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
-	AvgGrit                     float32  // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
-	AvgFlow                     float32  // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
-	EnhancedAvgAltitude         uint32   // Scale: 5; Offset: 500; Units: m
-	EnhancedMaxAltitude         uint32   // Scale: 5; Offset: 500; Units: m
-	EnhancedMinAltitude         uint32   // Scale: 5; Offset: 500; Units: m
+	Name                        string
+	Uuid                        string
+	Timestamp                   time.Time // Units: s
+	StartTime                   time.Time
+	StartPositionLat            int32   // Units: semicircles
+	StartPositionLong           int32   // Units: semicircles
+	EndPositionLat              int32   // Units: semicircles
+	EndPositionLong             int32   // Units: semicircles
+	TotalElapsedTime            uint32  // Scale: 1000; Units: s; Time (includes pauses)
+	TotalTimerTime              uint32  // Scale: 1000; Units: s; Timer Time (excludes pauses)
+	TotalDistance               uint32  // Scale: 100; Units: m
+	TotalCycles                 uint32  // Units: cycles
+	NecLat                      int32   // Units: semicircles; North east corner latitude.
+	NecLong                     int32   // Units: semicircles; North east corner longitude.
+	SwcLat                      int32   // Units: semicircles; South west corner latitude.
+	SwcLong                     int32   // Units: semicircles; South west corner latitude.
+	TotalWork                   uint32  // Units: J
+	TotalMovingTime             uint32  // Scale: 1000; Units: s
+	ActiveTime                  uint32  // Scale: 1000; Units: s
+	TimeStanding                uint32  // Scale: 1000; Units: s; Total time spent in the standing position
+	TotalGrit                   float32 // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+	TotalFlow                   float32 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+	AvgGrit                     float32 // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+	AvgFlow                     float32 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+	EnhancedAvgAltitude         uint32  // Scale: 5; Offset: 500; Units: m
+	EnhancedMaxAltitude         uint32  // Scale: 5; Offset: 500; Units: m
+	EnhancedMinAltitude         uint32  // Scale: 5; Offset: 500; Units: m
 	MessageIndex                typedef.MessageIndex
 	TotalCalories               uint16 // Units: kcal
 	TotalFatCalories            uint16 // Units: kcal; If New Leaf
@@ -119,9 +122,6 @@ type SegmentLap struct {
 	TotalFractionalDescent      uint8 // Scale: 100; Units: m; fractional part of total_descent
 
 	state [12]uint8 // Used for tracking expanded fields.
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewSegmentLap creates new SegmentLap struct based on given mesg.

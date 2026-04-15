@@ -21,6 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type TimestampCorrelation struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp                 time.Time // Units: s; Whole second part of UTC timestamp at the time the system timestamp was recorded.
 	SystemTimestamp           time.Time // Units: s; Whole second part of the system timestamp
 	LocalTimestamp            time.Time // Units: s; timestamp epoch expressed in local time used to convert timestamps to local time
@@ -28,9 +31,6 @@ type TimestampCorrelation struct {
 	FractionalSystemTimestamp uint16    // Scale: 32768; Units: s; Fractional part of the system timestamp
 	TimestampMs               uint16    // Units: ms; Millisecond part of the UTC timestamp at the time the system timestamp was recorded.
 	SystemTimestampMs         uint16    // Units: ms; Millisecond part of the system timestamp
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewTimestampCorrelation creates new TimestampCorrelation struct based on given mesg.

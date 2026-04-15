@@ -20,13 +20,13 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type HsaHeartRateData struct {
-	Timestamp          time.Time // Units: s
-	HeartRate          []uint8   // Array: [N]; Units: bpm; Beats / min. Blank: 0
-	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
-	Status             uint8     // Status of measurements in buffer - 0 indicates SEARCHING 1 indicates LOCKED
-
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
+	HeartRate          []uint8   // Array: [N]; Units: bpm; Beats / min. Blank: 0
+	Timestamp          time.Time // Units: s
+	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
+	Status             uint8     // Status of measurements in buffer - 0 indicates SEARCHING 1 indicates LOCKED
 }
 
 // NewHsaHeartRateData creates new HsaHeartRateData struct based on given mesg.

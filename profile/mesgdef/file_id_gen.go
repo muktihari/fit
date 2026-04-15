@@ -20,15 +20,15 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type FileId struct {
-	TimeCreated  time.Time // Only set for files that are can be created/erased.
+	UnknownFields []proto.Field // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+
 	ProductName  string    // Optional free form string to indicate the devices name or model
+	TimeCreated  time.Time // Only set for files that are can be created/erased.
 	SerialNumber uint32    // Base: uint32z
 	Manufacturer typedef.Manufacturer
 	Product      uint16
 	Number       uint16 // Only set for files that are not created/erased.
 	Type         typedef.File
-
-	UnknownFields []proto.Field // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 }
 
 // NewFileId creates new FileId struct based on given mesg.

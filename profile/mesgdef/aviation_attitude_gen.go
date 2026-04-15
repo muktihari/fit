@@ -22,7 +22,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type AviationAttitude struct {
-	Timestamp             time.Time                  // Units: s; Timestamp message was output
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	SystemTime            []uint32                   // Array: [N]; Units: ms; System time associated with sample expressed in ms.
 	Pitch                 []int16                    // Array: [N]; Scale: 10430.38; Units: radians; Range -PI/2 to +PI/2
 	Roll                  []int16                    // Array: [N]; Scale: 10430.38; Units: radians; Range -PI to +PI
@@ -33,10 +35,8 @@ type AviationAttitude struct {
 	AttitudeStageComplete []uint8                    // Array: [N]; Units: %; The percent complete of the current attitude stage. Set to 0 for attitude stages 0, 1 and 2 and to 100 for attitude stage 3 by AHRS modules that do not support it. Range - 100
 	Track                 []uint16                   // Array: [N]; Scale: 10430.38; Units: radians; Track Angle/Heading Range 0 - 2pi
 	Validity              []typedef.AttitudeValidity // Array: [N]
+	Timestamp             time.Time                  // Units: s; Timestamp message was output
 	TimestampMs           uint16                     // Units: ms; Fractional part of timestamp, added to timestamp
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewAviationAttitude creates new AviationAttitude struct based on given mesg.

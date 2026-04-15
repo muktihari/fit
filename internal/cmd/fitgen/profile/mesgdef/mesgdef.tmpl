@@ -21,18 +21,18 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type {{ .Name }} struct {
+    UnknownFields []proto.Field            // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+    {{ if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) -}}
+    DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+    {{ end }}
+    
     {{ range .OptimizedFields -}}
     {{ .Name }} {{ .Type }} {{ if .Comment }} // {{ .Comment }} {{ end }}
-    {{ end }}
-
-    {{ if gt .MaxFieldExpandNum 1 -}}
+    {{ end -}}
+    
+    {{ if gt .MaxFieldExpandNum 1 }}
     state [{{ .StateSize }}]uint8 // Used for tracking expanded fields.
-    {{ end }}
-
-    UnknownFields []proto.Field            // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-    {{- if and (not (eq .Name "FileId")) (not (eq .Name "DeveloperDataId")) (not (eq .Name "FieldDescription")) }}
-    DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
-    {{- end }}
+    {{ end -}}
 }
 
 // New{{ .Name }} creates new {{ .Name }} struct based on given mesg. 

@@ -18,14 +18,14 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type FieldCapabilities struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	MessageIndex typedef.MessageIndex
 	MesgNum      typedef.MesgNum
 	Count        uint16
 	File         typedef.File
 	FieldNum     uint8
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewFieldCapabilities creates new FieldCapabilities struct based on given mesg.

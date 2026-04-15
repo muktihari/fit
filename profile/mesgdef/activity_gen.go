@@ -21,6 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type Activity struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp      time.Time
 	LocalTimestamp time.Time // timestamp epoch expressed in local time, used to convert activity timestamps to local time
 	TotalTimerTime uint32    // Scale: 1000; Units: s; Exclude pauses
@@ -29,9 +32,6 @@ type Activity struct {
 	Event          typedef.Event
 	EventType      typedef.EventType
 	EventGroup     uint8
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewActivity creates new Activity struct based on given mesg.

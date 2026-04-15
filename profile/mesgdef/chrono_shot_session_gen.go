@@ -21,6 +21,9 @@ import (
 // Note: The order of the fields is optimized using a memory alignment algorithm.
 // Do not rely on field indices, such as when using reflection.
 type ChronoShotSession struct {
+	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
+	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
+
 	Timestamp         time.Time
 	MinSpeed          uint32 // Scale: 1000; Units: m/s
 	MaxSpeed          uint32 // Scale: 1000; Units: m/s
@@ -29,9 +32,6 @@ type ChronoShotSession struct {
 	StandardDeviation uint32 // Scale: 1000; Units: m/s
 	ShotCount         uint16
 	ProjectileType    typedef.ProjectileType
-
-	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
-	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 }
 
 // NewChronoShotSession creates new ChronoShotSession struct based on given mesg.
