@@ -74,23 +74,40 @@ const (
 	SubSportVirtualActivity      SubSport = 58
 	SubSportObstacle             SubSport = 59 // Used for events where participants run, crawl through mud, climb over walls, etc.
 	SubSportBreathing            SubSport = 62
+	SubSportCcrDiving            SubSport = 63 // Diving w/ closed circuit rebreather
 	SubSportSailRace             SubSport = 65 // Sailing
+	SubSportExpedition           SubSport = 66 // Generic
 	SubSportUltra                SubSport = 67 // Ultramarathon
 	SubSportIndoorClimbing       SubSport = 68 // Climbing
 	SubSportBouldering           SubSport = 69 // Climbing
 	SubSportHiit                 SubSport = 70 // High Intensity Interval Training
+	SubSportIndoorGrinding       SubSport = 71 // Sailing position, operating manual winches to power boat controls
+	SubSportHuntingWithDogs      SubSport = 72 // Hunting
 	SubSportAmrap                SubSport = 73 // HIIT
 	SubSportEmom                 SubSport = 74 // HIIT
 	SubSportTabata               SubSport = 75 // HIIT
+	SubSportEsport               SubSport = 77 // Video Gaming, Cycling, etc.
+	SubSportTriathlon            SubSport = 78 // Multisport
+	SubSportDuathlon             SubSport = 79 // Multisport
+	SubSportBrick                SubSport = 80 // Multisport
+	SubSportSwimRun              SubSport = 81 // Multisport
+	SubSportAdventureRace        SubSport = 82 // Multisport
+	SubSportTruckerWorkout       SubSport = 83 // DEZL trucker workout training sport
 	SubSportPickleball           SubSport = 84 // Racket
 	SubSportPadel                SubSport = 85 // Racket
 	SubSportIndoorWheelchairWalk SubSport = 86
 	SubSportIndoorWheelchairRun  SubSport = 87
 	SubSportIndoorHandCycling    SubSport = 88
-	SubSportSquash               SubSport = 94
-	SubSportBadminton            SubSport = 95
-	SubSportRacquetball          SubSport = 96
-	SubSportTableTennis          SubSport = 97
+	SubSportField                SubSport = 90 // Hockey
+	SubSportIce                  SubSport = 91 // Hockey
+	SubSportUltimate             SubSport = 92 // Disc
+	SubSportPlatform             SubSport = 93 // Racket
+	SubSportSquash               SubSport = 94 // Racket
+	SubSportBadminton            SubSport = 95 // Racket
+	SubSportRacquetball          SubSport = 96 // Racket
+	SubSportTableTennis          SubSport = 97 // Racket
+	SubSportOverland             SubSport = 98
+	SubSportTrollingMotor        SubSport = 99  // Generic
 	SubSportFlyCanopy            SubSport = 110 // Flying
 	SubSportFlyParaglide         SubSport = 111 // Flying
 	SubSportFlyParamotor         SubSport = 112 // Flying
@@ -101,6 +118,12 @@ const (
 	SubSportFlyWx                SubSport = 117 // Flying
 	SubSportFlyVfr               SubSport = 118 // Flying
 	SubSportFlyIfr               SubSport = 119 // Flying
+	SubSportDynamicApnea         SubSport = 121
+	SubSportEnduro               SubSport = 123 // Cycling
+	SubSportRucking              SubSport = 124 // Hiking
+	SubSportRally                SubSport = 125 // Motor sports
+	SubSportPoolTriathlon        SubSport = 126 // Multisport
+	SubSportEBikeEnduro          SubSport = 127 // Cycling
 	SubSportAll                  SubSport = 254
 	SubSportInvalid              SubSport = 0xFF
 )
@@ -231,8 +254,12 @@ func (s SubSport) String() string {
 		return "obstacle"
 	case SubSportBreathing:
 		return "breathing"
+	case SubSportCcrDiving:
+		return "ccr_diving"
 	case SubSportSailRace:
 		return "sail_race"
+	case SubSportExpedition:
+		return "expedition"
 	case SubSportUltra:
 		return "ultra"
 	case SubSportIndoorClimbing:
@@ -241,12 +268,30 @@ func (s SubSport) String() string {
 		return "bouldering"
 	case SubSportHiit:
 		return "hiit"
+	case SubSportIndoorGrinding:
+		return "indoor_grinding"
+	case SubSportHuntingWithDogs:
+		return "hunting_with_dogs"
 	case SubSportAmrap:
 		return "amrap"
 	case SubSportEmom:
 		return "emom"
 	case SubSportTabata:
 		return "tabata"
+	case SubSportEsport:
+		return "esport"
+	case SubSportTriathlon:
+		return "triathlon"
+	case SubSportDuathlon:
+		return "duathlon"
+	case SubSportBrick:
+		return "brick"
+	case SubSportSwimRun:
+		return "swim_run"
+	case SubSportAdventureRace:
+		return "adventure_race"
+	case SubSportTruckerWorkout:
+		return "trucker_workout"
 	case SubSportPickleball:
 		return "pickleball"
 	case SubSportPadel:
@@ -257,6 +302,14 @@ func (s SubSport) String() string {
 		return "indoor_wheelchair_run"
 	case SubSportIndoorHandCycling:
 		return "indoor_hand_cycling"
+	case SubSportField:
+		return "field"
+	case SubSportIce:
+		return "ice"
+	case SubSportUltimate:
+		return "ultimate"
+	case SubSportPlatform:
+		return "platform"
 	case SubSportSquash:
 		return "squash"
 	case SubSportBadminton:
@@ -265,6 +318,10 @@ func (s SubSport) String() string {
 		return "racquetball"
 	case SubSportTableTennis:
 		return "table_tennis"
+	case SubSportOverland:
+		return "overland"
+	case SubSportTrollingMotor:
+		return "trolling_motor"
 	case SubSportFlyCanopy:
 		return "fly_canopy"
 	case SubSportFlyParaglide:
@@ -285,6 +342,18 @@ func (s SubSport) String() string {
 		return "fly_vfr"
 	case SubSportFlyIfr:
 		return "fly_ifr"
+	case SubSportDynamicApnea:
+		return "dynamic_apnea"
+	case SubSportEnduro:
+		return "enduro"
+	case SubSportRucking:
+		return "rucking"
+	case SubSportRally:
+		return "rally"
+	case SubSportPoolTriathlon:
+		return "pool_triathlon"
+	case SubSportEBikeEnduro:
+		return "e_bike_enduro"
 	case SubSportAll:
 		return "all"
 	default:
@@ -417,8 +486,12 @@ func SubSportFromString(s string) SubSport {
 		return SubSportObstacle
 	case "breathing":
 		return SubSportBreathing
+	case "ccr_diving":
+		return SubSportCcrDiving
 	case "sail_race":
 		return SubSportSailRace
+	case "expedition":
+		return SubSportExpedition
 	case "ultra":
 		return SubSportUltra
 	case "indoor_climbing":
@@ -427,12 +500,30 @@ func SubSportFromString(s string) SubSport {
 		return SubSportBouldering
 	case "hiit":
 		return SubSportHiit
+	case "indoor_grinding":
+		return SubSportIndoorGrinding
+	case "hunting_with_dogs":
+		return SubSportHuntingWithDogs
 	case "amrap":
 		return SubSportAmrap
 	case "emom":
 		return SubSportEmom
 	case "tabata":
 		return SubSportTabata
+	case "esport":
+		return SubSportEsport
+	case "triathlon":
+		return SubSportTriathlon
+	case "duathlon":
+		return SubSportDuathlon
+	case "brick":
+		return SubSportBrick
+	case "swim_run":
+		return SubSportSwimRun
+	case "adventure_race":
+		return SubSportAdventureRace
+	case "trucker_workout":
+		return SubSportTruckerWorkout
 	case "pickleball":
 		return SubSportPickleball
 	case "padel":
@@ -443,6 +534,14 @@ func SubSportFromString(s string) SubSport {
 		return SubSportIndoorWheelchairRun
 	case "indoor_hand_cycling":
 		return SubSportIndoorHandCycling
+	case "field":
+		return SubSportField
+	case "ice":
+		return SubSportIce
+	case "ultimate":
+		return SubSportUltimate
+	case "platform":
+		return SubSportPlatform
 	case "squash":
 		return SubSportSquash
 	case "badminton":
@@ -451,6 +550,10 @@ func SubSportFromString(s string) SubSport {
 		return SubSportRacquetball
 	case "table_tennis":
 		return SubSportTableTennis
+	case "overland":
+		return SubSportOverland
+	case "trolling_motor":
+		return SubSportTrollingMotor
 	case "fly_canopy":
 		return SubSportFlyCanopy
 	case "fly_paraglide":
@@ -471,6 +574,18 @@ func SubSportFromString(s string) SubSport {
 		return SubSportFlyVfr
 	case "fly_ifr":
 		return SubSportFlyIfr
+	case "dynamic_apnea":
+		return SubSportDynamicApnea
+	case "enduro":
+		return SubSportEnduro
+	case "rucking":
+		return SubSportRucking
+	case "rally":
+		return SubSportRally
+	case "pool_triathlon":
+		return SubSportPoolTriathlon
+	case "e_bike_enduro":
+		return SubSportEBikeEnduro
 	case "all":
 		return SubSportAll
 	default:
@@ -542,23 +657,40 @@ func ListSubSport() []SubSport {
 		SubSportVirtualActivity,
 		SubSportObstacle,
 		SubSportBreathing,
+		SubSportCcrDiving,
 		SubSportSailRace,
+		SubSportExpedition,
 		SubSportUltra,
 		SubSportIndoorClimbing,
 		SubSportBouldering,
 		SubSportHiit,
+		SubSportIndoorGrinding,
+		SubSportHuntingWithDogs,
 		SubSportAmrap,
 		SubSportEmom,
 		SubSportTabata,
+		SubSportEsport,
+		SubSportTriathlon,
+		SubSportDuathlon,
+		SubSportBrick,
+		SubSportSwimRun,
+		SubSportAdventureRace,
+		SubSportTruckerWorkout,
 		SubSportPickleball,
 		SubSportPadel,
 		SubSportIndoorWheelchairWalk,
 		SubSportIndoorWheelchairRun,
 		SubSportIndoorHandCycling,
+		SubSportField,
+		SubSportIce,
+		SubSportUltimate,
+		SubSportPlatform,
 		SubSportSquash,
 		SubSportBadminton,
 		SubSportRacquetball,
 		SubSportTableTennis,
+		SubSportOverland,
+		SubSportTrollingMotor,
 		SubSportFlyCanopy,
 		SubSportFlyParaglide,
 		SubSportFlyParamotor,
@@ -569,6 +701,12 @@ func ListSubSport() []SubSport {
 		SubSportFlyWx,
 		SubSportFlyVfr,
 		SubSportFlyIfr,
+		SubSportDynamicApnea,
+		SubSportEnduro,
+		SubSportRucking,
+		SubSportRally,
+		SubSportPoolTriathlon,
+		SubSportEBikeEnduro,
 		SubSportAll,
 	}
 }

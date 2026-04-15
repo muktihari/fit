@@ -64,12 +64,18 @@ const (
 	SportFloorClimbing         Sport = 48
 	SportBaseball              Sport = 49
 	SportDiving                Sport = 53
+	SportShooting              Sport = 56 // Sport Shooting bits, set here for sport_bits alignment
+	SportWinterSport           Sport = 58
+	SportGrinding              Sport = 59 // Sailing position, operating manual winches to power boat controls
 	SportHiit                  Sport = 62
+	SportVideoGaming           Sport = 63
 	SportRacket                Sport = 64
 	SportWheelchairPushWalk    Sport = 65
 	SportWheelchairPushRun     Sport = 66
 	SportMeditation            Sport = 67
+	SportParaSport             Sport = 68
 	SportDiscGolf              Sport = 69
+	SportTeamSport             Sport = 70
 	SportCricket               Sport = 71
 	SportRugby                 Sport = 72
 	SportHockey                Sport = 73
@@ -77,10 +83,17 @@ const (
 	SportVolleyball            Sport = 75
 	SportWaterTubing           Sport = 76
 	SportWakesurfing           Sport = 77
+	SportWaterSport            Sport = 78
+	SportArchery               Sport = 79
 	SportMixedMartialArts      Sport = 80
+	SportMotorSports           Sport = 81
 	SportSnorkeling            Sport = 82
 	SportDance                 Sport = 83
 	SportJumpRope              Sport = 84
+	SportPoolApnea             Sport = 85
+	SportMobility              Sport = 86
+	SportGeocaching            Sport = 87
+	SportCanoeing              Sport = 88
 	SportAll                   Sport = 254 // All is for goals only to include all sports.
 	SportInvalid               Sport = 0xFF
 )
@@ -191,8 +204,16 @@ func (s Sport) String() string {
 		return "baseball"
 	case SportDiving:
 		return "diving"
+	case SportShooting:
+		return "shooting"
+	case SportWinterSport:
+		return "winter_sport"
+	case SportGrinding:
+		return "grinding"
 	case SportHiit:
 		return "hiit"
+	case SportVideoGaming:
+		return "video_gaming"
 	case SportRacket:
 		return "racket"
 	case SportWheelchairPushWalk:
@@ -201,8 +222,12 @@ func (s Sport) String() string {
 		return "wheelchair_push_run"
 	case SportMeditation:
 		return "meditation"
+	case SportParaSport:
+		return "para_sport"
 	case SportDiscGolf:
 		return "disc_golf"
+	case SportTeamSport:
+		return "team_sport"
 	case SportCricket:
 		return "cricket"
 	case SportRugby:
@@ -217,14 +242,28 @@ func (s Sport) String() string {
 		return "water_tubing"
 	case SportWakesurfing:
 		return "wakesurfing"
+	case SportWaterSport:
+		return "water_sport"
+	case SportArchery:
+		return "archery"
 	case SportMixedMartialArts:
 		return "mixed_martial_arts"
+	case SportMotorSports:
+		return "motor_sports"
 	case SportSnorkeling:
 		return "snorkeling"
 	case SportDance:
 		return "dance"
 	case SportJumpRope:
 		return "jump_rope"
+	case SportPoolApnea:
+		return "pool_apnea"
+	case SportMobility:
+		return "mobility"
+	case SportGeocaching:
+		return "geocaching"
+	case SportCanoeing:
+		return "canoeing"
 	case SportAll:
 		return "all"
 	default:
@@ -337,8 +376,16 @@ func SportFromString(s string) Sport {
 		return SportBaseball
 	case "diving":
 		return SportDiving
+	case "shooting":
+		return SportShooting
+	case "winter_sport":
+		return SportWinterSport
+	case "grinding":
+		return SportGrinding
 	case "hiit":
 		return SportHiit
+	case "video_gaming":
+		return SportVideoGaming
 	case "racket":
 		return SportRacket
 	case "wheelchair_push_walk":
@@ -347,8 +394,12 @@ func SportFromString(s string) Sport {
 		return SportWheelchairPushRun
 	case "meditation":
 		return SportMeditation
+	case "para_sport":
+		return SportParaSport
 	case "disc_golf":
 		return SportDiscGolf
+	case "team_sport":
+		return SportTeamSport
 	case "cricket":
 		return SportCricket
 	case "rugby":
@@ -363,14 +414,28 @@ func SportFromString(s string) Sport {
 		return SportWaterTubing
 	case "wakesurfing":
 		return SportWakesurfing
+	case "water_sport":
+		return SportWaterSport
+	case "archery":
+		return SportArchery
 	case "mixed_martial_arts":
 		return SportMixedMartialArts
+	case "motor_sports":
+		return SportMotorSports
 	case "snorkeling":
 		return SportSnorkeling
 	case "dance":
 		return SportDance
 	case "jump_rope":
 		return SportJumpRope
+	case "pool_apnea":
+		return SportPoolApnea
+	case "mobility":
+		return SportMobility
+	case "geocaching":
+		return SportGeocaching
+	case "canoeing":
+		return SportCanoeing
 	case "all":
 		return SportAll
 	default:
@@ -432,12 +497,18 @@ func ListSport() []Sport {
 		SportFloorClimbing,
 		SportBaseball,
 		SportDiving,
+		SportShooting,
+		SportWinterSport,
+		SportGrinding,
 		SportHiit,
+		SportVideoGaming,
 		SportRacket,
 		SportWheelchairPushWalk,
 		SportWheelchairPushRun,
 		SportMeditation,
+		SportParaSport,
 		SportDiscGolf,
+		SportTeamSport,
 		SportCricket,
 		SportRugby,
 		SportHockey,
@@ -445,10 +516,17 @@ func ListSport() []Sport {
 		SportVolleyball,
 		SportWaterTubing,
 		SportWakesurfing,
+		SportWaterSport,
+		SportArchery,
 		SportMixedMartialArts,
+		SportMotorSports,
 		SportSnorkeling,
 		SportDance,
 		SportJumpRope,
+		SportPoolApnea,
+		SportMobility,
+		SportGeocaching,
+		SportCanoeing,
 		SportAll,
 	}
 }

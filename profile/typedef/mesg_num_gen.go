@@ -135,6 +135,7 @@ const (
 	MesgNumDiveApneaAlarm                   MesgNum = 393
 	MesgNumSkinTempOvernight                MesgNum = 398
 	MesgNumHsaWristTemperatureData          MesgNum = 409 // Message number for the HSA wrist temperature data message
+	MesgNumNapEvent                         MesgNum = 412
 	MesgNumSleepDisruptionSeverityPeriod    MesgNum = 470
 	MesgNumSleepDisruptionOvernightSeverity MesgNum = 471
 	MesgNumMfgRangeMin                      MesgNum = 0xFF00 // 0xFF00 - 0xFFFE reserved for manufacturer specific messages
@@ -391,6 +392,8 @@ func (m MesgNum) String() string {
 		return "skin_temp_overnight"
 	case MesgNumHsaWristTemperatureData:
 		return "hsa_wrist_temperature_data"
+	case MesgNumNapEvent:
+		return "nap_event"
 	case MesgNumSleepDisruptionSeverityPeriod:
 		return "sleep_disruption_severity_period"
 	case MesgNumSleepDisruptionOvernightSeverity:
@@ -652,6 +655,8 @@ func MesgNumFromString(s string) MesgNum {
 		return MesgNumSkinTempOvernight
 	case "hsa_wrist_temperature_data":
 		return MesgNumHsaWristTemperatureData
+	case "nap_event":
+		return MesgNumNapEvent
 	case "sleep_disruption_severity_period":
 		return MesgNumSleepDisruptionSeverityPeriod
 	case "sleep_disruption_overnight_severity":
@@ -792,6 +797,7 @@ func ListMesgNum() []MesgNum {
 		MesgNumDiveApneaAlarm,
 		MesgNumSkinTempOvernight,
 		MesgNumHsaWristTemperatureData,
+		MesgNumNapEvent,
 		MesgNumSleepDisruptionSeverityPeriod,
 		MesgNumSleepDisruptionOvernightSeverity,
 		MesgNumMfgRangeMin,
@@ -1051,6 +1057,8 @@ func MesgNumRegister(v MesgNum, s string) error {
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumSkinTempOvernight", v)
 	case MesgNumHsaWristTemperatureData:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumHsaWristTemperatureData", v)
+	case MesgNumNapEvent:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumNapEvent", v)
 	case MesgNumSleepDisruptionSeverityPeriod:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumSleepDisruptionSeverityPeriod", v)
 	case MesgNumSleepDisruptionOvernightSeverity:
