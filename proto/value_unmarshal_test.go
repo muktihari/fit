@@ -181,6 +181,11 @@ func TestValueUnmarshalStringValue(t *testing.T) {
 		err   error
 	}{
 		{
+			in:    []byte("Walk or jog lightly."),
+			array: false,
+			out:   []string{"Walk or jog lightly."},
+		},
+		{
 			in:    []byte("Walk or jog lightly.\x00��\x00"),
 			array: false,
 			out:   []string{"Walk or jog lightly."},
@@ -194,6 +199,16 @@ func TestValueUnmarshalStringValue(t *testing.T) {
 			in:    []byte("Walk or jog lightly.\x00��\x00"),
 			array: true,
 			out:   []string{"Walk or jog lightly."},
+		},
+		{
+			in:    []byte("Open\x00Water\x00"),
+			array: true,
+			out:   []string{"Open", "Water"},
+		},
+		{
+			in:    []byte("Open\x00Water"),
+			array: true,
+			out:   []string{"Open", "Water"},
 		},
 	}
 

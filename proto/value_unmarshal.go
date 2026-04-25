@@ -208,6 +208,8 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 						size++
 					}
 					last = i + 1
+				} else if i == len(b)-1 { // case: string is not terminated
+					size++
 				}
 			}
 			last = 0
@@ -220,6 +222,10 @@ func UnmarshalValue(b []byte, arch byte, baseType basetype.BaseType, profileType
 						}
 					}
 					last = i + 1
+				} else if i == len(b)-1 { // case: string is not terminated
+					if s := utf8String(b[last : i+1]); len(s) > 0 {
+						vals = append(vals, s)
+					}
 				}
 			}
 			return SliceString(vals), nil

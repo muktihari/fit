@@ -3071,3 +3071,9 @@ func BenchmarkDecodeMessageData(b *testing.B) {
 		cur = 0 // reset reader
 	}
 }
+
+func TestStrcount(t *testing.T) {
+	if v := strcount([]byte("Open\x00Water")); v != 2 {
+		t.Fatalf("expected: 2, got: %v", v)
+	}
+}
