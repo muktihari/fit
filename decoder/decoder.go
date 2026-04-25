@@ -1028,6 +1028,8 @@ func strcount(b []byte) (size byte) {
 				size++
 			}
 			last = i + 1
+		} else if i == len(b)-1 { // case: string is not terminated
+			size++
 		}
 	}
 	return size
