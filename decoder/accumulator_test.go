@@ -19,8 +19,8 @@ func TestAccumulatorCollect(t *testing.T) {
 	type value struct {
 		mesgNum      typedef.MesgNum
 		destFieldNum byte
-		value        uint32
-		expected     uint32
+		value        uint64
+		expected     uint64
 	}
 
 	tt := []struct {
@@ -73,10 +73,10 @@ func TestAccumulatorCollect(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			accumu := NewAccumulator()
+			accumu := new(accumulator)
 			for i := range tc.collects {
 				val := &tc.collects[i]
-				accumu.Collect(val.mesgNum, val.destFieldNum, val.value)
+				accumu.collect(val.mesgNum, val.destFieldNum, val.value)
 			}
 			for i := range tc.toAccumulates {
 				val := &tc.toAccumulates[i]
@@ -92,36 +92,36 @@ func TestAccumulatorCollect(t *testing.T) {
 func TestAccumulatorCollectValue(t *testing.T) {
 	tt := []struct {
 		val               proto.Value
-		accumulatedValues []value
+		accumulatedValues []accuValue
 	}{
-		{val: proto.Int8(1), accumulatedValues: []value{{last: 1, value: 1}}},
-		{val: proto.Uint8(2), accumulatedValues: []value{{last: 2, value: 2}}},
-		{val: proto.Int16(3), accumulatedValues: []value{{last: 3, value: 3}}},
-		{val: proto.Uint16(4), accumulatedValues: []value{{last: 4, value: 4}}},
-		{val: proto.Int32(5), accumulatedValues: []value{{last: 5, value: 5}}},
-		{val: proto.Uint32(6), accumulatedValues: []value{{last: 6, value: 6}}},
-		{val: proto.Int64(7), accumulatedValues: []value{{last: 7, value: 7}}},
-		{val: proto.Uint64(8), accumulatedValues: []value{{last: 8, value: 8}}},
-		{val: proto.Float32(9), accumulatedValues: []value{{last: 9, value: 9}}},
-		{val: proto.Float64(10), accumulatedValues: []value{{last: 10, value: 10}}},
-		{val: proto.SliceInt8([]int8{1, 2}), accumulatedValues: []value{{last: 2, value: 2}}},
-		{val: proto.SliceUint8([]uint8{2, 3}), accumulatedValues: []value{{last: 3, value: 3}}},
-		{val: proto.SliceInt16([]int16{3, 4}), accumulatedValues: []value{{last: 4, value: 4}}},
-		{val: proto.SliceUint16([]uint16{4, 5}), accumulatedValues: []value{{last: 5, value: 5}}},
-		{val: proto.SliceInt32([]int32{5, 6}), accumulatedValues: []value{{last: 6, value: 6}}},
-		{val: proto.SliceUint32([]uint32{6, 7}), accumulatedValues: []value{{last: 7, value: 7}}},
-		{val: proto.SliceInt64([]int64{7, 8}), accumulatedValues: []value{{last: 8, value: 8}}},
-		{val: proto.SliceUint64([]uint64{8, 9}), accumulatedValues: []value{{last: 9, value: 9}}},
-		{val: proto.SliceFloat32([]float32{9, 10}), accumulatedValues: []value{{last: 10, value: 10}}},
-		{val: proto.SliceFloat64([]float64{10, 11}), accumulatedValues: []value{{last: 11, value: 11}}},
+		{val: proto.Int8(1), accumulatedValues: []accuValue{{last: 1, value: 1}}},
+		{val: proto.Uint8(2), accumulatedValues: []accuValue{{last: 2, value: 2}}},
+		{val: proto.Int16(3), accumulatedValues: []accuValue{{last: 3, value: 3}}},
+		{val: proto.Uint16(4), accumulatedValues: []accuValue{{last: 4, value: 4}}},
+		{val: proto.Int32(5), accumulatedValues: []accuValue{{last: 5, value: 5}}},
+		{val: proto.Uint32(6), accumulatedValues: []accuValue{{last: 6, value: 6}}},
+		{val: proto.Int64(7), accumulatedValues: []accuValue{{last: 7, value: 7}}},
+		{val: proto.Uint64(8), accumulatedValues: []accuValue{{last: 8, value: 8}}},
+		{val: proto.Float32(9), accumulatedValues: []accuValue{{last: 9, value: 9}}},
+		{val: proto.Float64(10), accumulatedValues: []accuValue{{last: 10, value: 10}}},
+		{val: proto.SliceInt8([]int8{1, 2}), accumulatedValues: []accuValue{{last: 2, value: 2}}},
+		{val: proto.SliceUint8([]uint8{2, 3}), accumulatedValues: []accuValue{{last: 3, value: 3}}},
+		{val: proto.SliceInt16([]int16{3, 4}), accumulatedValues: []accuValue{{last: 4, value: 4}}},
+		{val: proto.SliceUint16([]uint16{4, 5}), accumulatedValues: []accuValue{{last: 5, value: 5}}},
+		{val: proto.SliceInt32([]int32{5, 6}), accumulatedValues: []accuValue{{last: 6, value: 6}}},
+		{val: proto.SliceUint32([]uint32{6, 7}), accumulatedValues: []accuValue{{last: 7, value: 7}}},
+		{val: proto.SliceInt64([]int64{7, 8}), accumulatedValues: []accuValue{{last: 8, value: 8}}},
+		{val: proto.SliceUint64([]uint64{8, 9}), accumulatedValues: []accuValue{{last: 9, value: 9}}},
+		{val: proto.SliceFloat32([]float32{9, 10}), accumulatedValues: []accuValue{{last: 10, value: 10}}},
+		{val: proto.SliceFloat64([]float64{10, 11}), accumulatedValues: []accuValue{{last: 11, value: 11}}},
 	}
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %v", i, tc.val.Any()), func(t *testing.T) {
-			accumu := NewAccumulator()
-			accumu.CollectValue(0, 0, tc.val)
+			accumu := new(accumulator)
+			accumu.Collect(0, 0, tc.val)
 			if diff := cmp.Diff(accumu.values, tc.accumulatedValues,
-				cmp.AllowUnexported(value{}),
+				cmp.AllowUnexported(accuValue{}),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -130,8 +130,8 @@ func TestAccumulatorCollectValue(t *testing.T) {
 }
 
 func TestAccumulatorReset(t *testing.T) {
-	accumu := NewAccumulator()
-	accumu.Collect(mesgnum.Record, fieldnum.RecordSpeed, 1000)
+	accumu := new(accumulator)
+	accumu.collect(mesgnum.Record, fieldnum.RecordSpeed, 1000)
 
 	if len(accumu.values) != 1 {
 		t.Fatalf("expected AccumulatedValues is 1, got: %d", len(accumu.values))
