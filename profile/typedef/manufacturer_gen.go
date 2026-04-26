@@ -254,6 +254,7 @@ const (
 	ManufacturerJespr                      Manufacturer = 347
 	ManufacturerHuawei                     Manufacturer = 348
 	ManufacturerGotoes                     Manufacturer = 349
+	ManufacturerCadenceApp                 Manufacturer = 350
 	ManufacturerActigraphcorp              Manufacturer = 5759
 	ManufacturerInvalid                    Manufacturer = 0xFFFF
 )
@@ -744,6 +745,8 @@ func (m Manufacturer) String() string {
 		return "huawei"
 	case ManufacturerGotoes:
 		return "gotoes"
+	case ManufacturerCadenceApp:
+		return "cadence_app"
 	case ManufacturerActigraphcorp:
 		return "actigraphcorp"
 	default:
@@ -1236,6 +1239,8 @@ func ManufacturerFromString(s string) Manufacturer {
 		return ManufacturerHuawei
 	case "gotoes":
 		return ManufacturerGotoes
+	case "cadence_app":
+		return ManufacturerCadenceApp
 	case "actigraphcorp":
 		return ManufacturerActigraphcorp
 	default:
@@ -1487,6 +1492,7 @@ func ListManufacturer() []Manufacturer {
 		ManufacturerJespr,
 		ManufacturerHuawei,
 		ManufacturerGotoes,
+		ManufacturerCadenceApp,
 		ManufacturerActigraphcorp,
 	}
 }
