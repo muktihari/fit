@@ -94,7 +94,7 @@ func bitsFromSlice[S []E, E numeric](v *bits, s S, bitsize int) {
 //
 // We allow pulling bits value as long as the store's size is not zero.
 // Let's say we have 16 bits left in the store, but the caller asks for 32 bits, we return that remaining 16 bits.
-func (v *bits) Pull(bitsize byte) (val uint32, ok bool) {
+func (v *bits) Pull(bitsize byte) (val uint64, ok bool) {
 	if v.size == 0 {
 		return 0, false
 	}
@@ -103,9 +103,9 @@ func (v *bits) Pull(bitsize byte) (val uint32, ok bool) {
 	size := v.size - uint64(bitsize)
 	v.size = size &^ uint64(int64(size)>>63)
 
-	mask := uint64(1)<<bitsize - 1  // e.g. (1 << 8) - 1     = 255
-	val = uint32(v.store[0] & mask) // e.g. 0x27010E08 & 255 = 0x08
-	v.store[0] >>= bitsize          // e.g. 0x27010E08 >> 8  = 0x27010E
+	mask := uint64(1)<<bitsize - 1 // e.g. (1 << 8) - 1     = 255
+	val = v.store[0] & mask        // e.g. 0x27010E08 & 255 = 0x08
+	v.store[0] >>= bitsize         // e.g. 0x27010E08 >> 8  = 0x27010E
 
 	for i := 1; i < len(v.store); i++ {
 		if v.store[i] == 0 {

@@ -224,7 +224,7 @@ func TestMakeBits(t *testing.T) {
 func TestBitsPull(t *testing.T) {
 	type pull struct {
 		bits  byte
-		value uint32
+		value uint64
 		vbits bits
 		ok    bool
 	}
@@ -282,12 +282,12 @@ func TestBitsPull(t *testing.T) {
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			for j, p := range tc.pulls {
-				u32, ok := tc.vbits.Pull(p.bits)
+				value, ok := tc.vbits.Pull(p.bits)
 				if ok != p.ok {
 					t.Fatalf("[%d] expected ok: %v, got: %v", j, p.ok, ok)
 				}
-				if u32 != p.value {
-					t.Fatalf("[%d] expected value: %v, got: %v", j, p.value, u32)
+				if value != p.value {
+					t.Fatalf("[%d] expected value: %v, got: %v", j, p.value, value)
 				}
 				if tc.vbits != p.vbits {
 					t.Fatalf("[%d] expected bits:\n%v,\n got:\n%v", j, tc.vbits, p.vbits)

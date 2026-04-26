@@ -1763,7 +1763,7 @@ func TestDecodeFields(t *testing.T) {
 		mesgdef           *proto.MessageDefinition
 		mesg              proto.Message
 		validateFn        func(mesg proto.Message) error
-		accumulatedValues []value
+		accumulatedValues []accuValue
 		err               error
 	}{
 		{
@@ -1812,7 +1812,7 @@ func TestDecodeFields(t *testing.T) {
 					},
 				},
 			},
-			accumulatedValues: []value{
+			accumulatedValues: []accuValue{
 				{
 					mesgNum:  mesgnum.Record,
 					fieldNum: fieldnum.RecordDistance,
@@ -1852,7 +1852,7 @@ func TestDecodeFields(t *testing.T) {
 					},
 				},
 			},
-			accumulatedValues: []value{
+			accumulatedValues: []accuValue{
 				{
 					mesgNum:  mesgnum.Hr,
 					fieldNum: fieldnum.HrEventTimestamp,
@@ -2095,7 +2095,7 @@ func TestDecodeFields(t *testing.T) {
 				return
 			}
 			if diff := cmp.Diff(dec.accumulator.values, tc.accumulatedValues,
-				cmp.AllowUnexported(value{}),
+				cmp.AllowUnexported(accuValue{}),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -2112,7 +2112,7 @@ func TestDecodeFields(t *testing.T) {
 func TestExpandComponents(t *testing.T) {
 	tt := []struct {
 		name                 string
-		accumu               *Accumulator
+		accumu               *accumulator
 		mesg                 proto.Message
 		fieldsAfterExpansion []proto.Field
 	}{
@@ -2214,7 +2214,7 @@ func TestExpandComponents(t *testing.T) {
 			// event_timestamp:     "4.654296875|4.8974609375|5.6552734375|6.609375|7.5283203125|8.3984375|9.23828125|10.044921875"
 			// event_timestamp raw: "4766       |5015        |5791        |6768    |7709        |8600     |9460      |10286"
 			name: "expand components: Hr mesg's event_timestamp_12",
-			accumu: &Accumulator{values: []value{
+			accumu: &accumulator{values: []accuValue{
 				// Prior Hr message
 				{mesgNum: mesgnum.Hr, fieldNum: fieldnum.HrEventTimestamp, value: 3707, last: 3707},
 			}},
@@ -2720,7 +2720,7 @@ func TestReset(t *testing.T) {
 			dec.Reset(buf, tc.opts...)
 
 			if diff := cmp.Diff(dec, tc.dec,
-				cmp.AllowUnexported(Accumulator{}),
+				cmp.AllowUnexported(accumulator{}),
 				cmp.AllowUnexported(options{}),
 				cmp.AllowUnexported(Decoder{}),
 				cmp.AllowUnexported(readBuffer{}),
@@ -2842,7 +2842,7 @@ func TestLogs(t *testing.T) {
 
 func TestConvertUint32ToValue(t *testing.T) {
 	tt := []struct {
-		value    uint32
+		value    uint64
 		baseType basetype.BaseType
 		expected proto.Value
 	}{
@@ -2905,7 +2905,7 @@ func TestConvertUint32ToValue(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %d -> %s", i, tc.value, tc.baseType), func(t *testing.T) {
-			val := convertUint32ToValue(tc.value, tc.baseType)
+			val := convertUint64ToValue(tc.value, tc.baseType)
 			if diff := cmp.Diff(val, tc.expected,
 				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
