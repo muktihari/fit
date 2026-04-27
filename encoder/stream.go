@@ -23,7 +23,9 @@ type StreamEncoder struct {
 func NewStream(w io.Writer, opts ...Option) (*StreamEncoder, error) {
 	switch w.(type) {
 	case io.WriterAt, io.WriteSeeker:
-		return &StreamEncoder{enc: New(w, opts...)}, nil
+		e := new(StreamEncoder)
+		e.Reset(w, opts...)
+		return e, nil
 	}
 	return nil, fmt.Errorf("io.WriterAt or io.WriteSeeker is expected: %w", errInvalidWriter)
 }
@@ -75,6 +77,9 @@ func (e *StreamEncoder) SequenceCompleted() error {
 func (e *StreamEncoder) Reset(w io.Writer, opts ...Option) error {
 	switch w.(type) {
 	case io.WriterAt, io.WriteSeeker:
+		if e.enc == nil {
+			e.enc = new(Encoder)
+		}
 		e.enc.Reset(w, opts...)
 		e.fileHeader = proto.FileHeader{}
 		e.fileHeaderWritten = false
