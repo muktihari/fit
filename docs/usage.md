@@ -784,8 +784,8 @@ import (
 )
 
 var (
-    pool    = sync.Pool{New: func() any { return decoder.New(nil) }}
-    lispool = sync.Pool{New: func() any { return filedef.NewListener() }}
+    pool    = sync.Pool{New: func() any { return new(decoder.Decoder) }}
+    lispool = sync.Pool{New: func() any { return new(filedef.Listener) }}
 )
 
 func main() {
@@ -1304,7 +1304,7 @@ import (
     "github.com/muktihari/fit/profile/filedef"
 )
 
-var pool = sync.Pool{New: func() any { return encoder.New(nil) }}
+var pool = sync.Pool{New: func() any { return new(encoder.Encoder) }}
 
 func main() {
     srv := http.NewServeMux()
