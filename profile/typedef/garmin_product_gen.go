@@ -472,10 +472,14 @@ const (
 	GarminProductInstinct3Solar50Mm         GarminProduct = 4759
 	GarminProductTactix8Amoled              GarminProduct = 4775
 	GarminProductTactix8Solar               GarminProduct = 4776
+	GarminProductFr170Music                 GarminProduct = 4814
+	GarminProductFr170                      GarminProduct = 4815
 	GarminProductApproachJ1                 GarminProduct = 4825
 	GarminProductD2Mach2                    GarminProduct = 4879
+	GarminProductFr702026                   GarminProduct = 4916
 	GarminProductInstinctCrossoverAmoled    GarminProduct = 4678
 	GarminProductD2AirX15                   GarminProduct = 4944
+	GarminProductD2Mach2Pro                 GarminProduct = 5056
 	GarminProductSdm4                       GarminProduct = 10007 // SDM4 footpod
 	GarminProductEdgeRemote                 GarminProduct = 10014
 	GarminProductTacxTrainingAppWin         GarminProduct = 20533
@@ -1413,14 +1417,22 @@ func (g GarminProduct) String() string {
 		return "tactix8_amoled"
 	case GarminProductTactix8Solar:
 		return "tactix8_solar"
+	case GarminProductFr170Music:
+		return "fr170_music"
+	case GarminProductFr170:
+		return "fr170"
 	case GarminProductApproachJ1:
 		return "approach_j1"
 	case GarminProductD2Mach2:
 		return "d2_mach2"
+	case GarminProductFr702026:
+		return "fr70_2026"
 	case GarminProductInstinctCrossoverAmoled:
 		return "instinct_crossover_amoled"
 	case GarminProductD2AirX15:
 		return "d2_air_x15"
+	case GarminProductD2Mach2Pro:
+		return "d2_mach2_pro"
 	case GarminProductSdm4:
 		return "sdm4"
 	case GarminProductEdgeRemote:
@@ -2371,14 +2383,22 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductTactix8Amoled
 	case "tactix8_solar":
 		return GarminProductTactix8Solar
+	case "fr170_music":
+		return GarminProductFr170Music
+	case "fr170":
+		return GarminProductFr170
 	case "approach_j1":
 		return GarminProductApproachJ1
 	case "d2_mach2":
 		return GarminProductD2Mach2
+	case "fr70_2026":
+		return GarminProductFr702026
 	case "instinct_crossover_amoled":
 		return GarminProductInstinctCrossoverAmoled
 	case "d2_air_x15":
 		return GarminProductD2AirX15
+	case "d2_mach2_pro":
+		return GarminProductD2Mach2Pro
 	case "sdm4":
 		return GarminProductSdm4
 	case "edge_remote":
@@ -2870,10 +2890,14 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductInstinct3Solar50Mm,
 		GarminProductTactix8Amoled,
 		GarminProductTactix8Solar,
+		GarminProductFr170Music,
+		GarminProductFr170,
 		GarminProductApproachJ1,
 		GarminProductD2Mach2,
+		GarminProductFr702026,
 		GarminProductInstinctCrossoverAmoled,
 		GarminProductD2AirX15,
+		GarminProductD2Mach2Pro,
 		GarminProductSdm4,
 		GarminProductEdgeRemote,
 		GarminProductTacxTrainingAppWin,

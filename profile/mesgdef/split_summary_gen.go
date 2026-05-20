@@ -28,6 +28,7 @@ type SplitSummary struct {
 	MaxSpeed        uint32 // Scale: 1000; Units: m/s
 	AvgVertSpeed    int32  // Scale: 1000; Units: m/s
 	TotalCalories   uint32 // Units: kcal
+	ActiveTime      uint32 // Scale: 1000; Units: s; total active time in all split rounds
 	TotalMovingTime uint32 // Scale: 1000; Units: s
 	MessageIndex    typedef.MessageIndex
 	NumSplits       uint16
@@ -55,7 +56,7 @@ func (m *SplitSummary) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{16377, 8192, 0, 4611686018427387904}
+		knownNums := [4]uint64{16377, 8194, 0, 4611686018427387904}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -87,6 +88,7 @@ func (m *SplitSummary) Reset(mesg *proto.Message) {
 		MaxHeartRate:    vals[11].Uint8(),
 		AvgVertSpeed:    vals[12].Int32(),
 		TotalCalories:   vals[13].Uint32(),
+		ActiveTime:      vals[65].Uint32(),
 		TotalMovingTime: vals[77].Uint32(),
 
 		UnknownFields:   unknownFields,
@@ -100,7 +102,7 @@ func (m *SplitSummary) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 14)
+	fields := make([]proto.Field, 0, 15)
 	mesg := proto.Message{Num: typedef.MesgNumSplitSummary}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -166,6 +168,11 @@ func (m *SplitSummary) ToMesg(options *Options) proto.Message {
 	if m.TotalCalories != basetype.Uint32Invalid {
 		field := factory.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint32(m.TotalCalories)
+		fields = append(fields, field)
+	}
+	if m.ActiveTime != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 65)
+		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
 	if m.TotalMovingTime != basetype.Uint32Invalid {
@@ -237,6 +244,17 @@ func (m *SplitSummary) AvgVertSpeedScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.AvgVertSpeed)/1000 - 0
+}
+
+// ActiveTimeScaled return ActiveTime in its scaled value.
+// If ActiveTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; total active time in all split rounds
+func (m *SplitSummary) ActiveTimeScaled() float64 {
+	if m.ActiveTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.ActiveTime)/1000 - 0
 }
 
 // TotalMovingTimeScaled return TotalMovingTime in its scaled value.
@@ -415,6 +433,28 @@ func (m *SplitSummary) SetAvgVertSpeedScaled(v float64) *SplitSummary {
 // Units: kcal
 func (m *SplitSummary) SetTotalCalories(v uint32) *SplitSummary {
 	m.TotalCalories = v
+	return m
+}
+
+// SetActiveTime sets ActiveTime value.
+//
+// Scale: 1000; Units: s; total active time in all split rounds
+func (m *SplitSummary) SetActiveTime(v uint32) *SplitSummary {
+	m.ActiveTime = v
+	return m
+}
+
+// SetActiveTimeScaled is similar to SetActiveTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; total active time in all split rounds
+func (m *SplitSummary) SetActiveTimeScaled(v float64) *SplitSummary {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.ActiveTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.ActiveTime = uint32(unscaled)
 	return m
 }
 
