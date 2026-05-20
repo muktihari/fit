@@ -24,7 +24,7 @@ type HsaWristTemperatureData struct {
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 
-	Value              []uint16  // Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
+	Value              []uint16  // Array: [N]; Scale: 1000; Units: C; Wrist temperature reading
 	Timestamp          time.Time // Units: s
 	ProcessingInterval uint16    // Units: s; Processing interval length in seconds
 }
@@ -115,7 +115,7 @@ func (m *HsaWristTemperatureData) TimestampUint32() uint32 { return datetime.ToU
 // ValueScaled return Value in its scaled value.
 // If Value value is invalid, nil will be returned.
 //
-// Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
+// Array: [N]; Scale: 1000; Units: C; Wrist temperature reading
 func (m *HsaWristTemperatureData) ValueScaled() []float64 {
 	if m.Value == nil {
 		return nil
@@ -149,7 +149,7 @@ func (m *HsaWristTemperatureData) SetProcessingInterval(v uint16) *HsaWristTempe
 
 // SetValue sets Value value.
 //
-// Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
+// Array: [N]; Scale: 1000; Units: C; Wrist temperature reading
 func (m *HsaWristTemperatureData) SetValue(v []uint16) *HsaWristTemperatureData {
 	m.Value = v
 	return m
@@ -158,7 +158,7 @@ func (m *HsaWristTemperatureData) SetValue(v []uint16) *HsaWristTemperatureData 
 // SetValueScaled is similar to SetValue except it accepts a scaled value.
 // This method automatically converts the given value to its []uint16 form, discarding any applied scale and offset.
 //
-// Array: [N]; Scale: 1000; Units: degC; Wrist temperature reading
+// Array: [N]; Scale: 1000; Units: C; Wrist temperature reading
 func (m *HsaWristTemperatureData) SetValueScaled(vs []float64) *HsaWristTemperatureData {
 	if vs == nil {
 		m.Value = nil

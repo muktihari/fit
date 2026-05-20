@@ -694,6 +694,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 			Components: []proto.Component{
 				0: {FieldNum: 127 /* enhanced_min_altitude */, Scale: 5, Offset: 500, Bits: 16},
 			}},
+		78:  {Name: "active_time", Num: 78, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "s"},
 		82:  {Name: "player_score", Num: 82, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1},
 		83:  {Name: "opponent_score", Num: 83, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1},
 		84:  {Name: "opponent_name", Num: 84, Type: profile.String, BaseType: basetype.String, Scale: 1},
@@ -891,6 +892,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 				0: {FieldNum: 113 /* enhanced_min_altitude */, Scale: 5, Offset: 500, Bits: 16},
 			}},
 		63:  {Name: "min_heart_rate", Num: 63, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 1, Units: "bpm"},
+		70:  {Name: "active_time", Num: 70, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "s"},
 		71:  {Name: "wkt_step_index", Num: 71, Type: profile.MessageIndex, BaseType: basetype.Uint16, Scale: 1},
 		74:  {Name: "opponent_score", Num: 74, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1},
 		75:  {Name: "stroke_count", Num: 75, Type: profile.Uint16, BaseType: basetype.Uint16, Array: true /* [N] */, Scale: 1, Units: "counts"},
@@ -1542,6 +1544,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		27:  {Name: "end_time", Num: 27, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1},
 		28:  {Name: "total_calories", Num: 28, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1, Units: "kcal"},
 		74:  {Name: "start_elevation", Num: 74, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 5, Offset: 500, Units: "m"},
+		78:  {Name: "active_time", Num: 78, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "s"},
 		110: {Name: "total_moving_time", Num: 110, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "s"},
 	},
 	mesgnum.SplitSummary: {
@@ -1558,6 +1561,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		11:  {Name: "max_heart_rate", Num: 11, Type: profile.Uint8, BaseType: basetype.Uint8, Scale: 1, Units: "bpm"},
 		12:  {Name: "avg_vert_speed", Num: 12, Type: profile.Sint32, BaseType: basetype.Sint32, Scale: 1000, Units: "m/s"},
 		13:  {Name: "total_calories", Num: 13, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1, Units: "kcal"},
+		65:  {Name: "active_time", Num: 65, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "s"},
 		77:  {Name: "total_moving_time", Num: 77, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "s"},
 	},
 	mesgnum.ClimbPro: {
@@ -2222,7 +2226,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 	mesgnum.HsaWristTemperatureData: {
 		253: {Name: "timestamp", Num: 253, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1, Units: "s"},
 		0:   {Name: "processing_interval", Num: 0, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1, Units: "s"},
-		1:   {Name: "value", Num: 1, Type: profile.Uint16, BaseType: basetype.Uint16, Array: true /* [N] */, Scale: 1000, Units: "degC"},
+		1:   {Name: "value", Num: 1, Type: profile.Uint16, BaseType: basetype.Uint16, Array: true /* [N] */, Scale: 1000, Units: "C"},
 	},
 	mesgnum.MemoGlob: {
 		250: {Name: "part_index", Num: 250, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1},

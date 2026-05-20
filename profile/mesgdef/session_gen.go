@@ -65,6 +65,7 @@ type Session struct {
 	TotalWork                     uint32 // Units: J
 	TotalMovingTime               uint32 // Scale: 1000; Units: s
 	AvgLapTime                    uint32 // Scale: 1000; Units: s
+	ActiveTime                    uint32 // Scale: 1000; Units: s
 	TimeStanding                  uint32 // Scale: 1000; Units: s; Total time spend in the standing position
 	EnhancedAvgSpeed              uint32 // Scale: 1000; Units: m/s; total_distance / total_timer_time
 	EnhancedMaxSpeed              uint32 // Scale: 1000; Units: m/s
@@ -204,7 +205,7 @@ func (m *Session) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{18446742974197919743, 18446678103011623167, 932252819858127487, 6917529027641541119}
+		knownNums := [4]uint64{18446742974197919743, 18446678103011639551, 932252819858127487, 6917529027641541119}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -298,6 +299,7 @@ func (m *Session) Reset(mesg *proto.Message) {
 		AvgLapTime:                    vals[69].Uint32(),
 		BestLapIndex:                  vals[70].Uint16(),
 		MinAltitude:                   vals[71].Uint16(),
+		ActiveTime:                    vals[78].Uint32(),
 		PlayerScore:                   vals[82].Uint16(),
 		OpponentScore:                 vals[83].Uint16(),
 		OpponentName:                  vals[84].String(),
@@ -397,7 +399,7 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 157)
+	fields := make([]proto.Field, 0, 158)
 	mesg := proto.Message{Num: typedef.MesgNumSession}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -758,6 +760,11 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 	if m.MinAltitude != basetype.Uint16Invalid {
 		field := factory.CreateField(mesg.Num, 71)
 		field.Value = proto.Uint16(m.MinAltitude)
+		fields = append(fields, field)
+	}
+	if m.ActiveTime != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 78)
+		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
 	if m.PlayerScore != basetype.Uint16Invalid {
@@ -1623,6 +1630,17 @@ func (m *Session) MinAltitudeScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.MinAltitude)/5 - 500
+}
+
+// ActiveTimeScaled return ActiveTime in its scaled value.
+// If ActiveTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
+func (m *Session) ActiveTimeScaled() float64 {
+	if m.ActiveTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.ActiveTime)/1000 - 0
 }
 
 // MaxBallSpeedScaled return MaxBallSpeed in its scaled value.
@@ -3302,6 +3320,28 @@ func (m *Session) SetMinAltitudeScaled(v float64) *Session {
 		return m
 	}
 	m.MinAltitude = uint16(unscaled)
+	return m
+}
+
+// SetActiveTime sets ActiveTime value.
+//
+// Scale: 1000; Units: s
+func (m *Session) SetActiveTime(v uint32) *Session {
+	m.ActiveTime = v
+	return m
+}
+
+// SetActiveTimeScaled is similar to SetActiveTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Session) SetActiveTimeScaled(v float64) *Session {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.ActiveTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.ActiveTime = uint32(unscaled)
 	return m
 }
 

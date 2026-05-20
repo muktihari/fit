@@ -57,6 +57,7 @@ type Lap struct {
 	TotalCycles                   uint32  // Units: cycles
 	TotalWork                     uint32  // Units: J
 	TotalMovingTime               uint32  // Scale: 1000; Units: s
+	ActiveTime                    uint32  // Scale: 1000; Units: s
 	TimeStanding                  uint32  // Scale: 1000; Units: s; Total time spent in the standing position
 	EnhancedAvgSpeed              uint32  // Scale: 1000; Units: m/s
 	EnhancedMaxSpeed              uint32  // Scale: 1000; Units: m/s
@@ -170,7 +171,7 @@ func (m *Lap) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{18446744000829325311, 2305842996261682304, 8438416128, 6917529027641081856}
+		knownNums := [4]uint64{18446744000829325311, 2305842996261682368, 8438416128, 6917529027641081856}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -252,6 +253,7 @@ func (m *Lap) Reset(mesg *proto.Message) {
 		RepetitionNum:                 vals[61].Uint16(),
 		MinAltitude:                   vals[62].Uint16(),
 		MinHeartRate:                  vals[63].Uint8(),
+		ActiveTime:                    vals[70].Uint32(),
 		WktStepIndex:                  typedef.MessageIndex(vals[71].Uint16()),
 		OpponentScore:                 vals[74].Uint16(),
 		StrokeCount:                   vals[75].SliceUint16(),
@@ -329,7 +331,7 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 123)
+	fields := make([]proto.Field, 0, 124)
 	mesg := proto.Message{Num: typedef.MesgNumLap}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -630,6 +632,11 @@ func (m *Lap) ToMesg(options *Options) proto.Message {
 	if m.MinHeartRate != basetype.Uint8Invalid {
 		field := factory.CreateField(mesg.Num, 63)
 		field.Value = proto.Uint8(m.MinHeartRate)
+		fields = append(fields, field)
+	}
+	if m.ActiveTime != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 70)
+		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
 	if m.WktStepIndex != typedef.MessageIndexInvalid {
@@ -1316,6 +1323,17 @@ func (m *Lap) MinAltitudeScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.MinAltitude)/5 - 500
+}
+
+// ActiveTimeScaled return ActiveTime in its scaled value.
+// If ActiveTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
+func (m *Lap) ActiveTimeScaled() float64 {
+	if m.ActiveTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.ActiveTime)/1000 - 0
 }
 
 // AvgVerticalOscillationScaled return AvgVerticalOscillation in its scaled value.
@@ -2702,6 +2720,28 @@ func (m *Lap) SetMinAltitudeScaled(v float64) *Lap {
 // Units: bpm
 func (m *Lap) SetMinHeartRate(v uint8) *Lap {
 	m.MinHeartRate = v
+	return m
+}
+
+// SetActiveTime sets ActiveTime value.
+//
+// Scale: 1000; Units: s
+func (m *Lap) SetActiveTime(v uint32) *Lap {
+	m.ActiveTime = v
+	return m
+}
+
+// SetActiveTimeScaled is similar to SetActiveTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Lap) SetActiveTimeScaled(v float64) *Lap {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.ActiveTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.ActiveTime = uint32(unscaled)
 	return m
 }
 

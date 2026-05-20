@@ -493,7 +493,7 @@ const (
 	HsaStressDataStressLevel                          = 1   // [ HsaStressData ] [Type: Sint8, Base: sint8, Array: [N], Units: s]; Stress Level: [0,100] Off wrist: -1 Excess motion: -2 Not enough data: -3 Recovering from exercise: -4 Unidentified: -5 Blank: -16
 	HsaWristTemperatureDataTimestamp                  = 253 // [ HsaWristTemperatureData ] [Type: DateTime, Base: uint32, Units: s];
 	HsaWristTemperatureDataProcessingInterval         = 0   // [ HsaWristTemperatureData ] [Type: Uint16, Base: uint16, Units: s]; Processing interval length in seconds
-	HsaWristTemperatureDataValue                      = 1   // [ HsaWristTemperatureData ] [Type: Uint16, Base: uint16, Array: [N], Scale: 1000, Offset: 0, Units: degC]; Wrist temperature reading
+	HsaWristTemperatureDataValue                      = 1   // [ HsaWristTemperatureData ] [Type: Uint16, Base: uint16, Array: [N], Scale: 1000, Offset: 0, Units: C]; Wrist temperature reading
 	JumpTimestamp                                     = 253 // [ Jump ] [Type: DateTime, Base: uint32, Units: s];
 	JumpDistance                                      = 0   // [ Jump ] [Type: Float32, Base: float32, Units: m];
 	JumpHeight                                        = 1   // [ Jump ] [Type: Float32, Base: float32, Units: m];
@@ -564,6 +564,7 @@ const (
 	LapRepetitionNum                                  = 61  // [ Lap ] [Type: Uint16, Base: uint16];
 	LapMinAltitude                                    = 62  // [ Lap ] [Type: Uint16, Base: uint16, Scale: 5, Offset: 500, Units: m];
 	LapMinHeartRate                                   = 63  // [ Lap ] [Type: Uint8, Base: uint8, Units: bpm];
+	LapActiveTime                                     = 70  // [ Lap ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: s];
 	LapWktStepIndex                                   = 71  // [ Lap ] [Type: MessageIndex, Base: uint16];
 	LapOpponentScore                                  = 74  // [ Lap ] [Type: Uint16, Base: uint16];
 	LapStrokeCount                                    = 75  // [ Lap ] [Type: Uint16, Base: uint16, Array: [N], Units: counts]; stroke_type enum used as the index
@@ -1058,6 +1059,7 @@ const (
 	SessionAvgLapTime                                 = 69  // [ Session ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: s];
 	SessionBestLapIndex                               = 70  // [ Session ] [Type: Uint16, Base: uint16];
 	SessionMinAltitude                                = 71  // [ Session ] [Type: Uint16, Base: uint16, Scale: 5, Offset: 500, Units: m];
+	SessionActiveTime                                 = 78  // [ Session ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: s];
 	SessionPlayerScore                                = 82  // [ Session ] [Type: Uint16, Base: uint16];
 	SessionOpponentScore                              = 83  // [ Session ] [Type: Uint16, Base: uint16];
 	SessionOpponentName                               = 84  // [ Session ] [Type: String, Base: string];
@@ -1206,6 +1208,7 @@ const (
 	SplitEndTime                                      = 27  // [ Split ] [Type: DateTime, Base: uint32];
 	SplitTotalCalories                                = 28  // [ Split ] [Type: Uint32, Base: uint32, Units: kcal];
 	SplitStartElevation                               = 74  // [ Split ] [Type: Uint32, Base: uint32, Scale: 5, Offset: 500, Units: m];
+	SplitActiveTime                                   = 78  // [ Split ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: s]; Active time of split rounds
 	SplitTotalMovingTime                              = 110 // [ Split ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: s];
 	SplitSummaryMessageIndex                          = 254 // [ SplitSummary ] [Type: MessageIndex, Base: uint16];
 	SplitSummarySplitType                             = 0   // [ SplitSummary ] [Type: SplitType, Base: enum];
@@ -1220,6 +1223,7 @@ const (
 	SplitSummaryMaxHeartRate                          = 11  // [ SplitSummary ] [Type: Uint8, Base: uint8, Units: bpm];
 	SplitSummaryAvgVertSpeed                          = 12  // [ SplitSummary ] [Type: Sint32, Base: sint32, Scale: 1000, Offset: 0, Units: m/s];
 	SplitSummaryTotalCalories                         = 13  // [ SplitSummary ] [Type: Uint32, Base: uint32, Units: kcal];
+	SplitSummaryActiveTime                            = 65  // [ SplitSummary ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: s]; total active time in all split rounds
 	SplitSummaryTotalMovingTime                       = 77  // [ SplitSummary ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: s];
 	Spo2DataTimestamp                                 = 253 // [ Spo2Data ] [Type: DateTime, Base: uint32, Units: s];
 	Spo2DataReadingSpo2                               = 0   // [ Spo2Data ] [Type: Uint8, Base: uint8, Units: percent];
