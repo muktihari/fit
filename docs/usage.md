@@ -1,5 +1,7 @@
 # Usage
 
+This document provides general guidance on how to get started with the library. This may not cover everything, however, the code itself is the live documentation, use https://pkg.go.dev/github.com/muktihari/fit#section-directories to navigate.
+
 Table of Contents:
 
 1. [Decoding](#Decoding)
