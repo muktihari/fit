@@ -1,5 +1,7 @@
 # Usage
 
+This document provides general guidance on how to get started with the library. This may not cover everything, however, the code itself is the live documentation, use https://pkg.go.dev/github.com/muktihari/fit#section-directories to navigate.
+
 Table of Contents:
 
 1. [Decoding](#Decoding)
@@ -473,8 +475,6 @@ You can also use [PeekFileHeader()](#-Peek-FileHeader), [PeekFileId()](#Peek-Fil
 
 We can verify whether the given file is a FIT file by checking the File Header (first 12-14 bytes). PeekFileHeader decodes only up to FileHeader (first 12-14 bytes) without decoding the whole reader. If we choose to continue, Decode picks up where this left then continue decoding next messages instead of starting from zero.
 
-NOTE: The FileHeader retrieved from this method is only valid before Decode method is completed, you will need to copy it if you want to use it later by dereferencing the pointer before calling Decode method.
-
 ```go
 package main
 
@@ -502,7 +502,7 @@ func main() {
     fmt.Printf("%v\n", fileHeader)
 
     // Output:
-    // &{14 32 2147 94080 .FIT 17310}
+    // {14 32 2147 94080 .FIT 17310}
 }
 ```
 
