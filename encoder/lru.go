@@ -8,7 +8,10 @@ import (
 	"bytes"
 )
 
-// lru implements simple lru algorithm. Item search best case: O(1), worst case: O(n), depends how recently used is it.
+// Lru is an opinionated `local_mesg_num` redefiner whose algorithm mimics
+// an LRU cache. When storage is full, the least recently used item is
+// replaced with a new item, which is then marked as the most recently used item.
+// This way, interleaving between `message definitions` is optimized.
 type lru struct {
 	// Holds the actual items representated in bytes.
 	items [][]byte
