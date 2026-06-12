@@ -9,6 +9,8 @@
 
 This project hosts the Go implementation for [The Flexible and Interoperable Data Transfer (FIT) Protocol](https://developer.garmin.com/fit), which is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. Activities recorded using devices such as smartwatch and cycling computer are now mostly in a FIT file format (\*.fit).
 
+> For Rust implementation see https://github.com/muktihari/rustyfit
+
 ## Motivation
 
 The FIT protocol, known for its compact size as a binary file format, is the preferred choice for manufacturers to use in their embedded devices. However, despite its widespread adoption, Garmin has not yet released an official SDK for Go, and existing third-party libraries for decoding and encoding the FIT protocol lack the semantics of the official SDK.
