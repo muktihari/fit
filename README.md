@@ -3,7 +3,6 @@
 ![GitHub Workflow Status](https://github.com/muktihari/fit/workflows/CI/badge.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/muktihari/fit.svg)](https://pkg.go.dev/github.com/muktihari/fit)
 [![CodeCov](https://codecov.io/gh/muktihari/fit/branch/master/graph/badge.svg)](https://codecov.io/gh/muktihari/fit)
-[![Go Report Card](https://goreportcard.com/badge/github.com/muktihari/fit)](https://goreportcard.com/report/github.com/muktihari/fit)
 [![Profile Version](https://img.shields.io/badge/profile-v21.205-lightblue.svg?style=flat)](https://github.com/garmin/fit-sdk-tools/releases)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/muktihari/fit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/muktihari/fit)
 
