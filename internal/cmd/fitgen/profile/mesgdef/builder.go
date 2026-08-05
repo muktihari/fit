@@ -287,57 +287,57 @@ func appendImports(imports map[string]struct{}, field *Field, profileType string
 }
 
 func (b *Builder) createDynamicField(mesgName string, field *Field, parserField *parser.Field) DynamicField {
-	var (
-		rawSwitchCases      = make(map[string][]CondValue)
-		rawSwitchCasesOrder = make(map[string]int)
-		valuesOrder         = make(map[string]map[ReturnValue]int)
-	)
+	var switchCases []SwitchCase
 	for _, subField := range parserField.SubFields {
-		condValue := CondValue{
-			ReturnValue: ReturnValue{
+		for i := 0; i < len(subField.RefFieldNames); i++ {
+			fieldRef := b.lookup.FieldByName(mesgName, subField.RefFieldNames[i])
+
+			caseName := fmt.Sprintf("%s%s",
+				b.transformType(fieldRef.Type, fieldRef.Array, field.FixedArraySize),
+				strutil.ToTitle(subField.RefFieldValue[i]),
+			)
+
+			var value string
+			scale := scaleOrDefault(subField.Scales, 0)
+			offset := offsetOrDefault(subField.Offsets, 0)
+			if scale != 1 || offset != 0 {
+				value = fmt.Sprintf("(float64(m.%s) * %g) - %g", field.Name, scale, offset)
+			} else {
+				value = fmt.Sprintf("%s(m.%s)", b.transformType(subField.Type, "", field.FixedArraySize), field.Name)
+			}
+
+			caseReturnValue := ReturnValue{
 				Name:  subField.Name,
+				Value: value,
 				Units: subField.Units,
-			},
-		}
-
-		scale := scaleOrDefault(subField.Scales, 0)
-		offset := offsetOrDefault(subField.Offsets, 0)
-		if scale != 1 || offset != 0 {
-			condValue.ReturnValue.Value = fmt.Sprintf("(float64(m.%s) * %g) - %g", field.Name, scale, offset)
-		} else {
-			condValue.ReturnValue.Value = fmt.Sprintf("%s(m.%s)", b.transformType(subField.Type, "", field.FixedArraySize), field.Name)
-		}
-
-		for i, refValueName := range subField.RefFieldNames {
-			fieldRef := b.lookup.FieldByName(mesgName, refValueName)
-
-			_, ok := rawSwitchCases[fieldRef.Name]
-			if !ok {
-				rawSwitchCasesOrder[fieldRef.Name] = len(rawSwitchCasesOrder)
-				valuesOrder[fieldRef.Name] = make(map[ReturnValue]int)
 			}
 
-			valOrder, ok := valuesOrder[fieldRef.Name][condValue.ReturnValue]
-			if !ok {
-				valOrder = len(rawSwitchCases[fieldRef.Name])
-				valuesOrder[fieldRef.Name][condValue.ReturnValue] = valOrder
-				rawSwitchCases[fieldRef.Name] = append(rawSwitchCases[fieldRef.Name], condValue)
+			switchName := fmt.Sprintf("m.%s", strutil.ToTitle(fieldRef.Name))
+			if i := slices.IndexFunc(switchCases, func(v SwitchCase) bool {
+				return v.Name == switchName
+			}); i >= 0 {
+				// switch exists
+				if j := slices.IndexFunc(switchCases[i].CondValues, func(v CondValue) bool {
+					return v.ReturnValue.Name == subField.Name
+				}); j >= 0 {
+					// same return value but new condition
+					switchCases[i].CondValues[j].Conds = append(switchCases[i].CondValues[j].Conds, caseName)
+				} else {
+					// new return value, create new condition
+					switchCases[i].CondValues = append(switchCases[i].CondValues, CondValue{
+						Conds:       []string{caseName},
+						ReturnValue: caseReturnValue,
+					})
+				}
+			} else {
+				switchCases = append(switchCases, SwitchCase{
+					Name: switchName,
+					CondValues: []CondValue{{
+						Conds:       []string{caseName},
+						ReturnValue: caseReturnValue,
+					}},
+				})
 			}
-
-			condValue = rawSwitchCases[fieldRef.Name][valOrder]
-			condValue.Conds = append(condValue.Conds,
-				fmt.Sprintf("%s%s",
-					b.transformType(fieldRef.Type, fieldRef.Array, field.FixedArraySize), strutil.ToTitle(subField.RefFieldValue[i])))
-
-			rawSwitchCases[fieldRef.Name][valOrder] = condValue
-		}
-	}
-
-	switchCases := make([]SwitchCase, len(rawSwitchCases))
-	for fieldNameRef, i := range rawSwitchCasesOrder {
-		switchCases[i] = SwitchCase{
-			Name:       fmt.Sprintf("m.%s", strutil.ToTitle(fieldNameRef)),
-			CondValues: rawSwitchCases[fieldNameRef],
 		}
 	}
 
