@@ -1229,18 +1229,31 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 
 // GetTotalCycles returns Dynamic Field interpretation of TotalCycles. Otherwise, returns the original value of TotalCycles.
 //
+// Based on m.SubSport:
+//   - name: "total_reps", units: "reps" , value: uint32(m.TotalCycles)
+//
 // Based on m.Sport:
+//   - name: "total_reps", units: "reps" , value: uint32(m.TotalCycles)
 //   - name: "total_strides", units: "strides" , value: uint32(m.TotalCycles)
 //   - name: "total_strokes", units: "strokes" , value: uint32(m.TotalCycles)
+//   - name: "total_pushes", units: "pushes" , value: uint32(m.TotalCycles)
 //
 // Otherwise:
 //   - name: "total_cycles", units: "cycles" , value: m.TotalCycles
 func (m *Session) GetTotalCycles() (name string, value any) {
+	switch m.SubSport {
+	case typedef.SubSportStrengthTraining:
+		return "total_reps", uint32(m.TotalCycles)
+	}
 	switch m.Sport {
+	case typedef.SportHiit:
+		return "total_reps", uint32(m.TotalCycles)
 	case typedef.SportRunning, typedef.SportWalking:
 		return "total_strides", uint32(m.TotalCycles)
 	case typedef.SportCycling, typedef.SportSwimming, typedef.SportRowing, typedef.SportStandUpPaddleboarding:
 		return "total_strokes", uint32(m.TotalCycles)
+	case typedef.SportWheelchairPushRun, typedef.SportWheelchairPushWalk:
+		return "total_pushes", uint32(m.TotalCycles)
 	}
 	return "total_cycles", m.TotalCycles
 }

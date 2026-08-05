@@ -456,6 +456,7 @@ const (
 	GarminProductInstinct3Amoled45Mm        GarminProduct = 4586
 	GarminProductInstinct3Amoled50Mm        GarminProduct = 4587
 	GarminProductDescentG2                  GarminProduct = 4588
+	GarminProductFenix7ProSolarNoWifi       GarminProduct = 4595
 	GarminProductVenuX1                     GarminProduct = 4603
 	GarminProductHrm200                     GarminProduct = 4606
 	GarminProductVivoactive6                GarminProduct = 4625
@@ -479,6 +480,7 @@ const (
 	GarminProductFr702026                   GarminProduct = 4916
 	GarminProductInstinctCrossoverAmoled    GarminProduct = 4678
 	GarminProductD2AirX15                   GarminProduct = 4944
+	GarminProductCirqaSmartBand             GarminProduct = 5019
 	GarminProductD2Mach2Pro                 GarminProduct = 5056
 	GarminProductSdm4                       GarminProduct = 10007 // SDM4 footpod
 	GarminProductEdgeRemote                 GarminProduct = 10014
@@ -1385,6 +1387,8 @@ func (g GarminProduct) String() string {
 		return "instinct3_amoled_50mm"
 	case GarminProductDescentG2:
 		return "descent_g2"
+	case GarminProductFenix7ProSolarNoWifi:
+		return "fenix7_pro_solar_no_wifi"
 	case GarminProductVenuX1:
 		return "venu_x1"
 	case GarminProductHrm200:
@@ -1431,6 +1435,8 @@ func (g GarminProduct) String() string {
 		return "instinct_crossover_amoled"
 	case GarminProductD2AirX15:
 		return "d2_air_x15"
+	case GarminProductCirqaSmartBand:
+		return "cirqa_smart_band"
 	case GarminProductD2Mach2Pro:
 		return "d2_mach2_pro"
 	case GarminProductSdm4:
@@ -2351,6 +2357,8 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductInstinct3Amoled50Mm
 	case "descent_g2":
 		return GarminProductDescentG2
+	case "fenix7_pro_solar_no_wifi":
+		return GarminProductFenix7ProSolarNoWifi
 	case "venu_x1":
 		return GarminProductVenuX1
 	case "hrm_200":
@@ -2397,6 +2405,8 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductInstinctCrossoverAmoled
 	case "d2_air_x15":
 		return GarminProductD2AirX15
+	case "cirqa_smart_band":
+		return GarminProductCirqaSmartBand
 	case "d2_mach2_pro":
 		return GarminProductD2Mach2Pro
 	case "sdm4":
@@ -2874,6 +2884,7 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductInstinct3Amoled45Mm,
 		GarminProductInstinct3Amoled50Mm,
 		GarminProductDescentG2,
+		GarminProductFenix7ProSolarNoWifi,
 		GarminProductVenuX1,
 		GarminProductHrm200,
 		GarminProductVivoactive6,
@@ -2897,6 +2908,7 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductFr702026,
 		GarminProductInstinctCrossoverAmoled,
 		GarminProductD2AirX15,
+		GarminProductCirqaSmartBand,
 		GarminProductD2Mach2Pro,
 		GarminProductSdm4,
 		GarminProductEdgeRemote,

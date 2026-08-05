@@ -595,17 +595,27 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		9:   {Name: "total_distance", Num: 9, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 100, Units: "m"},
 		10: {Name: "total_cycles", Num: 10, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1, Units: "cycles",
 			SubFields: []proto.SubField{
-				0: {Name: "total_strides", Type: profile.Uint32 /* basetype.Uint32 */, Scale: 1, Units: "strides",
+				0: {Name: "total_reps", Type: profile.Uint32 /* basetype.Uint32 */, Scale: 1, Units: "reps",
+					Maps: []proto.SubFieldMap{
+						0: {RefFieldNum: 6 /* sub_sport */, RefFieldValue: 20 /* strength_training */},
+						1: {RefFieldNum: 5 /* sport */, RefFieldValue: 62 /* hiit */},
+					}},
+				1: {Name: "total_strides", Type: profile.Uint32 /* basetype.Uint32 */, Scale: 1, Units: "strides",
 					Maps: []proto.SubFieldMap{
 						0: {RefFieldNum: 5 /* sport */, RefFieldValue: 1 /* running */},
 						1: {RefFieldNum: 5 /* sport */, RefFieldValue: 11 /* walking */},
 					}},
-				1: {Name: "total_strokes", Type: profile.Uint32 /* basetype.Uint32 */, Scale: 1, Units: "strokes",
+				2: {Name: "total_strokes", Type: profile.Uint32 /* basetype.Uint32 */, Scale: 1, Units: "strokes",
 					Maps: []proto.SubFieldMap{
 						0: {RefFieldNum: 5 /* sport */, RefFieldValue: 2 /* cycling */},
 						1: {RefFieldNum: 5 /* sport */, RefFieldValue: 5 /* swimming */},
 						2: {RefFieldNum: 5 /* sport */, RefFieldValue: 15 /* rowing */},
 						3: {RefFieldNum: 5 /* sport */, RefFieldValue: 37 /* stand_up_paddleboarding */},
+					}},
+				3: {Name: "total_pushes", Type: profile.Uint32 /* basetype.Uint32 */, Scale: 1, Units: "pushes",
+					Maps: []proto.SubFieldMap{
+						0: {RefFieldNum: 5 /* sport */, RefFieldValue: 66 /* wheelchair_push_run */},
+						1: {RefFieldNum: 5 /* sport */, RefFieldValue: 65 /* wheelchair_push_walk */},
 					}},
 			}},
 		11: {Name: "total_calories", Num: 11, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1, Units: "kcal"},
@@ -2113,6 +2123,7 @@ var mesgs = [...]*[256]*proto.FieldBase{
 		32: {Name: "descent", Num: 32, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1000, Units: "m"},
 		33: {Name: "moderate_activity_minutes", Num: 33, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1, Units: "minutes"},
 		34: {Name: "vigorous_activity_minutes", Num: 34, Type: profile.Uint16, BaseType: basetype.Uint16, Scale: 1, Units: "minutes"},
+		41: {Name: "pushes", Num: 41, Type: profile.Uint32, BaseType: basetype.Uint32, Scale: 1},
 	},
 	mesgnum.MonitoringHrData: {
 		253: {Name: "timestamp", Num: 253, Type: profile.DateTime, BaseType: basetype.Uint32, Scale: 1, Units: "s"},
