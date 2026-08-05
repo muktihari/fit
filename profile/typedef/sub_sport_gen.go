@@ -91,7 +91,7 @@ const (
 	SubSportDuathlon             SubSport = 79 // Multisport
 	SubSportBrick                SubSport = 80 // Multisport
 	SubSportSwimRun              SubSport = 81 // Multisport
-	SubSportAdventureRace        SubSport = 82 // Multisport
+	SubSportAdventureRace        SubSport = 82 // Multisport/Running
 	SubSportTruckerWorkout       SubSport = 83 // DEZL trucker workout training sport
 	SubSportPickleball           SubSport = 84 // Racket
 	SubSportPadel                SubSport = 85 // Racket

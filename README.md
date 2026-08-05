@@ -3,7 +3,7 @@
 ![GitHub Workflow Status](https://github.com/muktihari/fit/workflows/CI/badge.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/muktihari/fit.svg)](https://pkg.go.dev/github.com/muktihari/fit)
 [![CodeCov](https://codecov.io/gh/muktihari/fit/branch/master/graph/badge.svg)](https://codecov.io/gh/muktihari/fit)
-[![Profile Version](https://img.shields.io/badge/profile-v21.205-lightblue.svg?style=flat)](https://github.com/garmin/fit-sdk-tools/releases)
+[![Profile Version](https://img.shields.io/badge/profile-v21.212-lightblue.svg?style=flat)](https://github.com/garmin/fit-sdk-tools/releases)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/muktihari/fit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/muktihari/fit)
 
 This project hosts the Go implementation for [The Flexible and Interoperable Data Transfer (FIT) Protocol](https://developer.garmin.com/fit), which is a protocol developed by Garmin for storing and sharing data originating from sports, fitness, and health devices. Activities recorded using devices such as smartwatch and cycling computer are now mostly in a FIT file format (\*.fit).

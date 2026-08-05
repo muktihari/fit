@@ -13,16 +13,17 @@ import (
 type ActivityType byte
 
 const (
-	ActivityTypeGeneric          ActivityType = 0
-	ActivityTypeRunning          ActivityType = 1
-	ActivityTypeCycling          ActivityType = 2
-	ActivityTypeTransition       ActivityType = 3 // Mulitsport transition
-	ActivityTypeFitnessEquipment ActivityType = 4
-	ActivityTypeSwimming         ActivityType = 5
-	ActivityTypeWalking          ActivityType = 6
-	ActivityTypeSedentary        ActivityType = 8
-	ActivityTypeAll              ActivityType = 254 // All is for goals only to include all sports.
-	ActivityTypeInvalid          ActivityType = 0xFF
+	ActivityTypeGeneric           ActivityType = 0
+	ActivityTypeRunning           ActivityType = 1
+	ActivityTypeCycling           ActivityType = 2
+	ActivityTypeTransition        ActivityType = 3 // Mulitsport transition
+	ActivityTypeFitnessEquipment  ActivityType = 4
+	ActivityTypeSwimming          ActivityType = 5
+	ActivityTypeWalking           ActivityType = 6
+	ActivityTypeSedentary         ActivityType = 8
+	ActivityTypeWheelchairPushing ActivityType = 13
+	ActivityTypeAll               ActivityType = 254 // All is for goals only to include all sports.
+	ActivityTypeInvalid           ActivityType = 0xFF
 )
 
 func (a ActivityType) Byte() byte { return byte(a) }
@@ -45,6 +46,8 @@ func (a ActivityType) String() string {
 		return "walking"
 	case ActivityTypeSedentary:
 		return "sedentary"
+	case ActivityTypeWheelchairPushing:
+		return "wheelchair_pushing"
 	case ActivityTypeAll:
 		return "all"
 	default:
@@ -71,6 +74,8 @@ func ActivityTypeFromString(s string) ActivityType {
 		return ActivityTypeWalking
 	case "sedentary":
 		return ActivityTypeSedentary
+	case "wheelchair_pushing":
+		return ActivityTypeWheelchairPushing
 	case "all":
 		return ActivityTypeAll
 	default:
@@ -89,6 +94,7 @@ func ListActivityType() []ActivityType {
 		ActivityTypeSwimming,
 		ActivityTypeWalking,
 		ActivityTypeSedentary,
+		ActivityTypeWheelchairPushing,
 		ActivityTypeAll,
 	}
 }

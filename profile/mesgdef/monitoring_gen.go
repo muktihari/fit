@@ -32,6 +32,7 @@ type Monitoring struct {
 	Duration                     uint32              // Units: s
 	Ascent                       uint32              // Scale: 1000; Units: m
 	Descent                      uint32              // Scale: 1000; Units: m
+	Pushes                       uint32              // Wheelchair Pushes
 	ActivityTime                 [8]uint16           // Array: [8]; Units: minutes; Indexed using minute_activity_level enum
 	Calories                     uint16              // Units: kcal; Accumulated total calories. Maintained by MonitoringReader for each activity_type. See SDK documentation
 	Distance16                   uint16              // Units: 100 * m
@@ -75,7 +76,7 @@ func (m *Monitoring) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{34343608319, 0, 0, 2305843009213693952}
+		knownNums := [4]uint64{2233366863871, 0, 0, 2305843009213693952}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -139,6 +140,7 @@ func (m *Monitoring) Reset(mesg *proto.Message) {
 		Descent:                      vals[32].Uint32(),
 		ModerateActivityMinutes:      vals[33].Uint16(),
 		VigorousActivityMinutes:      vals[34].Uint16(),
+		Pushes:                       vals[41].Uint32(),
 
 		state: state,
 
@@ -153,7 +155,7 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 29)
+	fields := make([]proto.Field, 0, 30)
 	mesg := proto.Message{Num: typedef.MesgNumMonitoring}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
@@ -315,6 +317,11 @@ func (m *Monitoring) ToMesg(options *Options) proto.Message {
 	if m.VigorousActivityMinutes != basetype.Uint16Invalid {
 		field := factory.CreateField(mesg.Num, 34)
 		field.Value = proto.Uint16(m.VigorousActivityMinutes)
+		fields = append(fields, field)
+	}
+	if m.Pushes != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 41)
+		field.Value = proto.Uint32(m.Pushes)
 		fields = append(fields, field)
 	}
 
@@ -800,6 +807,14 @@ func (m *Monitoring) SetModerateActivityMinutes(v uint16) *Monitoring {
 // Units: minutes
 func (m *Monitoring) SetVigorousActivityMinutes(v uint16) *Monitoring {
 	m.VigorousActivityMinutes = v
+	return m
+}
+
+// SetPushes sets Pushes value.
+//
+// Wheelchair Pushes
+func (m *Monitoring) SetPushes(v uint32) *Monitoring {
+	m.Pushes = v
 	return m
 }
 

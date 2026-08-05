@@ -711,6 +711,7 @@ const (
 	MonitoringDescent                                 = 32  // [ Monitoring ] [Type: Uint32, Base: uint32, Scale: 1000, Offset: 0, Units: m];
 	MonitoringModerateActivityMinutes                 = 33  // [ Monitoring ] [Type: Uint16, Base: uint16, Units: minutes];
 	MonitoringVigorousActivityMinutes                 = 34  // [ Monitoring ] [Type: Uint16, Base: uint16, Units: minutes];
+	MonitoringPushes                                  = 41  // [ Monitoring ] [Type: Uint32, Base: uint32]; Wheelchair Pushes
 	MonitoringHrDataTimestamp                         = 253 // [ MonitoringHrData ] [Type: DateTime, Base: uint32, Units: s]; Must align to logging interval, for example, time must be 00:00:00 for daily log.
 	MonitoringHrDataRestingHeartRate                  = 0   // [ MonitoringHrData ] [Type: Uint8, Base: uint8, Units: bpm]; 7-day rolling average
 	MonitoringHrDataCurrentDayRestingHeartRate        = 1   // [ MonitoringHrData ] [Type: Uint8, Base: uint8, Units: bpm]; RHR for today only. (Feeds into 7-day average)
