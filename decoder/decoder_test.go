@@ -68,15 +68,7 @@ func TestDecodeRealFiles(t *testing.T) {
 
 			_, err = dec.DecodeWithContext(context.Background())
 			if err != nil {
-				// NOTE: Doubts exist regarding the integrity of these files.
-				if info.Name() == "Settings.fit" || info.Name() == "WeightScaleMultiUser.fit" {
-					if errors.Is(err, ErrCRCChecksumMismatch) {
-						return nil
-					}
-				}
-
 				t.Errorf("filename: %s: %v", info.Name(), err)
-
 				return nil
 			}
 

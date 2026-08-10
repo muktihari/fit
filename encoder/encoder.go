@@ -240,7 +240,14 @@ func (e *Encoder) Encode(fit *proto.FIT) (err error) {
 	}
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
-		err = e.encodeWithDirectUpdateStrategy(fit)
+		if fit.FileHeader.Size == 12 {
+			// When size is 12, we need to do checksum for both file header and data combined.
+			// Since we can only know file header's data size after calculating all messages,
+			// we can only use this strategy.
+			err = e.encodeWithEarlyCheckStrategy(fit)
+		} else {
+			err = e.encodeWithDirectUpdateStrategy(fit)
+		}
 	case io.Writer:
 		err = e.encodeWithEarlyCheckStrategy(fit)
 	default:
@@ -344,7 +351,8 @@ func (e *Encoder) encodeFileHeader(header *proto.FileHeader) error {
 
 	b, _ := header.MarshalAppend(e.buf[:0])
 
-	if header.Size != 14 {
+	if header.Size == 12 {
+		_, _ = e.crc16.Write(b[:header.Size]) // Checksum both file header and data together.
 		n, err := e.w.Write(b[:header.Size])
 		e.n += int64(n)
 		return err

@@ -432,6 +432,40 @@ func TestEncode(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("checksum should include file header if file header's size is 12", func(t *testing.T) {
+		fit := proto.FIT{
+			FileHeader: proto.FileHeader{
+				Size:            12,
+				ProtocolVersion: proto.V1,
+				ProfileVersion:  profile.Version,
+			},
+			Messages: []proto.Message{
+				{
+					Num: mesgnum.FileId,
+					Fields: []proto.Field{
+						factory.CreateField(mesgnum.FileId, fieldnum.FileIdManufacturer).WithValue(typedef.ManufacturerDevelopment.Uint16()),
+					},
+				},
+			},
+		}
+
+		w := &bufferAt{Buffer: new(bytes.Buffer)}
+		enc := New(w)
+		if err := enc.Encode(&fit); err != nil {
+			t.Fatalf("expected nil, got: %v", err)
+		}
+
+		checksumEncoded := binary.LittleEndian.Uint16(w.Bytes()[w.Len()-2:])
+
+		hasher := crc16.New()
+		hasher.Write(w.Bytes()[:w.Len()-2])
+		checksumCalculated := hasher.Sum16()
+
+		if checksumEncoded != checksumCalculated {
+			t.Fatalf("expected checksum: encoded: %d, calculated: %d", checksumEncoded, checksumCalculated)
+		}
+	})
 }
 
 func TestValidateMessages(t *testing.T) {
