@@ -465,6 +465,30 @@ func TestEncode(t *testing.T) {
 		if checksumEncoded != checksumCalculated {
 			t.Fatalf("expected checksum: encoded: %d, calculated: %d", checksumEncoded, checksumCalculated)
 		}
+
+		fit.FileHeader = proto.FileHeader{
+			Size:            12,
+			ProtocolVersion: proto.V1,
+			ProfileVersion:  profile.Version,
+		}
+		fit.CRC = 0
+
+		w.Reset()
+		enc.Reset(w)
+
+		if err := enc.EncodeWithContext(context.Background(), &fit); err != nil {
+			t.Fatalf("encode with context: expected nil, got: %v", err)
+		}
+
+		checksumEncoded = binary.LittleEndian.Uint16(w.Bytes()[w.Len()-2:])
+
+		hasher.Reset()
+		hasher.Write(w.Bytes()[:w.Len()-2])
+		checksumCalculated = hasher.Sum16()
+
+		if checksumEncoded != checksumCalculated {
+			t.Fatalf("encode with context: expected checksum: encoded: %d, calculated: %d", checksumEncoded, checksumCalculated)
+		}
 	})
 }
 

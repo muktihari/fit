@@ -576,7 +576,11 @@ func (e *Encoder) EncodeWithContext(ctx context.Context, fit *proto.FIT) (err er
 	}
 	switch e.w.(type) {
 	case io.WriterAt, io.WriteSeeker:
-		err = e.encodeWithDirectUpdateStrategyWithContext(ctx, fit)
+		if fit.FileHeader.Size == 12 { // See `Encode` for details.
+			err = e.encodeWithEarlyCheckStrategyWithContext(ctx, fit)
+		} else {
+			err = e.encodeWithDirectUpdateStrategyWithContext(ctx, fit)
+		}
 	case io.Writer:
 		err = e.encodeWithEarlyCheckStrategyWithContext(ctx, fit)
 	default:
