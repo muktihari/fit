@@ -82,7 +82,7 @@ func FuzzDecodeEncodeRoundTrip(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, in []byte) {
 		r := bytes.NewReader(in)
-		dec := decoder.New(r, decoder.WithIgnoreChecksum())
+		dec := decoder.New(r)
 
 		buf := &bufferAt{new(bytes.Buffer)}
 		enc := encoder.New(buf,

@@ -461,7 +461,10 @@ func (d *Decoder) decodeFileHeader() error {
 	if size != 12 && size != 14 { // current spec is either 12 or 14
 		return fmt.Errorf("file header size [%d] is invalid: %w", size, ErrNotFITFile)
 	}
-	_, _ = d.crc16.Write(b)
+
+	if d.options.shouldChecksum {
+		_, _ = d.crc16.Write(b)
+	}
 
 	rem := int(size - 1)
 	b, err = d.readBuffer.ReadN(rem)
@@ -487,22 +490,21 @@ func (d *Decoder) decodeFileHeader() error {
 		return fmt.Errorf("invalid data size: %w", ErrNotFITFile)
 	}
 
+	if d.options.shouldChecksum {
+		_, _ = d.crc16.Write(b[:11])
+	}
+
+	// If size is 12, checksum both file header and data together.
+	// If size is 14, checksum file header and data separately.
 	if size == 14 {
 		d.fileHeader.CRC = binary.LittleEndian.Uint16(b[11:13])
+		calculated := d.crc16.Sum16()
+		d.crc16.Reset() // Reset since checksuming file header for size 14 ends here.
+		if d.options.shouldChecksum && d.fileHeader.CRC != 0 && d.fileHeader.CRC != calculated {
+			return fmt.Errorf("expected file header's crc: %d, got: %d: %w",
+				d.fileHeader.CRC, calculated, ErrCRCChecksumMismatch)
+		}
 	}
-
-	if d.fileHeader.CRC == 0x0000 || !d.options.shouldChecksum { // do not need to check file header's crc integrity.
-		d.crc16.Reset()
-		return nil
-	}
-
-	_, _ = d.crc16.Write(b[:len(b)-2])
-	if d.crc16.Sum16() != d.fileHeader.CRC { // check file header integrity
-		return fmt.Errorf("expected file header's crc: %d, got: %d: %w",
-			d.fileHeader.CRC, d.crc16.Sum16(), ErrCRCChecksumMismatch)
-	}
-
-	d.crc16.Reset() // this hash will be re-used for calculating data integrity.
 
 	return nil
 }
