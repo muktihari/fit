@@ -13,488 +13,503 @@ import (
 type GarminProduct uint16
 
 const (
-	GarminProductHrm1                       GarminProduct = 1
-	GarminProductAxh01                      GarminProduct = 2 // AXH01 HRM chipset
-	GarminProductAxb01                      GarminProduct = 3
-	GarminProductAxb02                      GarminProduct = 4
-	GarminProductHrm2ss                     GarminProduct = 5
-	GarminProductDsiAlf02                   GarminProduct = 6
-	GarminProductHrm3ss                     GarminProduct = 7
-	GarminProductHrmRunSingleByteProductId  GarminProduct = 8  // hrm_run model for HRM ANT+ messaging
-	GarminProductBsm                        GarminProduct = 9  // BSM model for ANT+ messaging
-	GarminProductBcm                        GarminProduct = 10 // BCM model for ANT+ messaging
-	GarminProductAxs01                      GarminProduct = 11 // AXS01 HRM Bike Chipset model for ANT+ messaging
-	GarminProductHrmTriSingleByteProductId  GarminProduct = 12 // hrm_tri model for HRM ANT+ messaging
-	GarminProductHrm4RunSingleByteProductId GarminProduct = 13 // hrm4 run model for HRM ANT+ messaging
-	GarminProductFr225SingleByteProductId   GarminProduct = 14 // fr225 model for HRM ANT+ messaging
-	GarminProductGen3BsmSingleByteProductId GarminProduct = 15 // gen3_bsm model for Bike Speed ANT+ messaging
-	GarminProductGen3BcmSingleByteProductId GarminProduct = 16 // gen3_bcm model for Bike Cadence ANT+ messaging
-	GarminProductHrmFitSingleByteProductId  GarminProduct = 22
-	GarminProductOhr                        GarminProduct = 255 // Garmin Wearable Optical Heart Rate Sensor for ANT+ HR Profile Broadcasting
-	GarminProductFr301China                 GarminProduct = 473
-	GarminProductFr301Japan                 GarminProduct = 474
-	GarminProductFr301Korea                 GarminProduct = 475
-	GarminProductFr301Taiwan                GarminProduct = 494
-	GarminProductFr405                      GarminProduct = 717 // Forerunner 405
-	GarminProductFr50                       GarminProduct = 782 // Forerunner 50
-	GarminProductFr405Japan                 GarminProduct = 987
-	GarminProductFr60                       GarminProduct = 988 // Forerunner 60
-	GarminProductDsiAlf01                   GarminProduct = 1011
-	GarminProductFr310xt                    GarminProduct = 1018 // Forerunner 310
-	GarminProductEdge500                    GarminProduct = 1036
-	GarminProductFr110                      GarminProduct = 1124 // Forerunner 110
-	GarminProductEdge800                    GarminProduct = 1169
-	GarminProductEdge500Taiwan              GarminProduct = 1199
-	GarminProductEdge500Japan               GarminProduct = 1213
-	GarminProductChirp                      GarminProduct = 1253
-	GarminProductFr110Japan                 GarminProduct = 1274
-	GarminProductEdge200                    GarminProduct = 1325
-	GarminProductFr910xt                    GarminProduct = 1328
-	GarminProductEdge800Taiwan              GarminProduct = 1333
-	GarminProductEdge800Japan               GarminProduct = 1334
-	GarminProductAlf04                      GarminProduct = 1341
-	GarminProductFr610                      GarminProduct = 1345
-	GarminProductFr210Japan                 GarminProduct = 1360
-	GarminProductVectorSs                   GarminProduct = 1380
-	GarminProductVectorCp                   GarminProduct = 1381
-	GarminProductEdge800China               GarminProduct = 1386
-	GarminProductEdge500China               GarminProduct = 1387
-	GarminProductApproachG10                GarminProduct = 1405
-	GarminProductFr610Japan                 GarminProduct = 1410
-	GarminProductEdge500Korea               GarminProduct = 1422
-	GarminProductFr70                       GarminProduct = 1436
-	GarminProductFr310xt4T                  GarminProduct = 1446
-	GarminProductAmx                        GarminProduct = 1461
-	GarminProductFr10                       GarminProduct = 1482
-	GarminProductEdge800Korea               GarminProduct = 1497
-	GarminProductSwim                       GarminProduct = 1499
-	GarminProductFr910xtChina               GarminProduct = 1537
-	GarminProductFenix                      GarminProduct = 1551
-	GarminProductEdge200Taiwan              GarminProduct = 1555
-	GarminProductEdge510                    GarminProduct = 1561
-	GarminProductEdge810                    GarminProduct = 1567
-	GarminProductTempe                      GarminProduct = 1570
-	GarminProductFr910xtJapan               GarminProduct = 1600
-	GarminProductFr620                      GarminProduct = 1623
-	GarminProductFr220                      GarminProduct = 1632
-	GarminProductFr910xtKorea               GarminProduct = 1664
-	GarminProductFr10Japan                  GarminProduct = 1688
-	GarminProductEdge810Japan               GarminProduct = 1721
-	GarminProductVirbElite                  GarminProduct = 1735
-	GarminProductEdgeTouring                GarminProduct = 1736 // Also Edge Touring Plus
-	GarminProductEdge510Japan               GarminProduct = 1742
-	GarminProductHrmTri                     GarminProduct = 1743 // Also HRM-Swim
-	GarminProductHrmRun                     GarminProduct = 1752
-	GarminProductFr920xt                    GarminProduct = 1765
-	GarminProductEdge510Asia                GarminProduct = 1821
-	GarminProductEdge810China               GarminProduct = 1822
-	GarminProductEdge810Taiwan              GarminProduct = 1823
-	GarminProductEdge1000                   GarminProduct = 1836
-	GarminProductVivoFit                    GarminProduct = 1837
-	GarminProductVirbRemote                 GarminProduct = 1853
-	GarminProductVivoKi                     GarminProduct = 1885
-	GarminProductFr15                       GarminProduct = 1903
-	GarminProductVivoActive                 GarminProduct = 1907
-	GarminProductEdge510Korea               GarminProduct = 1918
-	GarminProductFr620Japan                 GarminProduct = 1928
-	GarminProductFr620China                 GarminProduct = 1929
-	GarminProductFr220Japan                 GarminProduct = 1930
-	GarminProductFr220China                 GarminProduct = 1931
-	GarminProductApproachS6                 GarminProduct = 1936
-	GarminProductVivoSmart                  GarminProduct = 1956
-	GarminProductFenix2                     GarminProduct = 1967
-	GarminProductEpix                       GarminProduct = 1988
-	GarminProductFenix3                     GarminProduct = 2050
-	GarminProductEdge1000Taiwan             GarminProduct = 2052
-	GarminProductEdge1000Japan              GarminProduct = 2053
-	GarminProductFr15Japan                  GarminProduct = 2061
-	GarminProductEdge520                    GarminProduct = 2067
-	GarminProductEdge1000China              GarminProduct = 2070
-	GarminProductFr620Russia                GarminProduct = 2072
-	GarminProductFr220Russia                GarminProduct = 2073
-	GarminProductVectorS                    GarminProduct = 2079
-	GarminProductEdge1000Korea              GarminProduct = 2100
-	GarminProductFr920xtTaiwan              GarminProduct = 2130
-	GarminProductFr920xtChina               GarminProduct = 2131
-	GarminProductFr920xtJapan               GarminProduct = 2132
-	GarminProductVirbx                      GarminProduct = 2134
-	GarminProductVivoSmartApac              GarminProduct = 2135
-	GarminProductEtrexTouch                 GarminProduct = 2140
-	GarminProductEdge25                     GarminProduct = 2147
-	GarminProductFr25                       GarminProduct = 2148
-	GarminProductVivoFit2                   GarminProduct = 2150
-	GarminProductFr225                      GarminProduct = 2153
-	GarminProductFr630                      GarminProduct = 2156
-	GarminProductFr230                      GarminProduct = 2157
-	GarminProductFr735xt                    GarminProduct = 2158
-	GarminProductVivoActiveApac             GarminProduct = 2160
-	GarminProductVector2                    GarminProduct = 2161
-	GarminProductVector2S                   GarminProduct = 2162
-	GarminProductVirbxe                     GarminProduct = 2172
-	GarminProductFr620Taiwan                GarminProduct = 2173
-	GarminProductFr220Taiwan                GarminProduct = 2174
-	GarminProductTruswing                   GarminProduct = 2175
-	GarminProductD2airvenu                  GarminProduct = 2187
-	GarminProductFenix3China                GarminProduct = 2188
-	GarminProductFenix3Twn                  GarminProduct = 2189
-	GarminProductVariaHeadlight             GarminProduct = 2192
-	GarminProductVariaTaillightOld          GarminProduct = 2193
-	GarminProductEdgeExplore1000            GarminProduct = 2204
-	GarminProductFr225Asia                  GarminProduct = 2219
-	GarminProductVariaRadarTaillight        GarminProduct = 2225
-	GarminProductVariaRadarDisplay          GarminProduct = 2226
-	GarminProductEdge20                     GarminProduct = 2238
-	GarminProductEdge520Asia                GarminProduct = 2260
-	GarminProductEdge520Japan               GarminProduct = 2261
-	GarminProductD2Bravo                    GarminProduct = 2262
-	GarminProductApproachS20                GarminProduct = 2266
-	GarminProductVivoSmart2                 GarminProduct = 2271
-	GarminProductEdge1000Thai               GarminProduct = 2274
-	GarminProductVariaRemote                GarminProduct = 2276
-	GarminProductEdge25Asia                 GarminProduct = 2288
-	GarminProductEdge25Jpn                  GarminProduct = 2289
-	GarminProductEdge20Asia                 GarminProduct = 2290
-	GarminProductApproachX40                GarminProduct = 2292
-	GarminProductFenix3Japan                GarminProduct = 2293
-	GarminProductVivoSmartEmea              GarminProduct = 2294
-	GarminProductFr630Asia                  GarminProduct = 2310
-	GarminProductFr630Jpn                   GarminProduct = 2311
-	GarminProductFr230Jpn                   GarminProduct = 2313
-	GarminProductHrm4Run                    GarminProduct = 2327
-	GarminProductEpixJapan                  GarminProduct = 2332
-	GarminProductVivoActiveHr               GarminProduct = 2337
-	GarminProductVivoSmartGpsHr             GarminProduct = 2347
-	GarminProductVivoSmartHr                GarminProduct = 2348
-	GarminProductVivoSmartHrAsia            GarminProduct = 2361
-	GarminProductVivoSmartGpsHrAsia         GarminProduct = 2362
-	GarminProductVivoMove                   GarminProduct = 2368
-	GarminProductVariaTaillight             GarminProduct = 2379
-	GarminProductFr235Asia                  GarminProduct = 2396
-	GarminProductFr235Japan                 GarminProduct = 2397
-	GarminProductVariaVision                GarminProduct = 2398
-	GarminProductVivoFit3                   GarminProduct = 2406
-	GarminProductFenix3Korea                GarminProduct = 2407
-	GarminProductFenix3Sea                  GarminProduct = 2408
-	GarminProductFenix3Hr                   GarminProduct = 2413
-	GarminProductVirbUltra30                GarminProduct = 2417
-	GarminProductIndexSmartScale            GarminProduct = 2429
-	GarminProductFr235                      GarminProduct = 2431
-	GarminProductFenix3Chronos              GarminProduct = 2432
-	GarminProductOregon7xx                  GarminProduct = 2441
-	GarminProductRino7xx                    GarminProduct = 2444
-	GarminProductEpixKorea                  GarminProduct = 2457
-	GarminProductFenix3HrChn                GarminProduct = 2473
-	GarminProductFenix3HrTwn                GarminProduct = 2474
-	GarminProductFenix3HrJpn                GarminProduct = 2475
-	GarminProductFenix3HrSea                GarminProduct = 2476
-	GarminProductFenix3HrKor                GarminProduct = 2477
-	GarminProductNautix                     GarminProduct = 2496
-	GarminProductVivoActiveHrApac           GarminProduct = 2497
-	GarminProductFr35                       GarminProduct = 2503
-	GarminProductOregon7xxWw                GarminProduct = 2512
-	GarminProductEdge820                    GarminProduct = 2530
-	GarminProductEdgeExplore820             GarminProduct = 2531
-	GarminProductFr735xtApac                GarminProduct = 2533
-	GarminProductFr735xtJapan               GarminProduct = 2534
-	GarminProductFenix5s                    GarminProduct = 2544
-	GarminProductD2BravoTitanium            GarminProduct = 2547
-	GarminProductVariaUt800                 GarminProduct = 2567 // Varia UT 800 SW
-	GarminProductRunningDynamicsPod         GarminProduct = 2593
-	GarminProductEdge820China               GarminProduct = 2599
-	GarminProductEdge820Japan               GarminProduct = 2600
-	GarminProductFenix5x                    GarminProduct = 2604
-	GarminProductVivoFitJr                  GarminProduct = 2606
-	GarminProductVivoSmart3                 GarminProduct = 2622
-	GarminProductVivoSport                  GarminProduct = 2623
-	GarminProductEdge820Taiwan              GarminProduct = 2628
-	GarminProductEdge820Korea               GarminProduct = 2629
-	GarminProductEdge820Sea                 GarminProduct = 2630
-	GarminProductFr35Hebrew                 GarminProduct = 2650
-	GarminProductApproachS60                GarminProduct = 2656
-	GarminProductFr35Apac                   GarminProduct = 2667
-	GarminProductFr35Japan                  GarminProduct = 2668
-	GarminProductFenix3ChronosAsia          GarminProduct = 2675
-	GarminProductVirb360                    GarminProduct = 2687
-	GarminProductFr935                      GarminProduct = 2691
-	GarminProductFenix5                     GarminProduct = 2697
-	GarminProductVivoactive3                GarminProduct = 2700
-	GarminProductFr235ChinaNfc              GarminProduct = 2733
-	GarminProductForetrex601701             GarminProduct = 2769
-	GarminProductVivoMoveHr                 GarminProduct = 2772
-	GarminProductEdge1030                   GarminProduct = 2713
-	GarminProductFr35Sea                    GarminProduct = 2727
-	GarminProductVector3                    GarminProduct = 2787
-	GarminProductFenix5Asia                 GarminProduct = 2796
-	GarminProductFenix5sAsia                GarminProduct = 2797
-	GarminProductFenix5xAsia                GarminProduct = 2798
-	GarminProductApproachZ80                GarminProduct = 2806
-	GarminProductFr35Korea                  GarminProduct = 2814
-	GarminProductD2charlie                  GarminProduct = 2819
-	GarminProductVivoSmart3Apac             GarminProduct = 2831
-	GarminProductVivoSportApac              GarminProduct = 2832
-	GarminProductFr935Asia                  GarminProduct = 2833
-	GarminProductDescent                    GarminProduct = 2859
-	GarminProductVivoFit4                   GarminProduct = 2878
-	GarminProductFr645                      GarminProduct = 2886
-	GarminProductFr645m                     GarminProduct = 2888
-	GarminProductFr30                       GarminProduct = 2891
-	GarminProductFenix5sPlus                GarminProduct = 2900
-	GarminProductEdge130                    GarminProduct = 2909
-	GarminProductEdge1030Asia               GarminProduct = 2924
-	GarminProductVivosmart4                 GarminProduct = 2927
-	GarminProductVivoMoveHrAsia             GarminProduct = 2945
-	GarminProductApproachX10                GarminProduct = 2962
-	GarminProductFr30Asia                   GarminProduct = 2977
-	GarminProductVivoactive3mW              GarminProduct = 2988
-	GarminProductFr645Asia                  GarminProduct = 3003
-	GarminProductFr645mAsia                 GarminProduct = 3004
-	GarminProductEdgeExplore                GarminProduct = 3011
-	GarminProductGpsmap66                   GarminProduct = 3028
-	GarminProductApproachS10                GarminProduct = 3049
-	GarminProductVivoactive3mL              GarminProduct = 3066
-	GarminProductFr245                      GarminProduct = 3076
-	GarminProductFr245Music                 GarminProduct = 3077
-	GarminProductApproachG80                GarminProduct = 3085
-	GarminProductEdge130Asia                GarminProduct = 3092
-	GarminProductEdge1030Bontrager          GarminProduct = 3095
-	GarminProductFenix5Plus                 GarminProduct = 3110
-	GarminProductFenix5xPlus                GarminProduct = 3111
-	GarminProductEdge520Plus                GarminProduct = 3112
-	GarminProductFr945                      GarminProduct = 3113
-	GarminProductEdge530                    GarminProduct = 3121
-	GarminProductEdge830                    GarminProduct = 3122
-	GarminProductInstinctEsports            GarminProduct = 3126
-	GarminProductFenix5sPlusApac            GarminProduct = 3134
-	GarminProductFenix5xPlusApac            GarminProduct = 3135
-	GarminProductEdge520PlusApac            GarminProduct = 3142
-	GarminProductDescentT1                  GarminProduct = 3143
-	GarminProductFr235lAsia                 GarminProduct = 3144
-	GarminProductFr245Asia                  GarminProduct = 3145
-	GarminProductVivoActive3mApac           GarminProduct = 3163
-	GarminProductGen3Bsm                    GarminProduct = 3192 // gen3 bike speed sensor
-	GarminProductGen3Bcm                    GarminProduct = 3193 // gen3 bike cadence sensor
-	GarminProductVivoSmart4Asia             GarminProduct = 3218
-	GarminProductVivoactive4Small           GarminProduct = 3224
-	GarminProductVivoactive4Large           GarminProduct = 3225
-	GarminProductVenu                       GarminProduct = 3226
-	GarminProductMarqDriver                 GarminProduct = 3246
-	GarminProductMarqAviator                GarminProduct = 3247
-	GarminProductMarqCaptain                GarminProduct = 3248
-	GarminProductMarqCommander              GarminProduct = 3249
-	GarminProductMarqExpedition             GarminProduct = 3250
-	GarminProductMarqAthlete                GarminProduct = 3251
-	GarminProductDescentMk2                 GarminProduct = 3258
-	GarminProductFr45                       GarminProduct = 3282
-	GarminProductGpsmap66i                  GarminProduct = 3284
-	GarminProductFenix6sSport               GarminProduct = 3287
-	GarminProductFenix6s                    GarminProduct = 3288
-	GarminProductFenix6Sport                GarminProduct = 3289
-	GarminProductFenix6                     GarminProduct = 3290
-	GarminProductFenix6x                    GarminProduct = 3291
-	GarminProductHrmDual                    GarminProduct = 3299 // HRM-Dual
-	GarminProductHrmPro                     GarminProduct = 3300 // HRM-Pro
-	GarminProductVivoMove3Premium           GarminProduct = 3308
-	GarminProductApproachS40                GarminProduct = 3314
-	GarminProductFr245mAsia                 GarminProduct = 3321
-	GarminProductEdge530Apac                GarminProduct = 3349
-	GarminProductEdge830Apac                GarminProduct = 3350
-	GarminProductVivoMove3                  GarminProduct = 3378
-	GarminProductVivoActive4SmallAsia       GarminProduct = 3387
-	GarminProductVivoActive4LargeAsia       GarminProduct = 3388
-	GarminProductVivoActive4OledAsia        GarminProduct = 3389
-	GarminProductSwim2                      GarminProduct = 3405
-	GarminProductMarqDriverAsia             GarminProduct = 3420
-	GarminProductMarqAviatorAsia            GarminProduct = 3421
-	GarminProductVivoMove3Asia              GarminProduct = 3422
-	GarminProductFr945Asia                  GarminProduct = 3441
-	GarminProductVivoActive3tChn            GarminProduct = 3446
-	GarminProductMarqCaptainAsia            GarminProduct = 3448
-	GarminProductMarqCommanderAsia          GarminProduct = 3449
-	GarminProductMarqExpeditionAsia         GarminProduct = 3450
-	GarminProductMarqAthleteAsia            GarminProduct = 3451
-	GarminProductIndexSmartScale2           GarminProduct = 3461
-	GarminProductInstinctSolar              GarminProduct = 3466
-	GarminProductFr45Asia                   GarminProduct = 3469
-	GarminProductVivoactive3Daimler         GarminProduct = 3473
-	GarminProductLegacyRey                  GarminProduct = 3498
-	GarminProductLegacyDarthVader           GarminProduct = 3499
-	GarminProductLegacyCaptainMarvel        GarminProduct = 3500
-	GarminProductLegacyFirstAvenger         GarminProduct = 3501
-	GarminProductFenix6sSportAsia           GarminProduct = 3512
-	GarminProductFenix6sAsia                GarminProduct = 3513
-	GarminProductFenix6SportAsia            GarminProduct = 3514
-	GarminProductFenix6Asia                 GarminProduct = 3515
-	GarminProductFenix6xAsia                GarminProduct = 3516
-	GarminProductLegacyCaptainMarvelAsia    GarminProduct = 3535
-	GarminProductLegacyFirstAvengerAsia     GarminProduct = 3536
-	GarminProductLegacyReyAsia              GarminProduct = 3537
-	GarminProductLegacyDarthVaderAsia       GarminProduct = 3538
-	GarminProductDescentMk2s                GarminProduct = 3542
-	GarminProductEdge130Plus                GarminProduct = 3558
-	GarminProductEdge1030Plus               GarminProduct = 3570
-	GarminProductRally200                   GarminProduct = 3578 // Rally 100/200 Power Meter Series
-	GarminProductFr745                      GarminProduct = 3589
-	GarminProductVenusqMusic                GarminProduct = 3596
-	GarminProductVenusqMusicV2              GarminProduct = 3599
-	GarminProductVenusq                     GarminProduct = 3600
-	GarminProductLily                       GarminProduct = 3615
-	GarminProductMarqAdventurer             GarminProduct = 3624
-	GarminProductEnduro                     GarminProduct = 3638
-	GarminProductSwim2Apac                  GarminProduct = 3639
-	GarminProductMarqAdventurerAsia         GarminProduct = 3648
-	GarminProductFr945Lte                   GarminProduct = 3652
-	GarminProductDescentMk2Asia             GarminProduct = 3702 // Mk2 and Mk2i
-	GarminProductVenu2                      GarminProduct = 3703
-	GarminProductVenu2s                     GarminProduct = 3704
-	GarminProductVenuDaimlerAsia            GarminProduct = 3737
-	GarminProductMarqGolfer                 GarminProduct = 3739
-	GarminProductVenuDaimler                GarminProduct = 3740
-	GarminProductFr745Asia                  GarminProduct = 3794
-	GarminProductVariaRct715                GarminProduct = 3808
-	GarminProductLilyAsia                   GarminProduct = 3809
-	GarminProductEdge1030PlusAsia           GarminProduct = 3812
-	GarminProductEdge130PlusAsia            GarminProduct = 3813
-	GarminProductApproachS12                GarminProduct = 3823
-	GarminProductEnduroAsia                 GarminProduct = 3872
-	GarminProductVenusqAsia                 GarminProduct = 3837
-	GarminProductEdge1040                   GarminProduct = 3843
-	GarminProductMarqGolferAsia             GarminProduct = 3850
-	GarminProductVenu2Plus                  GarminProduct = 3851
-	GarminProductGnss                       GarminProduct = 3865 // Airoha AG3335M Family
-	GarminProductFr55                       GarminProduct = 3869
-	GarminProductInstinct2                  GarminProduct = 3888
-	GarminProductInstinct2S                 GarminProduct = 3889
-	GarminProductFenix7s                    GarminProduct = 3905
-	GarminProductFenix7                     GarminProduct = 3906
-	GarminProductFenix7x                    GarminProduct = 3907
-	GarminProductFenix7sApac                GarminProduct = 3908
-	GarminProductFenix7Apac                 GarminProduct = 3909
-	GarminProductFenix7xApac                GarminProduct = 3910
-	GarminProductApproachG12                GarminProduct = 3927
-	GarminProductDescentMk2sAsia            GarminProduct = 3930
-	GarminProductApproachS42                GarminProduct = 3934
-	GarminProductEpixGen2                   GarminProduct = 3943
-	GarminProductEpixGen2Apac               GarminProduct = 3944
-	GarminProductVenu2sAsia                 GarminProduct = 3949
-	GarminProductVenu2Asia                  GarminProduct = 3950
-	GarminProductFr945LteAsia               GarminProduct = 3978
-	GarminProductVivoMoveSport              GarminProduct = 3982
-	GarminProductVivomoveTrend              GarminProduct = 3983
-	GarminProductApproachS12Asia            GarminProduct = 3986
-	GarminProductFr255Music                 GarminProduct = 3990
-	GarminProductFr255SmallMusic            GarminProduct = 3991
-	GarminProductFr255                      GarminProduct = 3992
-	GarminProductFr255Small                 GarminProduct = 3993
-	GarminProductApproachG12Asia            GarminProduct = 4001
-	GarminProductApproachS42Asia            GarminProduct = 4002
-	GarminProductDescentG1                  GarminProduct = 4005
-	GarminProductVenu2PlusAsia              GarminProduct = 4017
-	GarminProductFr955                      GarminProduct = 4024
-	GarminProductFr55Asia                   GarminProduct = 4033
-	GarminProductEdge540                    GarminProduct = 4061
-	GarminProductEdge840                    GarminProduct = 4062
-	GarminProductVivosmart5                 GarminProduct = 4063
-	GarminProductInstinct2Asia              GarminProduct = 4071
-	GarminProductMarqGen2                   GarminProduct = 4105 // Adventurer, Athlete, Captain, Golfer
-	GarminProductVenusq2                    GarminProduct = 4115
-	GarminProductVenusq2music               GarminProduct = 4116
-	GarminProductMarqGen2Aviator            GarminProduct = 4124
-	GarminProductD2AirX10                   GarminProduct = 4125
-	GarminProductHrmProPlus                 GarminProduct = 4130
-	GarminProductDescentG1Asia              GarminProduct = 4132
-	GarminProductTactix7                    GarminProduct = 4135
-	GarminProductInstinctCrossover          GarminProduct = 4155
-	GarminProductEdgeExplore2               GarminProduct = 4169
-	GarminProductDescentMk3                 GarminProduct = 4222
-	GarminProductDescentMk3i                GarminProduct = 4223
-	GarminProductApproachS70                GarminProduct = 4233
-	GarminProductFr265Large                 GarminProduct = 4257
-	GarminProductFr265Small                 GarminProduct = 4258
-	GarminProductVenu3                      GarminProduct = 4260
-	GarminProductVenu3s                     GarminProduct = 4261
-	GarminProductTacxNeoSmart               GarminProduct = 4265 // Neo Smart, Tacx
-	GarminProductTacxNeo2Smart              GarminProduct = 4266 // Neo 2 Smart, Tacx
-	GarminProductTacxNeo2TSmart             GarminProduct = 4267 // Neo 2T Smart, Tacx
-	GarminProductTacxNeoSmartBike           GarminProduct = 4268 // Neo Smart Bike, Tacx
-	GarminProductTacxSatoriSmart            GarminProduct = 4269 // Satori Smart, Tacx
-	GarminProductTacxFlowSmart              GarminProduct = 4270 // Flow Smart, Tacx
-	GarminProductTacxVortexSmart            GarminProduct = 4271 // Vortex Smart, Tacx
-	GarminProductTacxBushidoSmart           GarminProduct = 4272 // Bushido Smart, Tacx
-	GarminProductTacxGeniusSmart            GarminProduct = 4273 // Genius Smart, Tacx
-	GarminProductTacxFluxFluxSSmart         GarminProduct = 4274 // Flux/Flux S Smart, Tacx
-	GarminProductTacxFlux2Smart             GarminProduct = 4275 // Flux 2 Smart, Tacx
-	GarminProductTacxMagnum                 GarminProduct = 4276 // Magnum, Tacx
-	GarminProductEdge1040Asia               GarminProduct = 4305
-	GarminProductEpixGen2Pro42              GarminProduct = 4312
-	GarminProductEpixGen2Pro47              GarminProduct = 4313
-	GarminProductEpixGen2Pro51              GarminProduct = 4314
-	GarminProductFr965                      GarminProduct = 4315
-	GarminProductEnduro2                    GarminProduct = 4341
-	GarminProductFenix7sProSolar            GarminProduct = 4374
-	GarminProductFenix7ProSolar             GarminProduct = 4375
-	GarminProductFenix7xProSolar            GarminProduct = 4376
-	GarminProductLily2                      GarminProduct = 4380
-	GarminProductInstinct2X                 GarminProduct = 4394
-	GarminProductVivoactive5                GarminProduct = 4426
-	GarminProductFr165                      GarminProduct = 4432
-	GarminProductFr165Music                 GarminProduct = 4433
-	GarminProductEdge1050                   GarminProduct = 4440
-	GarminProductDescentT2                  GarminProduct = 4442
-	GarminProductHrmFit                     GarminProduct = 4446
-	GarminProductMarqGen2Commander          GarminProduct = 4472
-	GarminProductLilyAthlete                GarminProduct = 4477 // aka the Lily 2 Active
-	GarminProductRallyX10                   GarminProduct = 4525 // Rally 110/210
-	GarminProductFenix8Solar                GarminProduct = 4532
-	GarminProductFenix8SolarLarge           GarminProduct = 4533
-	GarminProductFenix8Small                GarminProduct = 4534
-	GarminProductFenix8                     GarminProduct = 4536
-	GarminProductD2Mach1Pro                 GarminProduct = 4556
-	GarminProductEnduro3                    GarminProduct = 4575
-	GarminProductInstincte40Mm              GarminProduct = 4583
-	GarminProductInstincte45Mm              GarminProduct = 4584
-	GarminProductInstinct3Solar45Mm         GarminProduct = 4585
-	GarminProductInstinct3Amoled45Mm        GarminProduct = 4586
-	GarminProductInstinct3Amoled50Mm        GarminProduct = 4587
-	GarminProductDescentG2                  GarminProduct = 4588
-	GarminProductFenix7ProSolarNoWifi       GarminProduct = 4595
-	GarminProductVenuX1                     GarminProduct = 4603
-	GarminProductHrm200                     GarminProduct = 4606
-	GarminProductVivoactive6                GarminProduct = 4625
-	GarminProductFenix8Pro                  GarminProduct = 4631
-	GarminProductEdge550                    GarminProduct = 4633
-	GarminProductEdge850                    GarminProduct = 4634
-	GarminProductVenu4                      GarminProduct = 4643
-	GarminProductVenu4s                     GarminProduct = 4644
-	GarminProductApproachs44                GarminProduct = 4647
-	GarminProductEdgeMtb                    GarminProduct = 4655
-	GarminProductApproachs50                GarminProduct = 4656
-	GarminProductFenixE                     GarminProduct = 4666
-	GarminProductBounce2                    GarminProduct = 4745
-	GarminProductInstinct3Solar50Mm         GarminProduct = 4759
-	GarminProductTactix8Amoled              GarminProduct = 4775
-	GarminProductTactix8Solar               GarminProduct = 4776
-	GarminProductFr170Music                 GarminProduct = 4814
-	GarminProductFr170                      GarminProduct = 4815
-	GarminProductApproachJ1                 GarminProduct = 4825
-	GarminProductD2Mach2                    GarminProduct = 4879
-	GarminProductFr702026                   GarminProduct = 4916
-	GarminProductInstinctCrossoverAmoled    GarminProduct = 4678
-	GarminProductD2AirX15                   GarminProduct = 4944
-	GarminProductCirqaSmartBand             GarminProduct = 5019
-	GarminProductD2Mach2Pro                 GarminProduct = 5056
-	GarminProductSdm4                       GarminProduct = 10007 // SDM4 footpod
-	GarminProductEdgeRemote                 GarminProduct = 10014
-	GarminProductTacxTrainingAppWin         GarminProduct = 20533
-	GarminProductTacxTrainingAppMac         GarminProduct = 20534
-	GarminProductTacxTrainingAppMacCatalyst GarminProduct = 20565
-	GarminProductTrainingCenter             GarminProduct = 20119
-	GarminProductTacxTrainingAppAndroid     GarminProduct = 30045
-	GarminProductTacxTrainingAppIos         GarminProduct = 30046
-	GarminProductTacxTrainingAppLegacy      GarminProduct = 30047
-	GarminProductConnectiqSimulator         GarminProduct = 65531
-	GarminProductAndroidAntplusPlugin       GarminProduct = 65532
-	GarminProductConnect                    GarminProduct = 65534 // Garmin Connect website
-	GarminProductInvalid                    GarminProduct = 0xFFFF
+	GarminProductHrm1                        GarminProduct = 1
+	GarminProductAxh01                       GarminProduct = 2 // AXH01 HRM chipset
+	GarminProductAxb01                       GarminProduct = 3
+	GarminProductAxb02                       GarminProduct = 4
+	GarminProductHrm2ss                      GarminProduct = 5
+	GarminProductDsiAlf02                    GarminProduct = 6
+	GarminProductHrm3ss                      GarminProduct = 7
+	GarminProductHrmRunSingleByteProductId   GarminProduct = 8  // hrm_run model for HRM ANT+ messaging
+	GarminProductBsm                         GarminProduct = 9  // BSM model for ANT+ messaging
+	GarminProductBcm                         GarminProduct = 10 // BCM model for ANT+ messaging
+	GarminProductAxs01                       GarminProduct = 11 // AXS01 HRM Bike Chipset model for ANT+ messaging
+	GarminProductHrmTriSingleByteProductId   GarminProduct = 12 // hrm_tri model for HRM ANT+ messaging
+	GarminProductHrm4RunSingleByteProductId  GarminProduct = 13 // hrm4 run model for HRM ANT+ messaging
+	GarminProductFr225SingleByteProductId    GarminProduct = 14 // fr225 model for HRM ANT+ messaging
+	GarminProductGen3BsmSingleByteProductId  GarminProduct = 15 // gen3_bsm model for Bike Speed ANT+ messaging
+	GarminProductGen3BcmSingleByteProductId  GarminProduct = 16 // gen3_bcm model for Bike Cadence ANT+ messaging
+	GarminProductHrmFitSingleByteProductId   GarminProduct = 22
+	GarminProductOhr                         GarminProduct = 255 // Garmin Wearable Optical Heart Rate Sensor for ANT+ HR Profile Broadcasting
+	GarminProductFr301China                  GarminProduct = 473
+	GarminProductFr301Japan                  GarminProduct = 474
+	GarminProductFr301Korea                  GarminProduct = 475
+	GarminProductFr301Taiwan                 GarminProduct = 494
+	GarminProductFr405                       GarminProduct = 717 // Forerunner 405
+	GarminProductFr50                        GarminProduct = 782 // Forerunner 50
+	GarminProductFr405Japan                  GarminProduct = 987
+	GarminProductFr60                        GarminProduct = 988 // Forerunner 60
+	GarminProductDsiAlf01                    GarminProduct = 1011
+	GarminProductFr310xt                     GarminProduct = 1018 // Forerunner 310
+	GarminProductEdge500                     GarminProduct = 1036
+	GarminProductFr110                       GarminProduct = 1124 // Forerunner 110
+	GarminProductEdge800                     GarminProduct = 1169
+	GarminProductEdge500Taiwan               GarminProduct = 1199
+	GarminProductEdge500Japan                GarminProduct = 1213
+	GarminProductChirp                       GarminProduct = 1253
+	GarminProductFr110Japan                  GarminProduct = 1274
+	GarminProductEdge200                     GarminProduct = 1325
+	GarminProductFr910xt                     GarminProduct = 1328
+	GarminProductEdge800Taiwan               GarminProduct = 1333
+	GarminProductEdge800Japan                GarminProduct = 1334
+	GarminProductAlf04                       GarminProduct = 1341
+	GarminProductFr610                       GarminProduct = 1345
+	GarminProductFr210Japan                  GarminProduct = 1360
+	GarminProductVectorSs                    GarminProduct = 1380
+	GarminProductVectorCp                    GarminProduct = 1381
+	GarminProductEdge800China                GarminProduct = 1386
+	GarminProductEdge500China                GarminProduct = 1387
+	GarminProductApproachG10                 GarminProduct = 1405
+	GarminProductFr610Japan                  GarminProduct = 1410
+	GarminProductEdge500Korea                GarminProduct = 1422
+	GarminProductFr70                        GarminProduct = 1436
+	GarminProductFr310xt4T                   GarminProduct = 1446
+	GarminProductAmx                         GarminProduct = 1461
+	GarminProductFr10                        GarminProduct = 1482
+	GarminProductEdge800Korea                GarminProduct = 1497
+	GarminProductSwim                        GarminProduct = 1499
+	GarminProductFr910xtChina                GarminProduct = 1537
+	GarminProductFenix                       GarminProduct = 1551
+	GarminProductEdge200Taiwan               GarminProduct = 1555
+	GarminProductEdge510                     GarminProduct = 1561
+	GarminProductEdge810                     GarminProduct = 1567
+	GarminProductTempe                       GarminProduct = 1570
+	GarminProductFr910xtJapan                GarminProduct = 1600
+	GarminProductFr620                       GarminProduct = 1623
+	GarminProductFr220                       GarminProduct = 1632
+	GarminProductFr910xtKorea                GarminProduct = 1664
+	GarminProductFr10Japan                   GarminProduct = 1688
+	GarminProductEdge810Japan                GarminProduct = 1721
+	GarminProductVirbElite                   GarminProduct = 1735
+	GarminProductEdgeTouring                 GarminProduct = 1736 // Also Edge Touring Plus
+	GarminProductEdge510Japan                GarminProduct = 1742
+	GarminProductHrmTri                      GarminProduct = 1743 // Also HRM-Swim
+	GarminProductHrmRun                      GarminProduct = 1752
+	GarminProductFr920xt                     GarminProduct = 1765
+	GarminProductEdge510Asia                 GarminProduct = 1821
+	GarminProductEdge810China                GarminProduct = 1822
+	GarminProductEdge810Taiwan               GarminProduct = 1823
+	GarminProductEdge1000                    GarminProduct = 1836
+	GarminProductVivoFit                     GarminProduct = 1837
+	GarminProductVirbRemote                  GarminProduct = 1853
+	GarminProductVivoKi                      GarminProduct = 1885
+	GarminProductFr15                        GarminProduct = 1903
+	GarminProductVivoActive                  GarminProduct = 1907
+	GarminProductEdge510Korea                GarminProduct = 1918
+	GarminProductFr620Japan                  GarminProduct = 1928
+	GarminProductFr620China                  GarminProduct = 1929
+	GarminProductFr220Japan                  GarminProduct = 1930
+	GarminProductFr220China                  GarminProduct = 1931
+	GarminProductApproachS6                  GarminProduct = 1936
+	GarminProductVivoSmart                   GarminProduct = 1956
+	GarminProductFenix2                      GarminProduct = 1967
+	GarminProductEpix                        GarminProduct = 1988
+	GarminProductFenix3                      GarminProduct = 2050
+	GarminProductEdge1000Taiwan              GarminProduct = 2052
+	GarminProductEdge1000Japan               GarminProduct = 2053
+	GarminProductFr15Japan                   GarminProduct = 2061
+	GarminProductEdge520                     GarminProduct = 2067
+	GarminProductEdge1000China               GarminProduct = 2070
+	GarminProductFr620Russia                 GarminProduct = 2072
+	GarminProductFr220Russia                 GarminProduct = 2073
+	GarminProductVectorS                     GarminProduct = 2079
+	GarminProductEdge1000Korea               GarminProduct = 2100
+	GarminProductFr920xtTaiwan               GarminProduct = 2130
+	GarminProductFr920xtChina                GarminProduct = 2131
+	GarminProductFr920xtJapan                GarminProduct = 2132
+	GarminProductVirbx                       GarminProduct = 2134
+	GarminProductVivoSmartApac               GarminProduct = 2135
+	GarminProductEtrexTouch                  GarminProduct = 2140
+	GarminProductEdge25                      GarminProduct = 2147
+	GarminProductFr25                        GarminProduct = 2148
+	GarminProductVivoFit2                    GarminProduct = 2150
+	GarminProductFr225                       GarminProduct = 2153
+	GarminProductFr630                       GarminProduct = 2156
+	GarminProductFr230                       GarminProduct = 2157
+	GarminProductFr735xt                     GarminProduct = 2158
+	GarminProductVivoActiveApac              GarminProduct = 2160
+	GarminProductVector2                     GarminProduct = 2161
+	GarminProductVector2S                    GarminProduct = 2162
+	GarminProductVirbxe                      GarminProduct = 2172
+	GarminProductFr620Taiwan                 GarminProduct = 2173
+	GarminProductFr220Taiwan                 GarminProduct = 2174
+	GarminProductTruswing                    GarminProduct = 2175
+	GarminProductD2airvenu                   GarminProduct = 2187
+	GarminProductFenix3China                 GarminProduct = 2188
+	GarminProductFenix3Twn                   GarminProduct = 2189
+	GarminProductVariaHeadlight              GarminProduct = 2192
+	GarminProductVariaTaillightOld           GarminProduct = 2193
+	GarminProductEdgeExplore1000             GarminProduct = 2204
+	GarminProductFr225Asia                   GarminProduct = 2219
+	GarminProductVariaRadarTaillight         GarminProduct = 2225
+	GarminProductVariaRadarDisplay           GarminProduct = 2226
+	GarminProductEdge20                      GarminProduct = 2238
+	GarminProductEdge520Asia                 GarminProduct = 2260
+	GarminProductEdge520Japan                GarminProduct = 2261
+	GarminProductD2Bravo                     GarminProduct = 2262
+	GarminProductApproachS20                 GarminProduct = 2266
+	GarminProductVivoSmart2                  GarminProduct = 2271
+	GarminProductEdge1000Thai                GarminProduct = 2274
+	GarminProductVariaRemote                 GarminProduct = 2276
+	GarminProductEdge25Asia                  GarminProduct = 2288
+	GarminProductEdge25Jpn                   GarminProduct = 2289
+	GarminProductEdge20Asia                  GarminProduct = 2290
+	GarminProductApproachX40                 GarminProduct = 2292
+	GarminProductFenix3Japan                 GarminProduct = 2293
+	GarminProductVivoSmartEmea               GarminProduct = 2294
+	GarminProductFr630Asia                   GarminProduct = 2310
+	GarminProductFr630Jpn                    GarminProduct = 2311
+	GarminProductFr230Jpn                    GarminProduct = 2313
+	GarminProductHrm4Run                     GarminProduct = 2327
+	GarminProductEpixJapan                   GarminProduct = 2332
+	GarminProductVivoActiveHr                GarminProduct = 2337
+	GarminProductVivoSmartGpsHr              GarminProduct = 2347
+	GarminProductVivoSmartHr                 GarminProduct = 2348
+	GarminProductVivoSmartHrAsia             GarminProduct = 2361
+	GarminProductVivoSmartGpsHrAsia          GarminProduct = 2362
+	GarminProductVivoMove                    GarminProduct = 2368
+	GarminProductVariaTaillight              GarminProduct = 2379
+	GarminProductFr235Asia                   GarminProduct = 2396
+	GarminProductFr235Japan                  GarminProduct = 2397
+	GarminProductVariaVision                 GarminProduct = 2398
+	GarminProductVivoFit3                    GarminProduct = 2406
+	GarminProductFenix3Korea                 GarminProduct = 2407
+	GarminProductFenix3Sea                   GarminProduct = 2408
+	GarminProductFenix3Hr                    GarminProduct = 2413
+	GarminProductVirbUltra30                 GarminProduct = 2417
+	GarminProductIndexSmartScale             GarminProduct = 2429
+	GarminProductFr235                       GarminProduct = 2431
+	GarminProductFenix3Chronos               GarminProduct = 2432
+	GarminProductOregon7xx                   GarminProduct = 2441
+	GarminProductRino7xx                     GarminProduct = 2444
+	GarminProductEpixKorea                   GarminProduct = 2457
+	GarminProductFenix3HrChn                 GarminProduct = 2473
+	GarminProductFenix3HrTwn                 GarminProduct = 2474
+	GarminProductFenix3HrJpn                 GarminProduct = 2475
+	GarminProductFenix3HrSea                 GarminProduct = 2476
+	GarminProductFenix3HrKor                 GarminProduct = 2477
+	GarminProductNautix                      GarminProduct = 2496
+	GarminProductVivoActiveHrApac            GarminProduct = 2497
+	GarminProductFr35                        GarminProduct = 2503
+	GarminProductOregon7xxWw                 GarminProduct = 2512
+	GarminProductEdge820                     GarminProduct = 2530
+	GarminProductEdgeExplore820              GarminProduct = 2531
+	GarminProductFr735xtApac                 GarminProduct = 2533
+	GarminProductFr735xtJapan                GarminProduct = 2534
+	GarminProductFenix5s                     GarminProduct = 2544
+	GarminProductD2BravoTitanium             GarminProduct = 2547
+	GarminProductVariaUt800                  GarminProduct = 2567 // Varia UT 800 SW
+	GarminProductRunningDynamicsPod          GarminProduct = 2593
+	GarminProductEdge820China                GarminProduct = 2599
+	GarminProductEdge820Japan                GarminProduct = 2600
+	GarminProductFenix5x                     GarminProduct = 2604
+	GarminProductVivoFitJr                   GarminProduct = 2606
+	GarminProductVivoSmart3                  GarminProduct = 2622
+	GarminProductVivoSport                   GarminProduct = 2623
+	GarminProductEdge820Taiwan               GarminProduct = 2628
+	GarminProductEdge820Korea                GarminProduct = 2629
+	GarminProductEdge820Sea                  GarminProduct = 2630
+	GarminProductFr35Hebrew                  GarminProduct = 2650
+	GarminProductApproachS60                 GarminProduct = 2656
+	GarminProductFr35Apac                    GarminProduct = 2667
+	GarminProductFr35Japan                   GarminProduct = 2668
+	GarminProductFenix3ChronosAsia           GarminProduct = 2675
+	GarminProductVirb360                     GarminProduct = 2687
+	GarminProductFr935                       GarminProduct = 2691
+	GarminProductFenix5                      GarminProduct = 2697
+	GarminProductVivoactive3                 GarminProduct = 2700
+	GarminProductFr235ChinaNfc               GarminProduct = 2733
+	GarminProductForetrex601701              GarminProduct = 2769
+	GarminProductVivoMoveHr                  GarminProduct = 2772
+	GarminProductEdge1030                    GarminProduct = 2713
+	GarminProductFr35Sea                     GarminProduct = 2727
+	GarminProductVector3                     GarminProduct = 2787
+	GarminProductFenix5Asia                  GarminProduct = 2796
+	GarminProductFenix5sAsia                 GarminProduct = 2797
+	GarminProductFenix5xAsia                 GarminProduct = 2798
+	GarminProductApproachZ80                 GarminProduct = 2806
+	GarminProductFr35Korea                   GarminProduct = 2814
+	GarminProductD2charlie                   GarminProduct = 2819
+	GarminProductVivoSmart3Apac              GarminProduct = 2831
+	GarminProductVivoSportApac               GarminProduct = 2832
+	GarminProductFr935Asia                   GarminProduct = 2833
+	GarminProductDescent                     GarminProduct = 2859
+	GarminProductVivoFit4                    GarminProduct = 2878
+	GarminProductFr645                       GarminProduct = 2886
+	GarminProductFr645m                      GarminProduct = 2888
+	GarminProductFr30                        GarminProduct = 2891
+	GarminProductFenix5sPlus                 GarminProduct = 2900
+	GarminProductEdge130                     GarminProduct = 2909
+	GarminProductEdge1030Asia                GarminProduct = 2924
+	GarminProductVivosmart4                  GarminProduct = 2927
+	GarminProductVivoMoveHrAsia              GarminProduct = 2945
+	GarminProductApproachX10                 GarminProduct = 2962
+	GarminProductFr30Asia                    GarminProduct = 2977
+	GarminProductVivoactive3mW               GarminProduct = 2988
+	GarminProductFr645Asia                   GarminProduct = 3003
+	GarminProductFr645mAsia                  GarminProduct = 3004
+	GarminProductEdgeExplore                 GarminProduct = 3011
+	GarminProductGpsmap66                    GarminProduct = 3028
+	GarminProductApproachS10                 GarminProduct = 3049
+	GarminProductVivoactive3mL               GarminProduct = 3066
+	GarminProductFr245                       GarminProduct = 3076
+	GarminProductFr245Music                  GarminProduct = 3077
+	GarminProductApproachG80                 GarminProduct = 3085
+	GarminProductEdge130Asia                 GarminProduct = 3092
+	GarminProductEdge1030Bontrager           GarminProduct = 3095
+	GarminProductFenix5Plus                  GarminProduct = 3110
+	GarminProductFenix5xPlus                 GarminProduct = 3111
+	GarminProductEdge520Plus                 GarminProduct = 3112
+	GarminProductFr945                       GarminProduct = 3113
+	GarminProductEdge530                     GarminProduct = 3121
+	GarminProductEdge830                     GarminProduct = 3122
+	GarminProductInstinctEsports             GarminProduct = 3126
+	GarminProductFenix5sPlusApac             GarminProduct = 3134
+	GarminProductFenix5xPlusApac             GarminProduct = 3135
+	GarminProductEdge520PlusApac             GarminProduct = 3142
+	GarminProductDescentT1                   GarminProduct = 3143
+	GarminProductFr235lAsia                  GarminProduct = 3144
+	GarminProductFr245Asia                   GarminProduct = 3145
+	GarminProductVivoActive3mApac            GarminProduct = 3163
+	GarminProductGen3Bsm                     GarminProduct = 3192 // gen3 bike speed sensor
+	GarminProductGen3Bcm                     GarminProduct = 3193 // gen3 bike cadence sensor
+	GarminProductVivoSmart4Asia              GarminProduct = 3218
+	GarminProductVivoactive4Small            GarminProduct = 3224
+	GarminProductVivoactive4Large            GarminProduct = 3225
+	GarminProductVenu                        GarminProduct = 3226
+	GarminProductMarqDriver                  GarminProduct = 3246
+	GarminProductMarqAviator                 GarminProduct = 3247
+	GarminProductMarqCaptain                 GarminProduct = 3248
+	GarminProductMarqCommander               GarminProduct = 3249
+	GarminProductMarqExpedition              GarminProduct = 3250
+	GarminProductMarqAthlete                 GarminProduct = 3251
+	GarminProductDescentMk2                  GarminProduct = 3258
+	GarminProductFr45                        GarminProduct = 3282
+	GarminProductGpsmap66i                   GarminProduct = 3284
+	GarminProductFenix6sSport                GarminProduct = 3287
+	GarminProductFenix6s                     GarminProduct = 3288
+	GarminProductFenix6Sport                 GarminProduct = 3289
+	GarminProductFenix6                      GarminProduct = 3290
+	GarminProductFenix6x                     GarminProduct = 3291
+	GarminProductHrmDual                     GarminProduct = 3299 // HRM-Dual
+	GarminProductHrmPro                      GarminProduct = 3300 // HRM-Pro
+	GarminProductVivoMove3Premium            GarminProduct = 3308
+	GarminProductApproachS40                 GarminProduct = 3314
+	GarminProductFr245mAsia                  GarminProduct = 3321
+	GarminProductEdge530Apac                 GarminProduct = 3349
+	GarminProductEdge830Apac                 GarminProduct = 3350
+	GarminProductVivoMove3                   GarminProduct = 3378
+	GarminProductVivoActive4SmallAsia        GarminProduct = 3387
+	GarminProductVivoActive4LargeAsia        GarminProduct = 3388
+	GarminProductVivoActive4OledAsia         GarminProduct = 3389
+	GarminProductSwim2                       GarminProduct = 3405
+	GarminProductMarqDriverAsia              GarminProduct = 3420
+	GarminProductMarqAviatorAsia             GarminProduct = 3421
+	GarminProductVivoMove3Asia               GarminProduct = 3422
+	GarminProductFr945Asia                   GarminProduct = 3441
+	GarminProductVivoActive3tChn             GarminProduct = 3446
+	GarminProductMarqCaptainAsia             GarminProduct = 3448
+	GarminProductMarqCommanderAsia           GarminProduct = 3449
+	GarminProductMarqExpeditionAsia          GarminProduct = 3450
+	GarminProductMarqAthleteAsia             GarminProduct = 3451
+	GarminProductIndexSmartScale2            GarminProduct = 3461
+	GarminProductInstinctSolar               GarminProduct = 3466
+	GarminProductFr45Asia                    GarminProduct = 3469
+	GarminProductVivoactive3Daimler          GarminProduct = 3473
+	GarminProductLegacyRey                   GarminProduct = 3498
+	GarminProductLegacyDarthVader            GarminProduct = 3499
+	GarminProductLegacyCaptainMarvel         GarminProduct = 3500
+	GarminProductLegacyFirstAvenger          GarminProduct = 3501
+	GarminProductFenix6sSportAsia            GarminProduct = 3512
+	GarminProductFenix6sAsia                 GarminProduct = 3513
+	GarminProductFenix6SportAsia             GarminProduct = 3514
+	GarminProductFenix6Asia                  GarminProduct = 3515
+	GarminProductFenix6xAsia                 GarminProduct = 3516
+	GarminProductLegacyCaptainMarvelAsia     GarminProduct = 3535
+	GarminProductLegacyFirstAvengerAsia      GarminProduct = 3536
+	GarminProductLegacyReyAsia               GarminProduct = 3537
+	GarminProductLegacyDarthVaderAsia        GarminProduct = 3538
+	GarminProductDescentMk2s                 GarminProduct = 3542
+	GarminProductEdge130Plus                 GarminProduct = 3558
+	GarminProductEdge1030Plus                GarminProduct = 3570
+	GarminProductRally200                    GarminProduct = 3578 // Rally 100/200 Power Meter Series
+	GarminProductFr745                       GarminProduct = 3589
+	GarminProductVenusqMusic                 GarminProduct = 3596
+	GarminProductVenusqMusicV2               GarminProduct = 3599
+	GarminProductVenusq                      GarminProduct = 3600
+	GarminProductLily                        GarminProduct = 3615
+	GarminProductMarqAdventurer              GarminProduct = 3624
+	GarminProductEnduro                      GarminProduct = 3638
+	GarminProductSwim2Apac                   GarminProduct = 3639
+	GarminProductMarqAdventurerAsia          GarminProduct = 3648
+	GarminProductFr945Lte                    GarminProduct = 3652
+	GarminProductDescentMk2Asia              GarminProduct = 3702 // Mk2 and Mk2i
+	GarminProductVenu2                       GarminProduct = 3703
+	GarminProductVenu2s                      GarminProduct = 3704
+	GarminProductVenuDaimlerAsia             GarminProduct = 3737
+	GarminProductMarqGolfer                  GarminProduct = 3739
+	GarminProductVenuDaimler                 GarminProduct = 3740
+	GarminProductFr745Asia                   GarminProduct = 3794
+	GarminProductVariaRct715                 GarminProduct = 3808
+	GarminProductLilyAsia                    GarminProduct = 3809
+	GarminProductEdge1030PlusAsia            GarminProduct = 3812
+	GarminProductEdge130PlusAsia             GarminProduct = 3813
+	GarminProductApproachS12                 GarminProduct = 3823
+	GarminProductEnduroAsia                  GarminProduct = 3872
+	GarminProductVenusqAsia                  GarminProduct = 3837
+	GarminProductEdge1040                    GarminProduct = 3843
+	GarminProductMarqGolferAsia              GarminProduct = 3850
+	GarminProductVenu2Plus                   GarminProduct = 3851
+	GarminProductGnss                        GarminProduct = 3865 // Airoha AG3335M Family
+	GarminProductFr55                        GarminProduct = 3869
+	GarminProductInstinct2                   GarminProduct = 3888
+	GarminProductInstinct2S                  GarminProduct = 3889
+	GarminProductFenix7s                     GarminProduct = 3905
+	GarminProductFenix7                      GarminProduct = 3906
+	GarminProductFenix7x                     GarminProduct = 3907
+	GarminProductFenix7sApac                 GarminProduct = 3908
+	GarminProductFenix7Apac                  GarminProduct = 3909
+	GarminProductFenix7xApac                 GarminProduct = 3910
+	GarminProductApproachG12                 GarminProduct = 3927
+	GarminProductDescentMk2sAsia             GarminProduct = 3930
+	GarminProductApproachS42                 GarminProduct = 3934
+	GarminProductEpixGen2                    GarminProduct = 3943
+	GarminProductEpixGen2Apac                GarminProduct = 3944
+	GarminProductVenu2sAsia                  GarminProduct = 3949
+	GarminProductVenu2Asia                   GarminProduct = 3950
+	GarminProductFr945LteAsia                GarminProduct = 3978
+	GarminProductVivoMoveSport               GarminProduct = 3982
+	GarminProductVivomoveTrend               GarminProduct = 3983
+	GarminProductApproachS12Asia             GarminProduct = 3986
+	GarminProductFr255Music                  GarminProduct = 3990
+	GarminProductFr255SmallMusic             GarminProduct = 3991
+	GarminProductFr255                       GarminProduct = 3992
+	GarminProductFr255Small                  GarminProduct = 3993
+	GarminProductApproachG12Asia             GarminProduct = 4001
+	GarminProductApproachS42Asia             GarminProduct = 4002
+	GarminProductDescentG1                   GarminProduct = 4005
+	GarminProductVenu2PlusAsia               GarminProduct = 4017
+	GarminProductFr955                       GarminProduct = 4024
+	GarminProductFr55Asia                    GarminProduct = 4033
+	GarminProductEdge540                     GarminProduct = 4061
+	GarminProductEdge840                     GarminProduct = 4062
+	GarminProductVivosmart5                  GarminProduct = 4063
+	GarminProductInstinct2Asia               GarminProduct = 4071
+	GarminProductMarqGen2                    GarminProduct = 4105 // Adventurer, Athlete, Captain, Golfer
+	GarminProductVenusq2                     GarminProduct = 4115
+	GarminProductVenusq2music                GarminProduct = 4116
+	GarminProductMarqGen2Aviator             GarminProduct = 4124
+	GarminProductD2AirX10                    GarminProduct = 4125
+	GarminProductHrmProPlus                  GarminProduct = 4130
+	GarminProductDescentG1Asia               GarminProduct = 4132
+	GarminProductTactix7                     GarminProduct = 4135
+	GarminProductInstinctCrossover           GarminProduct = 4155
+	GarminProductEdgeExplore2                GarminProduct = 4169
+	GarminProductDescentMk3                  GarminProduct = 4222
+	GarminProductDescentMk3i                 GarminProduct = 4223
+	GarminProductApproachS70                 GarminProduct = 4233
+	GarminProductFr265Large                  GarminProduct = 4257
+	GarminProductFr265Small                  GarminProduct = 4258
+	GarminProductVenu3                       GarminProduct = 4260
+	GarminProductVenu3s                      GarminProduct = 4261
+	GarminProductTacxNeoSmart                GarminProduct = 4265 // Neo Smart, Tacx
+	GarminProductTacxNeo2Smart               GarminProduct = 4266 // Neo 2 Smart, Tacx
+	GarminProductTacxNeo2TSmart              GarminProduct = 4267 // Neo 2T Smart, Tacx
+	GarminProductTacxNeoSmartBike            GarminProduct = 4268 // Neo Smart Bike, Tacx
+	GarminProductTacxSatoriSmart             GarminProduct = 4269 // Satori Smart, Tacx
+	GarminProductTacxFlowSmart               GarminProduct = 4270 // Flow Smart, Tacx
+	GarminProductTacxVortexSmart             GarminProduct = 4271 // Vortex Smart, Tacx
+	GarminProductTacxBushidoSmart            GarminProduct = 4272 // Bushido Smart, Tacx
+	GarminProductTacxGeniusSmart             GarminProduct = 4273 // Genius Smart, Tacx
+	GarminProductTacxFluxFluxSSmart          GarminProduct = 4274 // Flux/Flux S Smart, Tacx
+	GarminProductTacxFlux2Smart              GarminProduct = 4275 // Flux 2 Smart, Tacx
+	GarminProductTacxMagnum                  GarminProduct = 4276 // Magnum, Tacx
+	GarminProductEdge1040Asia                GarminProduct = 4305
+	GarminProductEpixGen2Pro42               GarminProduct = 4312
+	GarminProductEpixGen2Pro47               GarminProduct = 4313
+	GarminProductEpixGen2Pro51               GarminProduct = 4314
+	GarminProductFr965                       GarminProduct = 4315
+	GarminProductEnduro2                     GarminProduct = 4341
+	GarminProductFenix7sProSolar             GarminProduct = 4374
+	GarminProductFenix7ProSolar              GarminProduct = 4375
+	GarminProductFenix7xProSolar             GarminProduct = 4376
+	GarminProductLily2                       GarminProduct = 4380
+	GarminProductInstinct2X                  GarminProduct = 4394
+	GarminProductVivoactive5                 GarminProduct = 4426
+	GarminProductFr165                       GarminProduct = 4432
+	GarminProductFr165Music                  GarminProduct = 4433
+	GarminProductEdge1050                    GarminProduct = 4440
+	GarminProductDescentT2                   GarminProduct = 4442
+	GarminProductHrmFit                      GarminProduct = 4446
+	GarminProductMarqGen2Commander           GarminProduct = 4472
+	GarminProductLilyAthlete                 GarminProduct = 4477 // aka the Lily 2 Active
+	GarminProductRallyX10                    GarminProduct = 4525 // Rally 110/210
+	GarminProductFenix8Solar                 GarminProduct = 4532
+	GarminProductFenix8SolarLarge            GarminProduct = 4533
+	GarminProductFenix8Small                 GarminProduct = 4534
+	GarminProductFenix8                      GarminProduct = 4536
+	GarminProductD2Mach1Pro                  GarminProduct = 4556
+	GarminProductFr970                       GarminProduct = 4565
+	GarminProductFr570Large                  GarminProduct = 4570
+	GarminProductFr570Small                  GarminProduct = 4574
+	GarminProductEnduro3                     GarminProduct = 4575
+	GarminProductInstincte40Mm               GarminProduct = 4583
+	GarminProductInstincte45Mm               GarminProduct = 4584
+	GarminProductInstinct3Solar45Mm          GarminProduct = 4585
+	GarminProductInstinct3Amoled45Mm         GarminProduct = 4586
+	GarminProductInstinct3Amoled50Mm         GarminProduct = 4587
+	GarminProductDescentG2                   GarminProduct = 4588
+	GarminProductFenix7ProSolarNoWifi        GarminProduct = 4595
+	GarminProductVenuX1                      GarminProduct = 4603
+	GarminProductHrm200                      GarminProduct = 4606
+	GarminProductVivoactive6                 GarminProduct = 4625
+	GarminProductFenix8Pro                   GarminProduct = 4631
+	GarminProductEdge550                     GarminProduct = 4633
+	GarminProductEdge850                     GarminProduct = 4634
+	GarminProductVenu4                       GarminProduct = 4643
+	GarminProductVenu4s                      GarminProduct = 4644
+	GarminProductApproachs44                 GarminProduct = 4647
+	GarminProductEdgeMtb                     GarminProduct = 4655
+	GarminProductApproachs50                 GarminProduct = 4656
+	GarminProductFenixE                      GarminProduct = 4666
+	GarminProductBounce2                     GarminProduct = 4745
+	GarminProductInstinct3Solar50Mm          GarminProduct = 4759
+	GarminProductTactix8Amoled               GarminProduct = 4775
+	GarminProductTactix8Solar                GarminProduct = 4776
+	GarminProductFr170Music                  GarminProduct = 4814
+	GarminProductFr170                       GarminProduct = 4815
+	GarminProductApproachJ1                  GarminProduct = 4825
+	GarminProductD2Mach2                     GarminProduct = 4879
+	GarminProductFr702026                    GarminProduct = 4916
+	GarminProductFenix9Pro43Mm               GarminProduct = 4952
+	GarminProductFenix9Pro47Mm               GarminProduct = 4953
+	GarminProductFenix9Pro51Mm               GarminProduct = 4954
+	GarminProductFenix9ProSolar47Mm          GarminProduct = 4955
+	GarminProductFenix9ProSolar51Mm          GarminProduct = 4956
+	GarminProductFenix943Mm                  GarminProduct = 5133
+	GarminProductFenix9                      GarminProduct = 5134 // 47mm & 57mm
+	GarminProductInstinctCrossoverAmoled     GarminProduct = 4678
+	GarminProductD2AirX15                    GarminProduct = 4944
+	GarminProductCirqaSmartBand              GarminProduct = 5019
+	GarminProductD2Mach2Pro                  GarminProduct = 5056
+	GarminProductSdm4                        GarminProduct = 10007 // SDM4 footpod
+	GarminProductEdgeRemote                  GarminProduct = 10014
+	GarminProductTacxTrainingAppWin          GarminProduct = 20533
+	GarminProductTacxTrainingAppMac          GarminProduct = 20534
+	GarminProductTacxTrainingAppMacCatalyst  GarminProduct = 20565
+	GarminProductTrainingCenter              GarminProduct = 20119
+	GarminProductTacxTrainingAppAndroid      GarminProduct = 30045
+	GarminProductTacxTrainingAppIos          GarminProduct = 30046
+	GarminProductTacxTrainingAppLegacy       GarminProduct = 30047
+	GarminProductTrainingPeaksVirtualIos     GarminProduct = 30059
+	GarminProductTrainingPeaksVirtualAndroid GarminProduct = 30060
+	GarminProductTrainingPeaksVirtualWindows GarminProduct = 30061
+	GarminProductTrainingPeaksVirtualMacOs   GarminProduct = 30062
+	GarminProductTrainingPeaksVirtualAppleTv GarminProduct = 30063
+	GarminProductConnectiqSimulator          GarminProduct = 65531
+	GarminProductAndroidAntplusPlugin        GarminProduct = 65532
+	GarminProductConnect                     GarminProduct = 65534 // Garmin Connect website
+	GarminProductInvalid                     GarminProduct = 0xFFFF
 )
 
 func (g GarminProduct) Uint16() uint16 { return uint16(g) }
@@ -1373,6 +1388,12 @@ func (g GarminProduct) String() string {
 		return "fenix8"
 	case GarminProductD2Mach1Pro:
 		return "d2_mach1_pro"
+	case GarminProductFr970:
+		return "fr970"
+	case GarminProductFr570Large:
+		return "fr570_large"
+	case GarminProductFr570Small:
+		return "fr570_small"
 	case GarminProductEnduro3:
 		return "enduro3"
 	case GarminProductInstincte40Mm:
@@ -1431,6 +1452,20 @@ func (g GarminProduct) String() string {
 		return "d2_mach2"
 	case GarminProductFr702026:
 		return "fr70_2026"
+	case GarminProductFenix9Pro43Mm:
+		return "fenix9_pro_43mm"
+	case GarminProductFenix9Pro47Mm:
+		return "fenix9_pro_47mm"
+	case GarminProductFenix9Pro51Mm:
+		return "fenix9_pro_51mm"
+	case GarminProductFenix9ProSolar47Mm:
+		return "fenix9_pro_solar_47mm"
+	case GarminProductFenix9ProSolar51Mm:
+		return "fenix9_pro_solar_51mm"
+	case GarminProductFenix943Mm:
+		return "fenix9_43mm"
+	case GarminProductFenix9:
+		return "fenix9"
 	case GarminProductInstinctCrossoverAmoled:
 		return "instinct_crossover_amoled"
 	case GarminProductD2AirX15:
@@ -1457,6 +1492,16 @@ func (g GarminProduct) String() string {
 		return "tacx_training_app_ios"
 	case GarminProductTacxTrainingAppLegacy:
 		return "tacx_training_app_legacy"
+	case GarminProductTrainingPeaksVirtualIos:
+		return "training_peaks_virtual_ios"
+	case GarminProductTrainingPeaksVirtualAndroid:
+		return "training_peaks_virtual_android"
+	case GarminProductTrainingPeaksVirtualWindows:
+		return "training_peaks_virtual_windows"
+	case GarminProductTrainingPeaksVirtualMacOs:
+		return "training_peaks_virtual_mac_os"
+	case GarminProductTrainingPeaksVirtualAppleTv:
+		return "training_peaks_virtual_apple_tv"
 	case GarminProductConnectiqSimulator:
 		return "connectiq_simulator"
 	case GarminProductAndroidAntplusPlugin:
@@ -2343,6 +2388,12 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductFenix8
 	case "d2_mach1_pro":
 		return GarminProductD2Mach1Pro
+	case "fr970":
+		return GarminProductFr970
+	case "fr570_large":
+		return GarminProductFr570Large
+	case "fr570_small":
+		return GarminProductFr570Small
 	case "enduro3":
 		return GarminProductEnduro3
 	case "instinctE_40mm":
@@ -2401,6 +2452,20 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductD2Mach2
 	case "fr70_2026":
 		return GarminProductFr702026
+	case "fenix9_pro_43mm":
+		return GarminProductFenix9Pro43Mm
+	case "fenix9_pro_47mm":
+		return GarminProductFenix9Pro47Mm
+	case "fenix9_pro_51mm":
+		return GarminProductFenix9Pro51Mm
+	case "fenix9_pro_solar_47mm":
+		return GarminProductFenix9ProSolar47Mm
+	case "fenix9_pro_solar_51mm":
+		return GarminProductFenix9ProSolar51Mm
+	case "fenix9_43mm":
+		return GarminProductFenix943Mm
+	case "fenix9":
+		return GarminProductFenix9
 	case "instinct_crossover_amoled":
 		return GarminProductInstinctCrossoverAmoled
 	case "d2_air_x15":
@@ -2427,6 +2492,16 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductTacxTrainingAppIos
 	case "tacx_training_app_legacy":
 		return GarminProductTacxTrainingAppLegacy
+	case "training_peaks_virtual_ios":
+		return GarminProductTrainingPeaksVirtualIos
+	case "training_peaks_virtual_android":
+		return GarminProductTrainingPeaksVirtualAndroid
+	case "training_peaks_virtual_windows":
+		return GarminProductTrainingPeaksVirtualWindows
+	case "training_peaks_virtual_mac_os":
+		return GarminProductTrainingPeaksVirtualMacOs
+	case "training_peaks_virtual_apple_tv":
+		return GarminProductTrainingPeaksVirtualAppleTv
 	case "connectiq_simulator":
 		return GarminProductConnectiqSimulator
 	case "android_antplus_plugin":
@@ -2877,6 +2952,9 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductFenix8Small,
 		GarminProductFenix8,
 		GarminProductD2Mach1Pro,
+		GarminProductFr970,
+		GarminProductFr570Large,
+		GarminProductFr570Small,
 		GarminProductEnduro3,
 		GarminProductInstincte40Mm,
 		GarminProductInstincte45Mm,
@@ -2906,6 +2984,13 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductApproachJ1,
 		GarminProductD2Mach2,
 		GarminProductFr702026,
+		GarminProductFenix9Pro43Mm,
+		GarminProductFenix9Pro47Mm,
+		GarminProductFenix9Pro51Mm,
+		GarminProductFenix9ProSolar47Mm,
+		GarminProductFenix9ProSolar51Mm,
+		GarminProductFenix943Mm,
+		GarminProductFenix9,
 		GarminProductInstinctCrossoverAmoled,
 		GarminProductD2AirX15,
 		GarminProductCirqaSmartBand,
@@ -2919,6 +3004,11 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductTacxTrainingAppAndroid,
 		GarminProductTacxTrainingAppIos,
 		GarminProductTacxTrainingAppLegacy,
+		GarminProductTrainingPeaksVirtualIos,
+		GarminProductTrainingPeaksVirtualAndroid,
+		GarminProductTrainingPeaksVirtualWindows,
+		GarminProductTrainingPeaksVirtualMacOs,
+		GarminProductTrainingPeaksVirtualAppleTv,
 		GarminProductConnectiqSimulator,
 		GarminProductAndroidAntplusPlugin,
 		GarminProductConnect,
