@@ -148,9 +148,9 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 
 		accumu.SequenceCompleted()
 
-		// If it's a multisport activity such as a triathlon, append the session.
+		// If the boundary sports differ, append all sessions from the next file.
 		if ses.Sport != nextSes.Sport {
-			sessions = append(sessions, nextSes)
+			sessions = append(sessions, nextFitSessions...)
 			continue
 		}
 

@@ -527,6 +527,120 @@ func TestCombine(t *testing.T) {
 	}
 }
 
+func TestCombineMultisportSessions(t *testing.T) {
+	type sessionSummary struct {
+		Sport          typedef.Sport
+		TotalTimerTime uint32
+	}
+	tt := []struct {
+		name     string
+		sports   [][]typedef.Sport
+		expected []sessionSummary
+	}{
+		{
+			name: "different boundary sports",
+			sports: [][]typedef.Sport{
+				{typedef.SportSwimming, typedef.SportCycling},
+				{typedef.SportRunning, typedef.SportWalking},
+			},
+			expected: []sessionSummary{
+				{typedef.SportSwimming, 60000}, {typedef.SportCycling, 60000},
+				{typedef.SportRunning, 60000}, {typedef.SportWalking, 60000},
+			},
+		},
+		{
+			name: "matching boundary after different sports",
+			sports: [][]typedef.Sport{
+				{typedef.SportSwimming},
+				{typedef.SportCycling, typedef.SportRunning},
+				{typedef.SportRunning, typedef.SportWalking},
+			},
+			expected: []sessionSummary{
+				{typedef.SportSwimming, 60000}, {typedef.SportCycling, 60000},
+				{typedef.SportRunning, 120000}, {typedef.SportWalking, 60000},
+			},
+		},
+		{
+			name: "multiple different boundaries",
+			sports: [][]typedef.Sport{
+				{typedef.SportSwimming},
+				{typedef.SportCycling, typedef.SportRunning},
+				{typedef.SportWalking, typedef.SportHiking},
+			},
+			expected: []sessionSummary{
+				{typedef.SportSwimming, 60000}, {typedef.SportCycling, 60000},
+				{typedef.SportRunning, 60000}, {typedef.SportWalking, 60000},
+				{typedef.SportHiking, 60000},
+			},
+		},
+		{
+			name: "matching boundary sports",
+			sports: [][]typedef.Sport{
+				{typedef.SportSwimming, typedef.SportCycling},
+				{typedef.SportCycling, typedef.SportRunning},
+			},
+			expected: []sessionSummary{
+				{typedef.SportSwimming, 60000}, {typedef.SportCycling, 120000},
+				{typedef.SportRunning, 60000},
+			},
+		},
+		{
+			name:   "single session after different sport",
+			sports: [][]typedef.Sport{{typedef.SportCycling}, {typedef.SportRunning}},
+			expected: []sessionSummary{
+				{typedef.SportCycling, 60000}, {typedef.SportRunning, 60000},
+			},
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			start := time.Date(2026, time.January, 1, 0, 0, 0, 0, time.UTC)
+			var fits []*proto.FIT
+			for _, sports := range tc.sports {
+				fit := &proto.FIT{Messages: []proto.Message{
+					mesgdef.NewFileId(nil).SetType(typedef.FileActivity).SetTimeCreated(start).ToMesg(nil),
+				}}
+				for _, sport := range sports {
+					end := start.Add(time.Minute)
+					fit.Messages = append(fit.Messages,
+						mesgdef.NewRecord(nil).SetTimestamp(start).ToMesg(nil),
+						mesgdef.NewRecord(nil).SetTimestamp(end).ToMesg(nil),
+						mesgdef.NewSession(nil).SetSport(sport).SetStartTime(start).SetTimestamp(end).
+							SetTotalElapsedTime(60000).SetTotalTimerTime(60000).ToMesg(nil),
+					)
+					start = end
+				}
+				fits = append(fits, fit)
+			}
+
+			fit, err := Combine(fits)
+			if err != nil {
+				t.Fatal(err)
+			}
+			var sessions []sessionSummary
+			var activity *mesgdef.Activity
+			for _, mesg := range fit.Messages {
+				switch mesg.Num {
+				case mesgnum.Session:
+					session := mesgdef.NewSession(&mesg)
+					sessions = append(sessions, sessionSummary{session.Sport, session.TotalTimerTime})
+				case mesgnum.Activity:
+					activity = mesgdef.NewActivity(&mesg)
+				}
+			}
+			if diff := cmp.Diff(tc.expected, sessions); diff != "" {
+				t.Errorf("sessions (-want +got):\n%s", diff)
+			}
+			if activity == nil {
+				t.Fatal("missing activity summary")
+			}
+			if want := uint16(len(tc.expected)); activity.NumSessions != want {
+				t.Errorf("activity.NumSessions = %d, want %d", activity.NumSessions, want)
+			}
+		})
+	}
+}
+
 func TestGetLastDistanceOrZero(t *testing.T) {
 	now := time.Now()
 	tt := []struct {
