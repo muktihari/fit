@@ -38,6 +38,7 @@ type Length struct {
 	OpponentScore              uint16
 	EnhancedAvgRespirationRate uint16 // Scale: 100; Units: Breaths/min
 	EnhancedMaxRespirationRate uint16 // Scale: 100; Units: Breaths/min
+	MetabolicCalories          uint16 // Units: kcal
 	Event                      typedef.Event
 	EventType                  typedef.EventType
 	SwimStroke                 typedef.SwimStroke // Units: swim_stroke
@@ -68,7 +69,7 @@ func (m *Length) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{66854655, 0, 0, 6917529027641081856}
+		knownNums := [4]uint64{133963519, 0, 0, 6917529027641081856}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -112,6 +113,7 @@ func (m *Length) Reset(mesg *proto.Message) {
 		EnhancedMaxRespirationRate: vals[23].Uint16(),
 		AvgRespirationRate:         vals[24].Uint8(),
 		MaxRespirationRate:         vals[25].Uint8(),
+		MetabolicCalories:          vals[26].Uint16(),
 
 		state: state,
 
@@ -126,7 +128,7 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 22)
+	fields := make([]proto.Field, 0, 23)
 	mesg := proto.Message{Num: typedef.MesgNumLength}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -243,6 +245,11 @@ func (m *Length) ToMesg(options *Options) proto.Message {
 	if m.MaxRespirationRate != basetype.Uint8Invalid {
 		field := factory.CreateField(mesg.Num, 25)
 		field.Value = proto.Uint8(m.MaxRespirationRate)
+		fields = append(fields, field)
+	}
+	if m.MetabolicCalories != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 26)
+		field.Value = proto.Uint16(m.MetabolicCalories)
 		fields = append(fields, field)
 	}
 
@@ -538,6 +545,14 @@ func (m *Length) SetAvgRespirationRate(v uint8) *Length {
 // SetMaxRespirationRate sets MaxRespirationRate value.
 func (m *Length) SetMaxRespirationRate(v uint8) *Length {
 	m.MaxRespirationRate = v
+	return m
+}
+
+// SetMetabolicCalories sets MetabolicCalories value.
+//
+// Units: kcal
+func (m *Length) SetMetabolicCalories(v uint16) *Length {
+	m.MetabolicCalories = v
 	return m
 }
 

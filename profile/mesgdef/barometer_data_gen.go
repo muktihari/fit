@@ -12,6 +12,7 @@ import (
 	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/proto"
+	"math"
 	"time"
 )
 
@@ -25,6 +26,7 @@ type BarometerData struct {
 
 	SampleTimeOffset []uint16  // Array: [N]; Units: ms; Each time in the array describes the time at which the barometer sample with the corresponding index was taken. The samples may span across seconds. Array size must match the number of samples in baro_cal
 	BaroPres         []uint32  // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
+	EnhancedAltitude []uint32  // Array: [N]; Scale: 5; Offset: 500; Units: m
 	Timestamp        time.Time // Units: s; Whole second part of the timestamp
 	TimestampMs      uint16    // Units: ms; Millisecond part of the timestamp.
 }
@@ -46,7 +48,7 @@ func (m *BarometerData) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{7, 0, 0, 2305843009213693952}
+		knownNums := [4]uint64{15, 0, 0, 2305843009213693952}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -69,6 +71,7 @@ func (m *BarometerData) Reset(mesg *proto.Message) {
 		TimestampMs:      vals[0].Uint16(),
 		SampleTimeOffset: vals[1].SliceUint16(),
 		BaroPres:         vals[2].SliceUint32(),
+		EnhancedAltitude: vals[3].SliceUint32(),
 
 		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
@@ -81,7 +84,7 @@ func (m *BarometerData) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 4)
+	fields := make([]proto.Field, 0, 5)
 	mesg := proto.Message{Num: typedef.MesgNumBarometerData}
 
 	if !m.Timestamp.Before(datetime.Epoch()) {
@@ -104,6 +107,11 @@ func (m *BarometerData) ToMesg(options *Options) proto.Message {
 		field.Value = proto.SliceUint32(m.BaroPres)
 		fields = append(fields, field)
 	}
+	if m.EnhancedAltitude != nil {
+		field := factory.CreateField(mesg.Num, 3)
+		field.Value = proto.SliceUint32(m.EnhancedAltitude)
+		fields = append(fields, field)
+	}
 
 	n := len(fields)
 	mesg.Fields = make([]proto.Field, n+len(m.UnknownFields))
@@ -117,6 +125,25 @@ func (m *BarometerData) ToMesg(options *Options) proto.Message {
 
 // TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *BarometerData) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
+
+// EnhancedAltitudeScaled return EnhancedAltitude in its scaled value.
+// If EnhancedAltitude value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 5; Offset: 500; Units: m
+func (m *BarometerData) EnhancedAltitudeScaled() []float64 {
+	if m.EnhancedAltitude == nil {
+		return nil
+	}
+	var vals = make([]float64, len(m.EnhancedAltitude))
+	for i := range m.EnhancedAltitude {
+		if m.EnhancedAltitude[i] == basetype.Uint32Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.EnhancedAltitude[i])/5 - 500
+	}
+	return vals
+}
 
 // SetTimestamp sets Timestamp value.
 //
@@ -147,6 +174,35 @@ func (m *BarometerData) SetSampleTimeOffset(v []uint16) *BarometerData {
 // Array: [N]; Units: Pa; These are the raw ADC reading. The samples may span across seconds. A conversion will need to be done on this data once read.
 func (m *BarometerData) SetBaroPres(v []uint32) *BarometerData {
 	m.BaroPres = v
+	return m
+}
+
+// SetEnhancedAltitude sets EnhancedAltitude value.
+//
+// Array: [N]; Scale: 5; Offset: 500; Units: m
+func (m *BarometerData) SetEnhancedAltitude(v []uint32) *BarometerData {
+	m.EnhancedAltitude = v
+	return m
+}
+
+// SetEnhancedAltitudeScaled is similar to SetEnhancedAltitude except it accepts a scaled value.
+// This method automatically converts the given value to its []uint32 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 5; Offset: 500; Units: m
+func (m *BarometerData) SetEnhancedAltitudeScaled(vs []float64) *BarometerData {
+	if vs == nil {
+		m.EnhancedAltitude = nil
+		return m
+	}
+	m.EnhancedAltitude = make([]uint32, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 500) * 5
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+			m.EnhancedAltitude[i] = uint32(basetype.Uint32Invalid)
+			continue
+		}
+		m.EnhancedAltitude[i] = uint32(unscaled)
+	}
 	return m
 }
 

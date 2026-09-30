@@ -93,6 +93,7 @@ type SegmentLap struct {
 	RearGearShiftCount          uint16
 	StandCount                  uint16               // Number of transitions to the standing state
 	Manufacturer                typedef.Manufacturer // Manufacturer that produced the segment
+	MetabolicCalories           uint16               // Units: kcal
 	Event                       typedef.Event
 	EventType                   typedef.EventType
 	AvgHeartRate                uint8 // Units: bpm
@@ -142,7 +143,7 @@ func (m *SegmentLap) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{18446744073709551615, 1056964607, 0, 6917529027641081856}
+		knownNums := [4]uint64{18446744073709551615, 1073741823, 0, 6917529027641081856}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -254,6 +255,7 @@ func (m *SegmentLap) Reset(mesg *proto.Message) {
 		TotalFlow:                   vals[85].Float32(),
 		AvgGrit:                     vals[86].Float32(),
 		AvgFlow:                     vals[87].Float32(),
+		MetabolicCalories:           vals[88].Uint16(),
 		TotalFractionalAscent:       vals[89].Uint8(),
 		TotalFractionalDescent:      vals[90].Uint8(),
 		EnhancedAvgAltitude:         vals[91].Uint32(),
@@ -273,7 +275,7 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 95)
+	fields := make([]proto.Field, 0, 96)
 	mesg := proto.Message{Num: typedef.MesgNumSegmentLap}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -724,6 +726,11 @@ func (m *SegmentLap) ToMesg(options *Options) proto.Message {
 	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
 		field := factory.CreateField(mesg.Num, 87)
 		field.Value = proto.Float32(m.AvgFlow)
+		fields = append(fields, field)
+	}
+	if m.MetabolicCalories != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 88)
+		field.Value = proto.Uint16(m.MetabolicCalories)
 		fields = append(fields, field)
 	}
 	if m.TotalFractionalAscent != basetype.Uint8Invalid {
@@ -2656,6 +2663,14 @@ func (m *SegmentLap) SetAvgGrit(v float32) *SegmentLap {
 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 func (m *SegmentLap) SetAvgFlow(v float32) *SegmentLap {
 	m.AvgFlow = v
+	return m
+}
+
+// SetMetabolicCalories sets MetabolicCalories value.
+//
+// Units: kcal
+func (m *SegmentLap) SetMetabolicCalories(v uint16) *SegmentLap {
+	m.MetabolicCalories = v
 	return m
 }
 

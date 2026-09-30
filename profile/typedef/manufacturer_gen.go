@@ -257,6 +257,8 @@ const (
 	ManufacturerCadenceApp                 Manufacturer = 350
 	ManufacturerUnaWatch                   Manufacturer = 351
 	ManufacturerTymewear                   Manufacturer = 352
+	ManufacturerExposureLights             Manufacturer = 353
+	ManufacturerFortoCycling               Manufacturer = 354
 	ManufacturerActigraphcorp              Manufacturer = 5759
 	ManufacturerInvalid                    Manufacturer = 0xFFFF
 )
@@ -753,6 +755,10 @@ func (m Manufacturer) String() string {
 		return "una_watch"
 	case ManufacturerTymewear:
 		return "tymewear"
+	case ManufacturerExposureLights:
+		return "exposure_lights"
+	case ManufacturerFortoCycling:
+		return "forto_cycling"
 	case ManufacturerActigraphcorp:
 		return "actigraphcorp"
 	default:
@@ -1251,6 +1257,10 @@ func ManufacturerFromString(s string) Manufacturer {
 		return ManufacturerUnaWatch
 	case "tymewear":
 		return ManufacturerTymewear
+	case "exposure_lights":
+		return ManufacturerExposureLights
+	case "forto_cycling":
+		return ManufacturerFortoCycling
 	case "actigraphcorp":
 		return ManufacturerActigraphcorp
 	default:
@@ -1505,6 +1515,8 @@ func ListManufacturer() []Manufacturer {
 		ManufacturerCadenceApp,
 		ManufacturerUnaWatch,
 		ManufacturerTymewear,
+		ManufacturerExposureLights,
+		ManufacturerFortoCycling,
 		ManufacturerActigraphcorp,
 	}
 }

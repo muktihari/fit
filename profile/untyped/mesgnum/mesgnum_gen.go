@@ -56,6 +56,7 @@ const (
 	AntChannelId                     = 82
 	Length                           = 101
 	MonitoringInfo                   = 103
+	Battery                          = 104
 	Pad                              = 105
 	SlaveDevice                      = 106
 	Connectivity                     = 127

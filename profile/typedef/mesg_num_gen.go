@@ -56,6 +56,7 @@ const (
 	MesgNumAntChannelId                     MesgNum = 82
 	MesgNumLength                           MesgNum = 101
 	MesgNumMonitoringInfo                   MesgNum = 103
+	MesgNumBattery                          MesgNum = 104
 	MesgNumPad                              MesgNum = 105
 	MesgNumSlaveDevice                      MesgNum = 106
 	MesgNumConnectivity                     MesgNum = 127
@@ -234,6 +235,8 @@ func (m MesgNum) String() string {
 		return "length"
 	case MesgNumMonitoringInfo:
 		return "monitoring_info"
+	case MesgNumBattery:
+		return "battery"
 	case MesgNumPad:
 		return "pad"
 	case MesgNumSlaveDevice:
@@ -497,6 +500,8 @@ func MesgNumFromString(s string) MesgNum {
 		return MesgNumLength
 	case "monitoring_info":
 		return MesgNumMonitoringInfo
+	case "battery":
+		return MesgNumBattery
 	case "pad":
 		return MesgNumPad
 	case "slave_device":
@@ -718,6 +723,7 @@ func ListMesgNum() []MesgNum {
 		MesgNumAntChannelId,
 		MesgNumLength,
 		MesgNumMonitoringInfo,
+		MesgNumBattery,
 		MesgNumPad,
 		MesgNumSlaveDevice,
 		MesgNumConnectivity,
@@ -899,6 +905,8 @@ func MesgNumRegister(v MesgNum, s string) error {
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumLength", v)
 	case MesgNumMonitoringInfo:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumMonitoringInfo", v)
+	case MesgNumBattery:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumBattery", v)
 	case MesgNumPad:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumPad", v)
 	case MesgNumSlaveDevice:

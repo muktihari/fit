@@ -17,7 +17,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21214] }
+func _() { _ = [1]struct{}{}[profile.Version-21217] }
 
 func TypedefString(pt profile.ProfileType, v proto.Value) string {
 	switch pt {
@@ -439,6 +439,32 @@ func TypedefString(pt profile.ProfileType, v proto.Value) string {
 		return typedef.ClimbProEvent(v.Uint8()).String()
 	case profile.GasConsumptionRateType:
 		return typedef.GasConsumptionRateType(v.Uint8()).String()
+	case profile.ClimbGradingScale:
+		return typedef.ClimbGradingScale(v.Uint8()).String()
+	case profile.YdsGradingScale:
+		return typedef.YdsGradingScale(v.Uint8()).String()
+	case profile.UiaaGradingScale:
+		return typedef.UiaaGradingScale(v.Uint8()).String()
+	case profile.FrenchGradingScale:
+		return typedef.FrenchGradingScale(v.Uint8()).String()
+	case profile.BritishAdjectivalGradingScale:
+		return typedef.BritishAdjectivalGradingScale(v.Uint8()).String()
+	case profile.BritishTechnicalGradingScale:
+		return typedef.BritishTechnicalGradingScale(v.Uint8()).String()
+	case profile.EwbankGradingScale:
+		return typedef.EwbankGradingScale(v.Uint8()).String()
+	case profile.BrazilianGradingScale:
+		return typedef.BrazilianGradingScale(v.Uint8()).String()
+	case profile.SaxonGradingScale:
+		return typedef.SaxonGradingScale(v.Uint8()).String()
+	case profile.VerminGradingScale:
+		return typedef.VerminGradingScale(v.Uint8()).String()
+	case profile.FontGradingScale:
+		return typedef.FontGradingScale(v.Uint8()).String()
+	case profile.DankyuGradingScale:
+		return typedef.DankyuGradingScale(v.Uint8()).String()
+	case profile.SplitStatus:
+		return typedef.SplitStatus(v.Uint8()).String()
 	case profile.TapSensitivity:
 		return typedef.TapSensitivity(v.Uint8()).String()
 	case profile.RadarThreatLevelType:
@@ -457,6 +483,10 @@ func TypedefString(pt profile.ProfileType, v proto.Value) string {
 		return typedef.HrvStatus(v.Uint8()).String()
 	case profile.NoFlyTimeMode:
 		return typedef.NoFlyTimeMode(v.Uint8()).String()
+	case profile.DiveSectionType:
+		return typedef.DiveSectionType(v.Uint8()).String()
+	case profile.ApneaDiscipline:
+		return typedef.ApneaDiscipline(v.Uint8()).String()
 	}
 
 	return fmt.Sprintf("%v", pt.BaseType().Invalid())
