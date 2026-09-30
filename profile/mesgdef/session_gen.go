@@ -81,6 +81,7 @@ type Session struct {
 	TotalFlow                     float32              // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
 	AvgGrit                       float32              // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
 	AvgFlow                       float32              // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+	AvgGradeAdjustedSpeed         uint32               // Scale: 1000; Units: m/s
 	MessageIndex                  typedef.MessageIndex // Selected bit is set for the current session.
 	TotalCalories                 uint16               // Units: kcal
 	TotalFatCalories              uint16               // Units: kcal
@@ -114,6 +115,8 @@ type Session struct {
 	MaxNegVerticalSpeed           int16  // Scale: 1000; Units: m/s
 	BestLapIndex                  uint16
 	MinAltitude                   uint16 // Scale: 5; Offset: 500; Units: m
+	AvgStrokesPerLength           uint16 // Scale: 10; Units: strokes/length
+	AvgSwolf                      uint16
 	PlayerScore                   uint16
 	OpponentScore                 uint16
 	MaxBallSpeed                  uint16 // Scale: 100; Units: m/s
@@ -121,6 +124,9 @@ type Session struct {
 	AvgVerticalOscillation        uint16 // Scale: 10; Units: mm
 	AvgStanceTimePercent          uint16 // Scale: 100; Units: percent
 	AvgStanceTime                 uint16 // Scale: 10; Units: ms
+	NumSegmentLaps                uint16
+	FrontGearShiftCount           uint16
+	RearGearShiftCount            uint16
 	StandCount                    uint16 // Number of transitions to the standing state
 	AvgLevMotorPower              uint16 // Units: watts; lev average motor power during session
 	MaxLevMotorPower              uint16 // Units: watts; lev maximum motor power during session
@@ -205,7 +211,7 @@ func (m *Session) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{18446742974197919743, 18446678103011639551, 932252819858127487, 6917529027641541119}
+		knownNums := [4]uint64{18446742974197919743, 18446708889337315583, 932252819858127487, 6917529027642065407}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -300,6 +306,8 @@ func (m *Session) Reset(mesg *proto.Message) {
 		BestLapIndex:                  vals[70].Uint16(),
 		MinAltitude:                   vals[71].Uint16(),
 		ActiveTime:                    vals[78].Uint32(),
+		AvgStrokesPerLength:           vals[79].Uint16(),
+		AvgSwolf:                      vals[80].Uint16(),
 		PlayerScore:                   vals[82].Uint16(),
 		OpponentScore:                 vals[83].Uint16(),
 		OpponentName:                  vals[84].String(),
@@ -324,6 +332,9 @@ func (m *Session) Reset(mesg *proto.Message) {
 		AvgLeftPedalSmoothness:        vals[103].Uint8(),
 		AvgRightPedalSmoothness:       vals[104].Uint8(),
 		AvgCombinedPedalSmoothness:    vals[105].Uint8(),
+		NumSegmentLaps:                vals[106].Uint16(),
+		FrontGearShiftCount:           vals[107].Uint16(),
+		RearGearShiftCount:            vals[108].Uint16(),
 		SportProfileName:              vals[110].String(),
 		SportIndex:                    vals[111].Uint8(),
 		TimeStanding:                  vals[112].Uint32(),
@@ -385,6 +396,7 @@ func (m *Session) Reset(mesg *proto.Message) {
 		AvgCoreTemperature:            vals[208].Uint16(),
 		MinCoreTemperature:            vals[209].Uint16(),
 		MaxCoreTemperature:            vals[210].Uint16(),
+		AvgGradeAdjustedSpeed:         vals[211].Uint32(),
 
 		state: state,
 
@@ -399,7 +411,7 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 158)
+	fields := make([]proto.Field, 0, 164)
 	mesg := proto.Message{Num: typedef.MesgNumSession}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
@@ -767,6 +779,16 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
+	if m.AvgStrokesPerLength != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 79)
+		field.Value = proto.Uint16(m.AvgStrokesPerLength)
+		fields = append(fields, field)
+	}
+	if m.AvgSwolf != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 80)
+		field.Value = proto.Uint16(m.AvgSwolf)
+		fields = append(fields, field)
+	}
 	if m.PlayerScore != basetype.Uint16Invalid {
 		field := factory.CreateField(mesg.Num, 82)
 		field.Value = proto.Uint16(m.PlayerScore)
@@ -885,6 +907,21 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 	if m.AvgCombinedPedalSmoothness != basetype.Uint8Invalid {
 		field := factory.CreateField(mesg.Num, 105)
 		field.Value = proto.Uint8(m.AvgCombinedPedalSmoothness)
+		fields = append(fields, field)
+	}
+	if m.NumSegmentLaps != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 106)
+		field.Value = proto.Uint16(m.NumSegmentLaps)
+		fields = append(fields, field)
+	}
+	if m.FrontGearShiftCount != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 107)
+		field.Value = proto.Uint16(m.FrontGearShiftCount)
+		fields = append(fields, field)
+	}
+	if m.RearGearShiftCount != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 108)
+		field.Value = proto.Uint16(m.RearGearShiftCount)
 		fields = append(fields, field)
 	}
 	if m.SportProfileName != basetype.StringInvalid {
@@ -1216,6 +1253,11 @@ func (m *Session) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint16(m.MaxCoreTemperature)
 		fields = append(fields, field)
 	}
+	if m.AvgGradeAdjustedSpeed != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 211)
+		field.Value = proto.Uint32(m.AvgGradeAdjustedSpeed)
+		fields = append(fields, field)
+	}
 
 	n := len(fields)
 	mesg.Fields = make([]proto.Field, n+len(m.UnknownFields))
@@ -1262,6 +1304,9 @@ func (m *Session) GetTotalCycles() (name string, value any) {
 //
 // Based on m.Sport:
 //   - name: "avg_running_cadence", units: "strides/min" , value: uint8(m.AvgCadence)
+//   - name: "avg_swimming_cadence", units: "strokes/min" , value: uint8(m.AvgCadence)
+//   - name: "avg_paddlesport_cadence", units: "strokes/min" , value: uint8(m.AvgCadence)
+//   - name: "avg_push_cadence", units: "pushes/min" , value: uint8(m.AvgCadence)
 //
 // Otherwise:
 //   - name: "avg_cadence", units: "rpm" , value: m.AvgCadence
@@ -1269,6 +1314,12 @@ func (m *Session) GetAvgCadence() (name string, value any) {
 	switch m.Sport {
 	case typedef.SportRunning:
 		return "avg_running_cadence", uint8(m.AvgCadence)
+	case typedef.SportSwimming:
+		return "avg_swimming_cadence", uint8(m.AvgCadence)
+	case typedef.SportRowing, typedef.SportStandUpPaddleboarding:
+		return "avg_paddlesport_cadence", uint8(m.AvgCadence)
+	case typedef.SportWheelchairPushRun, typedef.SportWheelchairPushWalk:
+		return "avg_push_cadence", uint8(m.AvgCadence)
 	}
 	return "avg_cadence", m.AvgCadence
 }
@@ -1277,6 +1328,9 @@ func (m *Session) GetAvgCadence() (name string, value any) {
 //
 // Based on m.Sport:
 //   - name: "max_running_cadence", units: "strides/min" , value: uint8(m.MaxCadence)
+//   - name: "max_swimming_cadence", units: "strokes/min" , value: uint8(m.MaxCadence)
+//   - name: "max_paddlesport_cadence", units: "strokes/min" , value: uint8(m.MaxCadence)
+//   - name: "max_push_cadence", units: "pushes/min" , value: uint8(m.MaxCadence)
 //
 // Otherwise:
 //   - name: "max_cadence", units: "rpm" , value: m.MaxCadence
@@ -1284,6 +1338,12 @@ func (m *Session) GetMaxCadence() (name string, value any) {
 	switch m.Sport {
 	case typedef.SportRunning:
 		return "max_running_cadence", uint8(m.MaxCadence)
+	case typedef.SportSwimming:
+		return "max_swimming_cadence", uint8(m.MaxCadence)
+	case typedef.SportRowing, typedef.SportStandUpPaddleboarding:
+		return "max_paddlesport_cadence", uint8(m.MaxCadence)
+	case typedef.SportWheelchairPushRun, typedef.SportWheelchairPushWalk:
+		return "max_push_cadence", uint8(m.MaxCadence)
 	}
 	return "max_cadence", m.MaxCadence
 }
@@ -1654,6 +1714,17 @@ func (m *Session) ActiveTimeScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.ActiveTime)/1000 - 0
+}
+
+// AvgStrokesPerLengthScaled return AvgStrokesPerLength in its scaled value.
+// If AvgStrokesPerLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: strokes/length
+func (m *Session) AvgStrokesPerLengthScaled() float64 {
+	if m.AvgStrokesPerLength == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgStrokesPerLength)/10 - 0
 }
 
 // MaxBallSpeedScaled return MaxBallSpeed in its scaled value.
@@ -2240,6 +2311,17 @@ func (m *Session) MaxCoreTemperatureScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.MaxCoreTemperature)/100 - 0
+}
+
+// AvgGradeAdjustedSpeedScaled return AvgGradeAdjustedSpeed in its scaled value.
+// If AvgGradeAdjustedSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) AvgGradeAdjustedSpeedScaled() float64 {
+	if m.AvgGradeAdjustedSpeed == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgGradeAdjustedSpeed)/1000 - 0
 }
 
 // StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
@@ -3358,6 +3440,34 @@ func (m *Session) SetActiveTimeScaled(v float64) *Session {
 	return m
 }
 
+// SetAvgStrokesPerLength sets AvgStrokesPerLength value.
+//
+// Scale: 10; Units: strokes/length
+func (m *Session) SetAvgStrokesPerLength(v uint16) *Session {
+	m.AvgStrokesPerLength = v
+	return m
+}
+
+// SetAvgStrokesPerLengthScaled is similar to SetAvgStrokesPerLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: strokes/length
+func (m *Session) SetAvgStrokesPerLengthScaled(v float64) *Session {
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStrokesPerLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStrokesPerLength = uint16(unscaled)
+	return m
+}
+
+// SetAvgSwolf sets AvgSwolf value.
+func (m *Session) SetAvgSwolf(v uint16) *Session {
+	m.AvgSwolf = v
+	return m
+}
+
 // SetPlayerScore sets PlayerScore value.
 func (m *Session) SetPlayerScore(v uint16) *Session {
 	m.PlayerScore = v
@@ -3849,6 +3959,24 @@ func (m *Session) SetAvgCombinedPedalSmoothnessScaled(v float64) *Session {
 		return m
 	}
 	m.AvgCombinedPedalSmoothness = uint8(unscaled)
+	return m
+}
+
+// SetNumSegmentLaps sets NumSegmentLaps value.
+func (m *Session) SetNumSegmentLaps(v uint16) *Session {
+	m.NumSegmentLaps = v
+	return m
+}
+
+// SetFrontGearShiftCount sets FrontGearShiftCount value.
+func (m *Session) SetFrontGearShiftCount(v uint16) *Session {
+	m.FrontGearShiftCount = v
+	return m
+}
+
+// SetRearGearShiftCount sets RearGearShiftCount value.
+func (m *Session) SetRearGearShiftCount(v uint16) *Session {
+	m.RearGearShiftCount = v
 	return m
 }
 
@@ -4731,6 +4859,28 @@ func (m *Session) SetMaxCoreTemperatureScaled(v float64) *Session {
 		return m
 	}
 	m.MaxCoreTemperature = uint16(unscaled)
+	return m
+}
+
+// SetAvgGradeAdjustedSpeed sets AvgGradeAdjustedSpeed value.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetAvgGradeAdjustedSpeed(v uint32) *Session {
+	m.AvgGradeAdjustedSpeed = v
+	return m
+}
+
+// SetAvgGradeAdjustedSpeedScaled is similar to SetAvgGradeAdjustedSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Session) SetAvgGradeAdjustedSpeedScaled(v float64) *Session {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgGradeAdjustedSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgGradeAdjustedSpeed = uint32(unscaled)
 	return m
 }
 

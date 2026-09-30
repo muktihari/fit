@@ -25,26 +25,106 @@ type Split struct {
 	UnknownFields   []proto.Field          // UnknownFields are fields that are exist but they are not defined in Profile.xlsx
 	DeveloperFields []proto.DeveloperField // DeveloperFields are custom data fields [Added since protocol version 2.0]
 
-	StartTime         time.Time
-	EndTime           time.Time
-	TotalElapsedTime  uint32 // Scale: 1000; Units: s
-	TotalTimerTime    uint32 // Scale: 1000; Units: s
-	TotalDistance     uint32 // Scale: 100; Units: m
-	AvgSpeed          uint32 // Scale: 1000; Units: m/s
-	StartPositionLat  int32  // Units: semicircles
-	StartPositionLong int32  // Units: semicircles
-	EndPositionLat    int32  // Units: semicircles
-	EndPositionLong   int32  // Units: semicircles
-	MaxSpeed          uint32 // Scale: 1000; Units: m/s
-	AvgVertSpeed      int32  // Scale: 1000; Units: m/s
-	TotalCalories     uint32 // Units: kcal
-	StartElevation    uint32 // Scale: 5; Offset: 500; Units: m
-	ActiveTime        uint32 // Scale: 1000; Units: s; Active time of split rounds
-	TotalMovingTime   uint32 // Scale: 1000; Units: s
-	MessageIndex      typedef.MessageIndex
-	TotalAscent       uint16 // Units: m
-	TotalDescent      uint16 // Units: m
-	SplitType         typedef.SplitType
+	AvgLeftPowerPhase            []uint8   // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+	AvgLeftPowerPhasePeak        []uint8   // Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+	AvgRightPowerPhase           []uint8   // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+	AvgRightPowerPhasePeak       []uint8   // Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+	AvgPowerPosition             []uint16  // Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
+	MaxPowerPosition             []uint16  // Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
+	Timestamp                    time.Time // Units: s
+	StartTime                    time.Time
+	EndTime                      time.Time
+	TotalElapsedTime             uint32  // Scale: 1000; Units: s
+	TotalTimerTime               uint32  // Scale: 1000; Units: s
+	TotalDistance                uint32  // Scale: 100; Units: m
+	AvgSpeed                     uint32  // Scale: 1000; Units: m/s
+	NecLat                       int32   // Units: semicircles; North east corner latitude
+	NecLong                      int32   // Units: semicircles; North east corner longitude
+	SwcLat                       int32   // Units: semicircles; South west corner latitude
+	SwcLong                      int32   // Units: semicircles; South west corner longitude
+	StartPositionLat             int32   // Units: semicircles
+	StartPositionLong            int32   // Units: semicircles
+	EndPositionLat               int32   // Units: semicircles
+	EndPositionLong              int32   // Units: semicircles
+	MaxSpeed                     uint32  // Scale: 1000; Units: m/s
+	AvgVertSpeed                 int32   // Scale: 1000; Units: m/s
+	TotalCalories                uint32  // Units: kcal
+	TotalCycles                  uint32  // Units: cycles
+	TimeStanding                 uint32  // Scale: 1000; Units: s; Total time spent in the standing position
+	AvgFlow                      float32 // Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+	TotalGrit                    float32 // Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+	ClimbGradeValue              uint32
+	StartElevation               uint32 // Scale: 5; Offset: 500; Units: m
+	ActiveTime                   uint32 // Scale: 1000; Units: s; Active time of split rounds
+	AvgGradeAdjustedSpeed        uint32 // Scale: 1000; Units: m/s
+	TotalMovingTime              uint32 // Scale: 1000; Units: s
+	AvgAscentRate                uint32 // Scale: 1000; Units: m/s
+	MaxAscentRate                uint32 // Scale: 1000; Units: m/s
+	AvgDescentRate               uint32 // Scale: 1000; Units: m/s
+	MaxDescentRate               uint32 // Scale: 1000; Units: m/s
+	TotalAscentTime              uint32 // Scale: 1000; Units: s
+	TotalDescentTime             uint32 // Scale: 1000; Units: s
+	TotalHangTime                uint32 // Scale: 1000; Units: s
+	AvgDepth                     uint32 // Scale: 1000; Units: m; Average depth. 0 if above water
+	MaxDepth                     uint32 // Scale: 1000; Units: m; Max depth. 0 if above water
+	SurfaceInterval              uint32 // Units: s; Time since end of last dive
+	MessageIndex                 typedef.MessageIndex
+	TotalAscent                  uint16 // Units: m
+	TotalDescent                 uint16 // Units: m
+	AvgCadence                   uint16 // Scale: 128; Units: rpm
+	MaxCadence                   uint16 // Scale: 128; Units: rpm
+	AvgVerticalOscillation       uint16 // Scale: 10; Units: mm
+	AvgVerticalRatio             uint16 // Scale: 100; Units: percent
+	AvgStanceTime                uint16 // Scale: 10; Units: ms
+	AvgStanceTimeBalance         uint16 // Scale: 100; Units: percent
+	AvgStepLength                uint16 // Scale: 10; Units: mm
+	AvgPower                     uint16 // Units: watts
+	MaxPower                     uint16 // Units: watts
+	NormalizedPower              uint16 // Units: watts
+	LeftRightBalance             typedef.LeftRightBalance100
+	NumActiveLengths             uint16 // Units: lengths; # of active lengths of swim pool
+	AvgSwolf                     uint16
+	AvgStrokeDistance            uint16 // Scale: 100; Units: m
+	AvgStrokesPerLength          uint16 // Scale: 10; Units: strokes / length
+	FirstLapIndex                uint16 // This is only set for split types that will trigger the end of a lap when the split ends
+	NumLaps                      uint16 // This is only set for split types that will trigger the end of a lap when the split ends
+	NumFalls                     uint16 // Use with indoor climbing activities only
+	MetabolicCalories            uint16 // Units: kcal
+	AvgGrade                     int16  // Scale: 100; Units: %
+	MaxGrade                     int16  // Scale: 100; Units: %
+	MinCadence                   uint16 // Scale: 128; Units: rpm
+	AvgStress                    uint16
+	AvgVam                       uint16 // Scale: 1000; Units: m/s
+	AvgStanceTimePercent         uint16 // Scale: 100; Units: percent
+	FrontGearShiftCount          uint16
+	RearGearShiftCount           uint16
+	SplitType                    typedef.SplitType
+	Sport                        typedef.Sport
+	SubSport                     typedef.SubSport
+	AvgHeartRate                 uint8 // Units: bpm
+	MaxHeartRate                 uint8 // Units: bpm
+	AvgTemperature               int8  // Units: C
+	MaxTemperature               int8  // Units: C
+	MinTemperature               int8  // Units: C
+	AvgLeftPco                   int8  // Units: mm; Average left platform center offset
+	AvgRightPco                  int8  // Units: mm; Average right platform center offset
+	AvgLeftTorqueEffectiveness   uint8 // Scale: 2; Units: percent
+	AvgRightTorqueEffectiveness  uint8 // Scale: 2; Units: percent
+	AvgLeftPedalSmoothness       uint8 // Scale: 2; Units: percent
+	AvgRightPedalSmoothness      uint8 // Scale: 2; Units: percent
+	AvgCombinedPedalSmoothness   uint8 // Scale: 2; Units: percent
+	SwimStroke                   typedef.SwimStroke
+	ClimbGradingScale            typedef.ClimbGradingScale
+	Status                       typedef.SplitStatus // Use with indoor climbing activities only
+	ClimbSend                    typedef.Bool        // Use with indoor climbing activities only
+	TotalFractionalAscent        uint8               // Scale: 100; Units: m; fractional part of total_ascent
+	TotalFractionalDescent       uint8               // Scale: 100; Units: m; fractional part of total_descent
+	JumpCount                    uint8
+	DiveSectionType              typedef.DiveSectionType
+	ApneaDiscipline              typedef.ApneaDiscipline
+	MinHeartRate                 uint8 // Units: bpm
+	TotalFractionalCycles        uint8 // Scale: 128; Units: cycles
+	TotalAnaerobicTrainingEffect uint8 // Scale: 10
 }
 
 // NewSplit creates new Split struct based on given mesg.
@@ -64,7 +144,7 @@ func (m *Split) Reset(mesg *proto.Message) {
 		developerFields []proto.DeveloperField
 	)
 	if mesg != nil {
-		knownNums := [4]uint64{534798879, 70368744195072, 0, 4611686018427387904}
+		knownNums := [4]uint64{14987979559889009183, 10952544323132180479, 7696581476352, 6917529027641081856}
 		num, n := uint8(0), uint64(0)
 		for i := range mesg.Fields {
 			num = mesg.Fields[i].Num
@@ -83,26 +163,106 @@ func (m *Split) Reset(mesg *proto.Message) {
 	}
 
 	*m = Split{
-		MessageIndex:      typedef.MessageIndex(vals[254].Uint16()),
-		SplitType:         typedef.SplitType(vals[0].Uint8()),
-		TotalElapsedTime:  vals[1].Uint32(),
-		TotalTimerTime:    vals[2].Uint32(),
-		TotalDistance:     vals[3].Uint32(),
-		AvgSpeed:          vals[4].Uint32(),
-		StartTime:         datetime.ToTime(vals[9].Uint32()),
-		TotalAscent:       vals[13].Uint16(),
-		TotalDescent:      vals[14].Uint16(),
-		StartPositionLat:  vals[21].Int32(),
-		StartPositionLong: vals[22].Int32(),
-		EndPositionLat:    vals[23].Int32(),
-		EndPositionLong:   vals[24].Int32(),
-		MaxSpeed:          vals[25].Uint32(),
-		AvgVertSpeed:      vals[26].Int32(),
-		EndTime:           datetime.ToTime(vals[27].Uint32()),
-		TotalCalories:     vals[28].Uint32(),
-		StartElevation:    vals[74].Uint32(),
-		ActiveTime:        vals[78].Uint32(),
-		TotalMovingTime:   vals[110].Uint32(),
+		MessageIndex:                 typedef.MessageIndex(vals[254].Uint16()),
+		Timestamp:                    datetime.ToTime(vals[253].Uint32()),
+		SplitType:                    typedef.SplitType(vals[0].Uint8()),
+		TotalElapsedTime:             vals[1].Uint32(),
+		TotalTimerTime:               vals[2].Uint32(),
+		TotalDistance:                vals[3].Uint32(),
+		AvgSpeed:                     vals[4].Uint32(),
+		StartTime:                    datetime.ToTime(vals[9].Uint32()),
+		Sport:                        typedef.Sport(vals[11].Uint8()),
+		SubSport:                     typedef.SubSport(vals[12].Uint8()),
+		TotalAscent:                  vals[13].Uint16(),
+		TotalDescent:                 vals[14].Uint16(),
+		AvgHeartRate:                 vals[15].Uint8(),
+		MaxHeartRate:                 vals[16].Uint8(),
+		NecLat:                       vals[17].Int32(),
+		NecLong:                      vals[18].Int32(),
+		SwcLat:                       vals[19].Int32(),
+		SwcLong:                      vals[20].Int32(),
+		StartPositionLat:             vals[21].Int32(),
+		StartPositionLong:            vals[22].Int32(),
+		EndPositionLat:               vals[23].Int32(),
+		EndPositionLong:              vals[24].Int32(),
+		MaxSpeed:                     vals[25].Uint32(),
+		AvgVertSpeed:                 vals[26].Int32(),
+		EndTime:                      datetime.ToTime(vals[27].Uint32()),
+		TotalCalories:                vals[28].Uint32(),
+		AvgCadence:                   vals[29].Uint16(),
+		MaxCadence:                   vals[30].Uint16(),
+		TotalCycles:                  vals[31].Uint32(),
+		AvgTemperature:               vals[32].Int8(),
+		MaxTemperature:               vals[33].Int8(),
+		MinTemperature:               vals[34].Int8(),
+		AvgVerticalOscillation:       vals[35].Uint16(),
+		AvgVerticalRatio:             vals[36].Uint16(),
+		AvgStanceTime:                vals[37].Uint16(),
+		AvgStanceTimeBalance:         vals[38].Uint16(),
+		AvgStepLength:                vals[39].Uint16(),
+		AvgPower:                     vals[40].Uint16(),
+		MaxPower:                     vals[41].Uint16(),
+		NormalizedPower:              vals[42].Uint16(),
+		LeftRightBalance:             typedef.LeftRightBalance100(vals[43].Uint16()),
+		TimeStanding:                 vals[44].Uint32(),
+		AvgLeftPco:                   vals[45].Int8(),
+		AvgRightPco:                  vals[46].Int8(),
+		AvgLeftPowerPhase:            vals[47].SliceUint8(),
+		AvgLeftPowerPhasePeak:        vals[48].SliceUint8(),
+		AvgRightPowerPhase:           vals[49].SliceUint8(),
+		AvgRightPowerPhasePeak:       vals[50].SliceUint8(),
+		AvgPowerPosition:             vals[51].SliceUint16(),
+		MaxPowerPosition:             vals[52].SliceUint16(),
+		AvgLeftTorqueEffectiveness:   vals[53].Uint8(),
+		AvgRightTorqueEffectiveness:  vals[54].Uint8(),
+		AvgLeftPedalSmoothness:       vals[55].Uint8(),
+		AvgRightPedalSmoothness:      vals[56].Uint8(),
+		AvgCombinedPedalSmoothness:   vals[57].Uint8(),
+		AvgFlow:                      vals[58].Float32(),
+		TotalGrit:                    vals[59].Float32(),
+		SwimStroke:                   typedef.SwimStroke(vals[62].Uint8()),
+		NumActiveLengths:             vals[63].Uint16(),
+		AvgSwolf:                     vals[64].Uint16(),
+		AvgStrokeDistance:            vals[65].Uint16(),
+		AvgStrokesPerLength:          vals[66].Uint16(),
+		FirstLapIndex:                vals[67].Uint16(),
+		NumLaps:                      vals[68].Uint16(),
+		ClimbGradingScale:            typedef.ClimbGradingScale(vals[69].Uint8()),
+		ClimbGradeValue:              vals[70].Uint32(),
+		Status:                       typedef.SplitStatus(vals[71].Uint8()),
+		NumFalls:                     vals[72].Uint16(),
+		ClimbSend:                    vals[73].Bool(),
+		StartElevation:               vals[74].Uint32(),
+		ActiveTime:                   vals[78].Uint32(),
+		MetabolicCalories:            vals[79].Uint16(),
+		TotalFractionalAscent:        vals[80].Uint8(),
+		TotalFractionalDescent:       vals[81].Uint8(),
+		AvgGrade:                     vals[88].Int16(),
+		MaxGrade:                     vals[89].Int16(),
+		MinCadence:                   vals[90].Uint16(),
+		AvgGradeAdjustedSpeed:        vals[93].Uint32(),
+		AvgStress:                    vals[94].Uint16(),
+		AvgVam:                       vals[99].Uint16(),
+		JumpCount:                    vals[104].Uint8(),
+		TotalMovingTime:              vals[110].Uint32(),
+		DiveSectionType:              typedef.DiveSectionType(vals[112].Uint8()),
+		AvgAscentRate:                vals[113].Uint32(),
+		MaxAscentRate:                vals[114].Uint32(),
+		AvgDescentRate:               vals[115].Uint32(),
+		MaxDescentRate:               vals[116].Uint32(),
+		TotalAscentTime:              vals[117].Uint32(),
+		TotalDescentTime:             vals[118].Uint32(),
+		TotalHangTime:                vals[119].Uint32(),
+		ApneaDiscipline:              typedef.ApneaDiscipline(vals[120].Uint8()),
+		AvgDepth:                     vals[121].Uint32(),
+		MaxDepth:                     vals[122].Uint32(),
+		MinHeartRate:                 vals[124].Uint8(),
+		SurfaceInterval:              vals[127].Uint32(),
+		TotalFractionalCycles:        vals[142].Uint8(),
+		AvgStanceTimePercent:         vals[144].Uint16(),
+		TotalAnaerobicTrainingEffect: vals[168].Uint8(),
+		FrontGearShiftCount:          vals[169].Uint16(),
+		RearGearShiftCount:           vals[170].Uint16(),
 
 		UnknownFields:   unknownFields,
 		DeveloperFields: developerFields,
@@ -115,12 +275,17 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 		options = defaultOptions
 	}
 
-	fields := make([]proto.Field, 0, 20)
+	fields := make([]proto.Field, 0, 100)
 	mesg := proto.Message{Num: typedef.MesgNumSplit}
 
 	if m.MessageIndex != typedef.MessageIndexInvalid {
 		field := factory.CreateField(mesg.Num, 254)
 		field.Value = proto.Uint16(uint16(m.MessageIndex))
+		fields = append(fields, field)
+	}
+	if !m.Timestamp.Before(datetime.Epoch()) {
+		field := factory.CreateField(mesg.Num, 253)
+		field.Value = proto.Uint32(uint32(m.Timestamp.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
 	if m.SplitType != typedef.SplitTypeInvalid {
@@ -153,6 +318,16 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(uint32(m.StartTime.Sub(datetime.Epoch()).Seconds()))
 		fields = append(fields, field)
 	}
+	if m.Sport != typedef.SportInvalid {
+		field := factory.CreateField(mesg.Num, 11)
+		field.Value = proto.Uint8(byte(m.Sport))
+		fields = append(fields, field)
+	}
+	if m.SubSport != typedef.SubSportInvalid {
+		field := factory.CreateField(mesg.Num, 12)
+		field.Value = proto.Uint8(byte(m.SubSport))
+		fields = append(fields, field)
+	}
 	if m.TotalAscent != basetype.Uint16Invalid {
 		field := factory.CreateField(mesg.Num, 13)
 		field.Value = proto.Uint16(m.TotalAscent)
@@ -161,6 +336,36 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 	if m.TotalDescent != basetype.Uint16Invalid {
 		field := factory.CreateField(mesg.Num, 14)
 		field.Value = proto.Uint16(m.TotalDescent)
+		fields = append(fields, field)
+	}
+	if m.AvgHeartRate != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 15)
+		field.Value = proto.Uint8(m.AvgHeartRate)
+		fields = append(fields, field)
+	}
+	if m.MaxHeartRate != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 16)
+		field.Value = proto.Uint8(m.MaxHeartRate)
+		fields = append(fields, field)
+	}
+	if m.NecLat != basetype.Sint32Invalid {
+		field := factory.CreateField(mesg.Num, 17)
+		field.Value = proto.Int32(m.NecLat)
+		fields = append(fields, field)
+	}
+	if m.NecLong != basetype.Sint32Invalid {
+		field := factory.CreateField(mesg.Num, 18)
+		field.Value = proto.Int32(m.NecLong)
+		fields = append(fields, field)
+	}
+	if m.SwcLat != basetype.Sint32Invalid {
+		field := factory.CreateField(mesg.Num, 19)
+		field.Value = proto.Int32(m.SwcLat)
+		fields = append(fields, field)
+	}
+	if m.SwcLong != basetype.Sint32Invalid {
+		field := factory.CreateField(mesg.Num, 20)
+		field.Value = proto.Int32(m.SwcLong)
 		fields = append(fields, field)
 	}
 	if m.StartPositionLat != basetype.Sint32Invalid {
@@ -203,6 +408,221 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.TotalCalories)
 		fields = append(fields, field)
 	}
+	if m.AvgCadence != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 29)
+		field.Value = proto.Uint16(m.AvgCadence)
+		fields = append(fields, field)
+	}
+	if m.MaxCadence != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 30)
+		field.Value = proto.Uint16(m.MaxCadence)
+		fields = append(fields, field)
+	}
+	if m.TotalCycles != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 31)
+		field.Value = proto.Uint32(m.TotalCycles)
+		fields = append(fields, field)
+	}
+	if m.AvgTemperature != basetype.Sint8Invalid {
+		field := factory.CreateField(mesg.Num, 32)
+		field.Value = proto.Int8(m.AvgTemperature)
+		fields = append(fields, field)
+	}
+	if m.MaxTemperature != basetype.Sint8Invalid {
+		field := factory.CreateField(mesg.Num, 33)
+		field.Value = proto.Int8(m.MaxTemperature)
+		fields = append(fields, field)
+	}
+	if m.MinTemperature != basetype.Sint8Invalid {
+		field := factory.CreateField(mesg.Num, 34)
+		field.Value = proto.Int8(m.MinTemperature)
+		fields = append(fields, field)
+	}
+	if m.AvgVerticalOscillation != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 35)
+		field.Value = proto.Uint16(m.AvgVerticalOscillation)
+		fields = append(fields, field)
+	}
+	if m.AvgVerticalRatio != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 36)
+		field.Value = proto.Uint16(m.AvgVerticalRatio)
+		fields = append(fields, field)
+	}
+	if m.AvgStanceTime != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 37)
+		field.Value = proto.Uint16(m.AvgStanceTime)
+		fields = append(fields, field)
+	}
+	if m.AvgStanceTimeBalance != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 38)
+		field.Value = proto.Uint16(m.AvgStanceTimeBalance)
+		fields = append(fields, field)
+	}
+	if m.AvgStepLength != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 39)
+		field.Value = proto.Uint16(m.AvgStepLength)
+		fields = append(fields, field)
+	}
+	if m.AvgPower != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 40)
+		field.Value = proto.Uint16(m.AvgPower)
+		fields = append(fields, field)
+	}
+	if m.MaxPower != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 41)
+		field.Value = proto.Uint16(m.MaxPower)
+		fields = append(fields, field)
+	}
+	if m.NormalizedPower != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 42)
+		field.Value = proto.Uint16(m.NormalizedPower)
+		fields = append(fields, field)
+	}
+	if m.LeftRightBalance != typedef.LeftRightBalance100Invalid {
+		field := factory.CreateField(mesg.Num, 43)
+		field.Value = proto.Uint16(uint16(m.LeftRightBalance))
+		fields = append(fields, field)
+	}
+	if m.TimeStanding != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 44)
+		field.Value = proto.Uint32(m.TimeStanding)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPco != basetype.Sint8Invalid {
+		field := factory.CreateField(mesg.Num, 45)
+		field.Value = proto.Int8(m.AvgLeftPco)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPco != basetype.Sint8Invalid {
+		field := factory.CreateField(mesg.Num, 46)
+		field.Value = proto.Int8(m.AvgRightPco)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPowerPhase != nil {
+		field := factory.CreateField(mesg.Num, 47)
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhase)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPowerPhasePeak != nil {
+		field := factory.CreateField(mesg.Num, 48)
+		field.Value = proto.SliceUint8(m.AvgLeftPowerPhasePeak)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPowerPhase != nil {
+		field := factory.CreateField(mesg.Num, 49)
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhase)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPowerPhasePeak != nil {
+		field := factory.CreateField(mesg.Num, 50)
+		field.Value = proto.SliceUint8(m.AvgRightPowerPhasePeak)
+		fields = append(fields, field)
+	}
+	if m.AvgPowerPosition != nil {
+		field := factory.CreateField(mesg.Num, 51)
+		field.Value = proto.SliceUint16(m.AvgPowerPosition)
+		fields = append(fields, field)
+	}
+	if m.MaxPowerPosition != nil {
+		field := factory.CreateField(mesg.Num, 52)
+		field.Value = proto.SliceUint16(m.MaxPowerPosition)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftTorqueEffectiveness != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 53)
+		field.Value = proto.Uint8(m.AvgLeftTorqueEffectiveness)
+		fields = append(fields, field)
+	}
+	if m.AvgRightTorqueEffectiveness != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 54)
+		field.Value = proto.Uint8(m.AvgRightTorqueEffectiveness)
+		fields = append(fields, field)
+	}
+	if m.AvgLeftPedalSmoothness != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 55)
+		field.Value = proto.Uint8(m.AvgLeftPedalSmoothness)
+		fields = append(fields, field)
+	}
+	if m.AvgRightPedalSmoothness != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 56)
+		field.Value = proto.Uint8(m.AvgRightPedalSmoothness)
+		fields = append(fields, field)
+	}
+	if m.AvgCombinedPedalSmoothness != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 57)
+		field.Value = proto.Uint8(m.AvgCombinedPedalSmoothness)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.AvgFlow) != basetype.Float32Invalid {
+		field := factory.CreateField(mesg.Num, 58)
+		field.Value = proto.Float32(m.AvgFlow)
+		fields = append(fields, field)
+	}
+	if math.Float32bits(m.TotalGrit) != basetype.Float32Invalid {
+		field := factory.CreateField(mesg.Num, 59)
+		field.Value = proto.Float32(m.TotalGrit)
+		fields = append(fields, field)
+	}
+	if m.SwimStroke != typedef.SwimStrokeInvalid {
+		field := factory.CreateField(mesg.Num, 62)
+		field.Value = proto.Uint8(byte(m.SwimStroke))
+		fields = append(fields, field)
+	}
+	if m.NumActiveLengths != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 63)
+		field.Value = proto.Uint16(m.NumActiveLengths)
+		fields = append(fields, field)
+	}
+	if m.AvgSwolf != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 64)
+		field.Value = proto.Uint16(m.AvgSwolf)
+		fields = append(fields, field)
+	}
+	if m.AvgStrokeDistance != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 65)
+		field.Value = proto.Uint16(m.AvgStrokeDistance)
+		fields = append(fields, field)
+	}
+	if m.AvgStrokesPerLength != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 66)
+		field.Value = proto.Uint16(m.AvgStrokesPerLength)
+		fields = append(fields, field)
+	}
+	if m.FirstLapIndex != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 67)
+		field.Value = proto.Uint16(m.FirstLapIndex)
+		fields = append(fields, field)
+	}
+	if m.NumLaps != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 68)
+		field.Value = proto.Uint16(m.NumLaps)
+		fields = append(fields, field)
+	}
+	if m.ClimbGradingScale != typedef.ClimbGradingScaleInvalid {
+		field := factory.CreateField(mesg.Num, 69)
+		field.Value = proto.Uint8(byte(m.ClimbGradingScale))
+		fields = append(fields, field)
+	}
+	if m.ClimbGradeValue != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 70)
+		field.Value = proto.Uint32(m.ClimbGradeValue)
+		fields = append(fields, field)
+	}
+	if m.Status != typedef.SplitStatusInvalid {
+		field := factory.CreateField(mesg.Num, 71)
+		field.Value = proto.Uint8(byte(m.Status))
+		fields = append(fields, field)
+	}
+	if m.NumFalls != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 72)
+		field.Value = proto.Uint16(m.NumFalls)
+		fields = append(fields, field)
+	}
+	if m.ClimbSend < 2 {
+		field := factory.CreateField(mesg.Num, 73)
+		field.Value = proto.Bool(m.ClimbSend)
+		fields = append(fields, field)
+	}
 	if m.StartElevation != basetype.Uint32Invalid {
 		field := factory.CreateField(mesg.Num, 74)
 		field.Value = proto.Uint32(m.StartElevation)
@@ -213,9 +633,149 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 		field.Value = proto.Uint32(m.ActiveTime)
 		fields = append(fields, field)
 	}
+	if m.MetabolicCalories != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 79)
+		field.Value = proto.Uint16(m.MetabolicCalories)
+		fields = append(fields, field)
+	}
+	if m.TotalFractionalAscent != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 80)
+		field.Value = proto.Uint8(m.TotalFractionalAscent)
+		fields = append(fields, field)
+	}
+	if m.TotalFractionalDescent != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 81)
+		field.Value = proto.Uint8(m.TotalFractionalDescent)
+		fields = append(fields, field)
+	}
+	if m.AvgGrade != basetype.Sint16Invalid {
+		field := factory.CreateField(mesg.Num, 88)
+		field.Value = proto.Int16(m.AvgGrade)
+		fields = append(fields, field)
+	}
+	if m.MaxGrade != basetype.Sint16Invalid {
+		field := factory.CreateField(mesg.Num, 89)
+		field.Value = proto.Int16(m.MaxGrade)
+		fields = append(fields, field)
+	}
+	if m.MinCadence != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 90)
+		field.Value = proto.Uint16(m.MinCadence)
+		fields = append(fields, field)
+	}
+	if m.AvgGradeAdjustedSpeed != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 93)
+		field.Value = proto.Uint32(m.AvgGradeAdjustedSpeed)
+		fields = append(fields, field)
+	}
+	if m.AvgStress != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 94)
+		field.Value = proto.Uint16(m.AvgStress)
+		fields = append(fields, field)
+	}
+	if m.AvgVam != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 99)
+		field.Value = proto.Uint16(m.AvgVam)
+		fields = append(fields, field)
+	}
+	if m.JumpCount != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 104)
+		field.Value = proto.Uint8(m.JumpCount)
+		fields = append(fields, field)
+	}
 	if m.TotalMovingTime != basetype.Uint32Invalid {
 		field := factory.CreateField(mesg.Num, 110)
 		field.Value = proto.Uint32(m.TotalMovingTime)
+		fields = append(fields, field)
+	}
+	if m.DiveSectionType != typedef.DiveSectionTypeInvalid {
+		field := factory.CreateField(mesg.Num, 112)
+		field.Value = proto.Uint8(byte(m.DiveSectionType))
+		fields = append(fields, field)
+	}
+	if m.AvgAscentRate != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 113)
+		field.Value = proto.Uint32(m.AvgAscentRate)
+		fields = append(fields, field)
+	}
+	if m.MaxAscentRate != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 114)
+		field.Value = proto.Uint32(m.MaxAscentRate)
+		fields = append(fields, field)
+	}
+	if m.AvgDescentRate != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 115)
+		field.Value = proto.Uint32(m.AvgDescentRate)
+		fields = append(fields, field)
+	}
+	if m.MaxDescentRate != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 116)
+		field.Value = proto.Uint32(m.MaxDescentRate)
+		fields = append(fields, field)
+	}
+	if m.TotalAscentTime != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 117)
+		field.Value = proto.Uint32(m.TotalAscentTime)
+		fields = append(fields, field)
+	}
+	if m.TotalDescentTime != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 118)
+		field.Value = proto.Uint32(m.TotalDescentTime)
+		fields = append(fields, field)
+	}
+	if m.TotalHangTime != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 119)
+		field.Value = proto.Uint32(m.TotalHangTime)
+		fields = append(fields, field)
+	}
+	if m.ApneaDiscipline != typedef.ApneaDisciplineInvalid {
+		field := factory.CreateField(mesg.Num, 120)
+		field.Value = proto.Uint8(byte(m.ApneaDiscipline))
+		fields = append(fields, field)
+	}
+	if m.AvgDepth != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 121)
+		field.Value = proto.Uint32(m.AvgDepth)
+		fields = append(fields, field)
+	}
+	if m.MaxDepth != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 122)
+		field.Value = proto.Uint32(m.MaxDepth)
+		fields = append(fields, field)
+	}
+	if m.MinHeartRate != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 124)
+		field.Value = proto.Uint8(m.MinHeartRate)
+		fields = append(fields, field)
+	}
+	if m.SurfaceInterval != basetype.Uint32Invalid {
+		field := factory.CreateField(mesg.Num, 127)
+		field.Value = proto.Uint32(m.SurfaceInterval)
+		fields = append(fields, field)
+	}
+	if m.TotalFractionalCycles != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 142)
+		field.Value = proto.Uint8(m.TotalFractionalCycles)
+		fields = append(fields, field)
+	}
+	if m.AvgStanceTimePercent != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 144)
+		field.Value = proto.Uint16(m.AvgStanceTimePercent)
+		fields = append(fields, field)
+	}
+	if m.TotalAnaerobicTrainingEffect != basetype.Uint8Invalid {
+		field := factory.CreateField(mesg.Num, 168)
+		field.Value = proto.Uint8(m.TotalAnaerobicTrainingEffect)
+		fields = append(fields, field)
+	}
+	if m.FrontGearShiftCount != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 169)
+		field.Value = proto.Uint16(m.FrontGearShiftCount)
+		fields = append(fields, field)
+	}
+	if m.RearGearShiftCount != basetype.Uint16Invalid {
+		field := factory.CreateField(mesg.Num, 170)
+		field.Value = proto.Uint16(m.RearGearShiftCount)
 		fields = append(fields, field)
 	}
 
@@ -228,6 +788,150 @@ func (m *Split) ToMesg(options *Options) proto.Message {
 
 	return mesg
 }
+
+// GetAvgCadence returns Dynamic Field interpretation of AvgCadence. Otherwise, returns the original value of AvgCadence.
+//
+// Based on m.Sport:
+//   - name: "avg_running_cadence", units: "strides/min" , value: (float64(m.AvgCadence) * 128) - 0
+//   - name: "avg_swimming_cadence", units: "strokes/min" , value: (float64(m.AvgCadence) * 128) - 0
+//   - name: "avg_paddlesport_cadence", units: "strokes/min" , value: (float64(m.AvgCadence) * 128) - 0
+//   - name: "avg_push_cadence", units: "pushes/min" , value: uint16(m.AvgCadence)
+//
+// Otherwise:
+//   - name: "avg_cadence", units: "rpm" , value: m.AvgCadence
+func (m *Split) GetAvgCadence() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportRunning:
+		return "avg_running_cadence", (float64(m.AvgCadence) * 128) - 0
+	case typedef.SportSwimming:
+		return "avg_swimming_cadence", (float64(m.AvgCadence) * 128) - 0
+	case typedef.SportRowing, typedef.SportStandUpPaddleboarding:
+		return "avg_paddlesport_cadence", (float64(m.AvgCadence) * 128) - 0
+	case typedef.SportWheelchairPushRun, typedef.SportWheelchairPushWalk:
+		return "avg_push_cadence", uint16(m.AvgCadence)
+	}
+	return "avg_cadence", m.AvgCadence
+}
+
+// GetMaxCadence returns Dynamic Field interpretation of MaxCadence. Otherwise, returns the original value of MaxCadence.
+//
+// Based on m.Sport:
+//   - name: "max_running_cadence", units: "strides/min" , value: (float64(m.MaxCadence) * 128) - 0
+//   - name: "max_swimming_cadence", units: "strokes/min" , value: (float64(m.MaxCadence) * 128) - 0
+//   - name: "max_paddlesport_cadence", units: "strokes/min" , value: (float64(m.MaxCadence) * 128) - 0
+//   - name: "max_push_cadence", units: "pushes/min" , value: uint16(m.MaxCadence)
+//
+// Otherwise:
+//   - name: "max_cadence", units: "rpm" , value: m.MaxCadence
+func (m *Split) GetMaxCadence() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportRunning:
+		return "max_running_cadence", (float64(m.MaxCadence) * 128) - 0
+	case typedef.SportSwimming:
+		return "max_swimming_cadence", (float64(m.MaxCadence) * 128) - 0
+	case typedef.SportRowing, typedef.SportStandUpPaddleboarding:
+		return "max_paddlesport_cadence", (float64(m.MaxCadence) * 128) - 0
+	case typedef.SportWheelchairPushRun, typedef.SportWheelchairPushWalk:
+		return "max_push_cadence", uint16(m.MaxCadence)
+	}
+	return "max_cadence", m.MaxCadence
+}
+
+// GetTotalCycles returns Dynamic Field interpretation of TotalCycles. Otherwise, returns the original value of TotalCycles.
+//
+// Based on m.Sport:
+//   - name: "total_strides", units: "strides" , value: uint32(m.TotalCycles)
+//   - name: "total_strokes", units: "strokes" , value: uint32(m.TotalCycles)
+//   - name: "total_reps", units: "reps" , value: uint32(m.TotalCycles)
+//   - name: "total_pushes", units: "pushes" , value: uint32(m.TotalCycles)
+//
+// Otherwise:
+//   - name: "total_cycles", units: "cycles" , value: m.TotalCycles
+func (m *Split) GetTotalCycles() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportRunning, typedef.SportWalking:
+		return "total_strides", uint32(m.TotalCycles)
+	case typedef.SportCycling, typedef.SportSwimming, typedef.SportRowing, typedef.SportStandUpPaddleboarding:
+		return "total_strokes", uint32(m.TotalCycles)
+	case typedef.SportHiit:
+		return "total_reps", uint32(m.TotalCycles)
+	case typedef.SportWheelchairPushRun, typedef.SportWheelchairPushWalk:
+		return "total_pushes", uint32(m.TotalCycles)
+	}
+	return "total_cycles", m.TotalCycles
+}
+
+// GetClimbGradeValue returns Dynamic Field interpretation of ClimbGradeValue. Otherwise, returns the original value of ClimbGradeValue.
+//
+// Based on m.ClimbGradingScale:
+//   - name: "climb_grade_yds", value: typedef.YdsGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_uiaa", value: typedef.UiaaGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_french", value: typedef.FrenchGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_british_adjectival", value: typedef.BritishAdjectivalGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_british_technical", value: typedef.BritishTechnicalGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_ewbank", value: typedef.EwbankGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_brazilian", value: typedef.BrazilianGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_saxon", value: typedef.SaxonGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_vermin", value: typedef.VerminGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_font", value: typedef.FontGradingScale(m.ClimbGradeValue)
+//   - name: "climb_grade_dankyu", value: typedef.DankyuGradingScale(m.ClimbGradeValue)
+//
+// Otherwise:
+//   - name: "climb_grade_value", value: m.ClimbGradeValue
+func (m *Split) GetClimbGradeValue() (name string, value any) {
+	switch m.ClimbGradingScale {
+	case typedef.ClimbGradingScaleYds:
+		return "climb_grade_yds", typedef.YdsGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleUiaa:
+		return "climb_grade_uiaa", typedef.UiaaGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleFrench:
+		return "climb_grade_french", typedef.FrenchGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleBritishAdjectival:
+		return "climb_grade_british_adjectival", typedef.BritishAdjectivalGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleBritishTechnical:
+		return "climb_grade_british_technical", typedef.BritishTechnicalGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleEwbank:
+		return "climb_grade_ewbank", typedef.EwbankGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleBrazilian:
+		return "climb_grade_brazilian", typedef.BrazilianGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleSaxon:
+		return "climb_grade_saxon", typedef.SaxonGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleVermin:
+		return "climb_grade_vermin", typedef.VerminGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleFont:
+		return "climb_grade_font", typedef.FontGradingScale(m.ClimbGradeValue)
+	case typedef.ClimbGradingScaleDankyu:
+		return "climb_grade_dankyu", typedef.DankyuGradingScale(m.ClimbGradeValue)
+	}
+	return "climb_grade_value", m.ClimbGradeValue
+}
+
+// GetMinCadence returns Dynamic Field interpretation of MinCadence. Otherwise, returns the original value of MinCadence.
+//
+// Based on m.Sport:
+//   - name: "min_running_cadence", units: "strides/min" , value: (float64(m.MinCadence) * 128) - 0
+//   - name: "min_swimming_cadence", units: "strokes/min" , value: (float64(m.MinCadence) * 128) - 0
+//   - name: "min_paddlesport_cadence", units: "strokes/min" , value: (float64(m.MinCadence) * 128) - 0
+//   - name: "min_push_cadence", units: "pushes/min" , value: uint16(m.MinCadence)
+//
+// Otherwise:
+//   - name: "min_cadence", units: "rpm" , value: m.MinCadence
+func (m *Split) GetMinCadence() (name string, value any) {
+	switch m.Sport {
+	case typedef.SportRunning:
+		return "min_running_cadence", (float64(m.MinCadence) * 128) - 0
+	case typedef.SportSwimming:
+		return "min_swimming_cadence", (float64(m.MinCadence) * 128) - 0
+	case typedef.SportRowing, typedef.SportStandUpPaddleboarding:
+		return "min_paddlesport_cadence", (float64(m.MinCadence) * 128) - 0
+	case typedef.SportWheelchairPushRun, typedef.SportWheelchairPushWalk:
+		return "min_push_cadence", uint16(m.MinCadence)
+	}
+	return "min_cadence", m.MinCadence
+}
+
+// TimestampUint32 returns Timestamp in uint32 (seconds since FIT's epoch) instead of time.Time.
+func (m *Split) TimestampUint32() uint32 { return datetime.ToUint32(m.Timestamp) }
 
 // StartTimeUint32 returns StartTime in uint32 (seconds since FIT's epoch) instead of time.Time.
 func (m *Split) StartTimeUint32() uint32 { return datetime.ToUint32(m.StartTime) }
@@ -301,6 +1005,247 @@ func (m *Split) AvgVertSpeedScaled() float64 {
 	return float64(m.AvgVertSpeed)/1000 - 0
 }
 
+// AvgCadenceScaled return AvgCadence in its scaled value.
+// If AvgCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm
+func (m *Split) AvgCadenceScaled() float64 {
+	if m.AvgCadence == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgCadence)/128 - 0
+}
+
+// MaxCadenceScaled return MaxCadence in its scaled value.
+// If MaxCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm
+func (m *Split) MaxCadenceScaled() float64 {
+	if m.MaxCadence == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.MaxCadence)/128 - 0
+}
+
+// AvgVerticalOscillationScaled return AvgVerticalOscillation in its scaled value.
+// If AvgVerticalOscillation value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: mm
+func (m *Split) AvgVerticalOscillationScaled() float64 {
+	if m.AvgVerticalOscillation == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgVerticalOscillation)/10 - 0
+}
+
+// AvgVerticalRatioScaled return AvgVerticalRatio in its scaled value.
+// If AvgVerticalRatio value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
+func (m *Split) AvgVerticalRatioScaled() float64 {
+	if m.AvgVerticalRatio == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgVerticalRatio)/100 - 0
+}
+
+// AvgStanceTimeScaled return AvgStanceTime in its scaled value.
+// If AvgStanceTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: ms
+func (m *Split) AvgStanceTimeScaled() float64 {
+	if m.AvgStanceTime == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgStanceTime)/10 - 0
+}
+
+// AvgStanceTimeBalanceScaled return AvgStanceTimeBalance in its scaled value.
+// If AvgStanceTimeBalance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
+func (m *Split) AvgStanceTimeBalanceScaled() float64 {
+	if m.AvgStanceTimeBalance == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgStanceTimeBalance)/100 - 0
+}
+
+// AvgStepLengthScaled return AvgStepLength in its scaled value.
+// If AvgStepLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: mm
+func (m *Split) AvgStepLengthScaled() float64 {
+	if m.AvgStepLength == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgStepLength)/10 - 0
+}
+
+// TimeStandingScaled return TimeStanding in its scaled value.
+// If TimeStanding value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
+func (m *Split) TimeStandingScaled() float64 {
+	if m.TimeStanding == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TimeStanding)/1000 - 0
+}
+
+// AvgLeftPowerPhaseScaled return AvgLeftPowerPhase in its scaled value.
+// If AvgLeftPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+func (m *Split) AvgLeftPowerPhaseScaled() []float64 {
+	if m.AvgLeftPowerPhase == nil {
+		return nil
+	}
+	var vals = make([]float64, len(m.AvgLeftPowerPhase))
+	for i := range m.AvgLeftPowerPhase {
+		if m.AvgLeftPowerPhase[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgLeftPowerPhase[i])/0.7111111 - 0
+	}
+	return vals
+}
+
+// AvgLeftPowerPhasePeakScaled return AvgLeftPowerPhasePeak in its scaled value.
+// If AvgLeftPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Split) AvgLeftPowerPhasePeakScaled() []float64 {
+	if m.AvgLeftPowerPhasePeak == nil {
+		return nil
+	}
+	var vals = make([]float64, len(m.AvgLeftPowerPhasePeak))
+	for i := range m.AvgLeftPowerPhasePeak {
+		if m.AvgLeftPowerPhasePeak[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgLeftPowerPhasePeak[i])/0.7111111 - 0
+	}
+	return vals
+}
+
+// AvgRightPowerPhaseScaled return AvgRightPowerPhase in its scaled value.
+// If AvgRightPowerPhase value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Split) AvgRightPowerPhaseScaled() []float64 {
+	if m.AvgRightPowerPhase == nil {
+		return nil
+	}
+	var vals = make([]float64, len(m.AvgRightPowerPhase))
+	for i := range m.AvgRightPowerPhase {
+		if m.AvgRightPowerPhase[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgRightPowerPhase[i])/0.7111111 - 0
+	}
+	return vals
+}
+
+// AvgRightPowerPhasePeakScaled return AvgRightPowerPhasePeak in its scaled value.
+// If AvgRightPowerPhasePeak value is invalid, nil will be returned.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Split) AvgRightPowerPhasePeakScaled() []float64 {
+	if m.AvgRightPowerPhasePeak == nil {
+		return nil
+	}
+	var vals = make([]float64, len(m.AvgRightPowerPhasePeak))
+	for i := range m.AvgRightPowerPhasePeak {
+		if m.AvgRightPowerPhasePeak[i] == basetype.Uint8Invalid {
+			vals[i] = math.Float64frombits(basetype.Float64Invalid)
+			continue
+		}
+		vals[i] = float64(m.AvgRightPowerPhasePeak[i])/0.7111111 - 0
+	}
+	return vals
+}
+
+// AvgLeftTorqueEffectivenessScaled return AvgLeftTorqueEffectiveness in its scaled value.
+// If AvgLeftTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
+func (m *Split) AvgLeftTorqueEffectivenessScaled() float64 {
+	if m.AvgLeftTorqueEffectiveness == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgLeftTorqueEffectiveness)/2 - 0
+}
+
+// AvgRightTorqueEffectivenessScaled return AvgRightTorqueEffectiveness in its scaled value.
+// If AvgRightTorqueEffectiveness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
+func (m *Split) AvgRightTorqueEffectivenessScaled() float64 {
+	if m.AvgRightTorqueEffectiveness == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgRightTorqueEffectiveness)/2 - 0
+}
+
+// AvgLeftPedalSmoothnessScaled return AvgLeftPedalSmoothness in its scaled value.
+// If AvgLeftPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
+func (m *Split) AvgLeftPedalSmoothnessScaled() float64 {
+	if m.AvgLeftPedalSmoothness == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgLeftPedalSmoothness)/2 - 0
+}
+
+// AvgRightPedalSmoothnessScaled return AvgRightPedalSmoothness in its scaled value.
+// If AvgRightPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
+func (m *Split) AvgRightPedalSmoothnessScaled() float64 {
+	if m.AvgRightPedalSmoothness == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgRightPedalSmoothness)/2 - 0
+}
+
+// AvgCombinedPedalSmoothnessScaled return AvgCombinedPedalSmoothness in its scaled value.
+// If AvgCombinedPedalSmoothness value is invalid, float64 invalid value will be returned.
+//
+// Scale: 2; Units: percent
+func (m *Split) AvgCombinedPedalSmoothnessScaled() float64 {
+	if m.AvgCombinedPedalSmoothness == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgCombinedPedalSmoothness)/2 - 0
+}
+
+// AvgStrokeDistanceScaled return AvgStrokeDistance in its scaled value.
+// If AvgStrokeDistance value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m
+func (m *Split) AvgStrokeDistanceScaled() float64 {
+	if m.AvgStrokeDistance == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgStrokeDistance)/100 - 0
+}
+
+// AvgStrokesPerLengthScaled return AvgStrokesPerLength in its scaled value.
+// If AvgStrokesPerLength value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10; Units: strokes / length
+func (m *Split) AvgStrokesPerLengthScaled() float64 {
+	if m.AvgStrokesPerLength == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgStrokesPerLength)/10 - 0
+}
+
 // StartElevationScaled return StartElevation in its scaled value.
 // If StartElevation value is invalid, float64 invalid value will be returned.
 //
@@ -323,6 +1268,83 @@ func (m *Split) ActiveTimeScaled() float64 {
 	return float64(m.ActiveTime)/1000 - 0
 }
 
+// TotalFractionalAscentScaled return TotalFractionalAscent in its scaled value.
+// If TotalFractionalAscent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
+func (m *Split) TotalFractionalAscentScaled() float64 {
+	if m.TotalFractionalAscent == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TotalFractionalAscent)/100 - 0
+}
+
+// TotalFractionalDescentScaled return TotalFractionalDescent in its scaled value.
+// If TotalFractionalDescent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: m; fractional part of total_descent
+func (m *Split) TotalFractionalDescentScaled() float64 {
+	if m.TotalFractionalDescent == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TotalFractionalDescent)/100 - 0
+}
+
+// AvgGradeScaled return AvgGrade in its scaled value.
+// If AvgGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
+func (m *Split) AvgGradeScaled() float64 {
+	if m.AvgGrade == basetype.Sint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgGrade)/100 - 0
+}
+
+// MaxGradeScaled return MaxGrade in its scaled value.
+// If MaxGrade value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: %
+func (m *Split) MaxGradeScaled() float64 {
+	if m.MaxGrade == basetype.Sint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.MaxGrade)/100 - 0
+}
+
+// MinCadenceScaled return MinCadence in its scaled value.
+// If MinCadence value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: rpm
+func (m *Split) MinCadenceScaled() float64 {
+	if m.MinCadence == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.MinCadence)/128 - 0
+}
+
+// AvgGradeAdjustedSpeedScaled return AvgGradeAdjustedSpeed in its scaled value.
+// If AvgGradeAdjustedSpeed value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) AvgGradeAdjustedSpeedScaled() float64 {
+	if m.AvgGradeAdjustedSpeed == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgGradeAdjustedSpeed)/1000 - 0
+}
+
+// AvgVamScaled return AvgVam in its scaled value.
+// If AvgVam value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) AvgVamScaled() float64 {
+	if m.AvgVam == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgVam)/1000 - 0
+}
+
 // TotalMovingTimeScaled return TotalMovingTime in its scaled value.
 // If TotalMovingTime value is invalid, float64 invalid value will be returned.
 //
@@ -332,6 +1354,162 @@ func (m *Split) TotalMovingTimeScaled() float64 {
 		return math.Float64frombits(basetype.Float64Invalid)
 	}
 	return float64(m.TotalMovingTime)/1000 - 0
+}
+
+// AvgAscentRateScaled return AvgAscentRate in its scaled value.
+// If AvgAscentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) AvgAscentRateScaled() float64 {
+	if m.AvgAscentRate == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgAscentRate)/1000 - 0
+}
+
+// MaxAscentRateScaled return MaxAscentRate in its scaled value.
+// If MaxAscentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) MaxAscentRateScaled() float64 {
+	if m.MaxAscentRate == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.MaxAscentRate)/1000 - 0
+}
+
+// AvgDescentRateScaled return AvgDescentRate in its scaled value.
+// If AvgDescentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) AvgDescentRateScaled() float64 {
+	if m.AvgDescentRate == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgDescentRate)/1000 - 0
+}
+
+// MaxDescentRateScaled return MaxDescentRate in its scaled value.
+// If MaxDescentRate value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) MaxDescentRateScaled() float64 {
+	if m.MaxDescentRate == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.MaxDescentRate)/1000 - 0
+}
+
+// TotalAscentTimeScaled return TotalAscentTime in its scaled value.
+// If TotalAscentTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
+func (m *Split) TotalAscentTimeScaled() float64 {
+	if m.TotalAscentTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TotalAscentTime)/1000 - 0
+}
+
+// TotalDescentTimeScaled return TotalDescentTime in its scaled value.
+// If TotalDescentTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
+func (m *Split) TotalDescentTimeScaled() float64 {
+	if m.TotalDescentTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TotalDescentTime)/1000 - 0
+}
+
+// TotalHangTimeScaled return TotalHangTime in its scaled value.
+// If TotalHangTime value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: s
+func (m *Split) TotalHangTimeScaled() float64 {
+	if m.TotalHangTime == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TotalHangTime)/1000 - 0
+}
+
+// AvgDepthScaled return AvgDepth in its scaled value.
+// If AvgDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; Average depth. 0 if above water
+func (m *Split) AvgDepthScaled() float64 {
+	if m.AvgDepth == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgDepth)/1000 - 0
+}
+
+// MaxDepthScaled return MaxDepth in its scaled value.
+// If MaxDepth value is invalid, float64 invalid value will be returned.
+//
+// Scale: 1000; Units: m; Max depth. 0 if above water
+func (m *Split) MaxDepthScaled() float64 {
+	if m.MaxDepth == basetype.Uint32Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.MaxDepth)/1000 - 0
+}
+
+// TotalFractionalCyclesScaled return TotalFractionalCycles in its scaled value.
+// If TotalFractionalCycles value is invalid, float64 invalid value will be returned.
+//
+// Scale: 128; Units: cycles
+func (m *Split) TotalFractionalCyclesScaled() float64 {
+	if m.TotalFractionalCycles == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TotalFractionalCycles)/128 - 0
+}
+
+// AvgStanceTimePercentScaled return AvgStanceTimePercent in its scaled value.
+// If AvgStanceTimePercent value is invalid, float64 invalid value will be returned.
+//
+// Scale: 100; Units: percent
+func (m *Split) AvgStanceTimePercentScaled() float64 {
+	if m.AvgStanceTimePercent == basetype.Uint16Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.AvgStanceTimePercent)/100 - 0
+}
+
+// TotalAnaerobicTrainingEffectScaled return TotalAnaerobicTrainingEffect in its scaled value.
+// If TotalAnaerobicTrainingEffect value is invalid, float64 invalid value will be returned.
+//
+// Scale: 10
+func (m *Split) TotalAnaerobicTrainingEffectScaled() float64 {
+	if m.TotalAnaerobicTrainingEffect == basetype.Uint8Invalid {
+		return math.Float64frombits(basetype.Float64Invalid)
+	}
+	return float64(m.TotalAnaerobicTrainingEffect)/10 - 0
+}
+
+// NecLatDegrees returns NecLat in degrees instead of semicircles.
+// If NecLat value is invalid, float64 invalid value will be returned.
+func (m *Split) NecLatDegrees() float64 {
+	return semicircles.ToDegrees(m.NecLat)
+}
+
+// NecLongDegrees returns NecLong in degrees instead of semicircles.
+// If NecLong value is invalid, float64 invalid value will be returned.
+func (m *Split) NecLongDegrees() float64 {
+	return semicircles.ToDegrees(m.NecLong)
+}
+
+// SwcLatDegrees returns SwcLat in degrees instead of semicircles.
+// If SwcLat value is invalid, float64 invalid value will be returned.
+func (m *Split) SwcLatDegrees() float64 {
+	return semicircles.ToDegrees(m.SwcLat)
+}
+
+// SwcLongDegrees returns SwcLong in degrees instead of semicircles.
+// If SwcLong value is invalid, float64 invalid value will be returned.
+func (m *Split) SwcLongDegrees() float64 {
+	return semicircles.ToDegrees(m.SwcLong)
 }
 
 // StartPositionLatDegrees returns StartPositionLat in degrees instead of semicircles.
@@ -361,6 +1539,14 @@ func (m *Split) EndPositionLongDegrees() float64 {
 // SetMessageIndex sets MessageIndex value.
 func (m *Split) SetMessageIndex(v typedef.MessageIndex) *Split {
 	m.MessageIndex = v
+	return m
+}
+
+// SetTimestamp sets Timestamp value.
+//
+// Units: s
+func (m *Split) SetTimestamp(v time.Time) *Split {
+	m.Timestamp = v
 	return m
 }
 
@@ -464,6 +1650,18 @@ func (m *Split) SetStartTime(v time.Time) *Split {
 	return m
 }
 
+// SetSport sets Sport value.
+func (m *Split) SetSport(v typedef.Sport) *Split {
+	m.Sport = v
+	return m
+}
+
+// SetSubSport sets SubSport value.
+func (m *Split) SetSubSport(v typedef.SubSport) *Split {
+	m.SubSport = v
+	return m
+}
+
 // SetTotalAscent sets TotalAscent value.
 //
 // Units: m
@@ -477,6 +1675,82 @@ func (m *Split) SetTotalAscent(v uint16) *Split {
 // Units: m
 func (m *Split) SetTotalDescent(v uint16) *Split {
 	m.TotalDescent = v
+	return m
+}
+
+// SetAvgHeartRate sets AvgHeartRate value.
+//
+// Units: bpm
+func (m *Split) SetAvgHeartRate(v uint8) *Split {
+	m.AvgHeartRate = v
+	return m
+}
+
+// SetMaxHeartRate sets MaxHeartRate value.
+//
+// Units: bpm
+func (m *Split) SetMaxHeartRate(v uint8) *Split {
+	m.MaxHeartRate = v
+	return m
+}
+
+// SetNecLat sets NecLat value.
+//
+// Units: semicircles; North east corner latitude
+func (m *Split) SetNecLat(v int32) *Split {
+	m.NecLat = v
+	return m
+}
+
+// SetNecLatDegrees is similar to SetNecLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetNecLatDegrees(degrees float64) *Split {
+	m.NecLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetNecLong sets NecLong value.
+//
+// Units: semicircles; North east corner longitude
+func (m *Split) SetNecLong(v int32) *Split {
+	m.NecLong = v
+	return m
+}
+
+// SetNecLongDegrees is similar to SetNecLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetNecLongDegrees(degrees float64) *Split {
+	m.NecLong = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSwcLat sets SwcLat value.
+//
+// Units: semicircles; South west corner latitude
+func (m *Split) SetSwcLat(v int32) *Split {
+	m.SwcLat = v
+	return m
+}
+
+// SetSwcLatDegrees is similar to SetSwcLat except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetSwcLatDegrees(degrees float64) *Split {
+	m.SwcLat = semicircles.ToSemicircles(degrees)
+	return m
+}
+
+// SetSwcLong sets SwcLong value.
+//
+// Units: semicircles; South west corner longitude
+func (m *Split) SetSwcLong(v int32) *Split {
+	m.SwcLong = v
+	return m
+}
+
+// SetSwcLongDegrees is similar to SetSwcLong except it accepts a value in degrees.
+// This method will automatically convert given degrees value to semicircles (int32) form.
+func (m *Split) SetSwcLongDegrees(degrees float64) *Split {
+	m.SwcLong = semicircles.ToSemicircles(degrees)
 	return m
 }
 
@@ -598,6 +1872,634 @@ func (m *Split) SetTotalCalories(v uint32) *Split {
 	return m
 }
 
+// SetAvgCadence sets AvgCadence value.
+//
+// Scale: 128; Units: rpm
+func (m *Split) SetAvgCadence(v uint16) *Split {
+	m.AvgCadence = v
+	return m
+}
+
+// SetAvgCadenceScaled is similar to SetAvgCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm
+func (m *Split) SetAvgCadenceScaled(v float64) *Split {
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgCadence = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgCadence = uint16(unscaled)
+	return m
+}
+
+// SetMaxCadence sets MaxCadence value.
+//
+// Scale: 128; Units: rpm
+func (m *Split) SetMaxCadence(v uint16) *Split {
+	m.MaxCadence = v
+	return m
+}
+
+// SetMaxCadenceScaled is similar to SetMaxCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm
+func (m *Split) SetMaxCadenceScaled(v float64) *Split {
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MaxCadence = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MaxCadence = uint16(unscaled)
+	return m
+}
+
+// SetTotalCycles sets TotalCycles value.
+//
+// Units: cycles
+func (m *Split) SetTotalCycles(v uint32) *Split {
+	m.TotalCycles = v
+	return m
+}
+
+// SetAvgTemperature sets AvgTemperature value.
+//
+// Units: C
+func (m *Split) SetAvgTemperature(v int8) *Split {
+	m.AvgTemperature = v
+	return m
+}
+
+// SetMaxTemperature sets MaxTemperature value.
+//
+// Units: C
+func (m *Split) SetMaxTemperature(v int8) *Split {
+	m.MaxTemperature = v
+	return m
+}
+
+// SetMinTemperature sets MinTemperature value.
+//
+// Units: C
+func (m *Split) SetMinTemperature(v int8) *Split {
+	m.MinTemperature = v
+	return m
+}
+
+// SetAvgVerticalOscillation sets AvgVerticalOscillation value.
+//
+// Scale: 10; Units: mm
+func (m *Split) SetAvgVerticalOscillation(v uint16) *Split {
+	m.AvgVerticalOscillation = v
+	return m
+}
+
+// SetAvgVerticalOscillationScaled is similar to SetAvgVerticalOscillation except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: mm
+func (m *Split) SetAvgVerticalOscillationScaled(v float64) *Split {
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgVerticalOscillation = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgVerticalOscillation = uint16(unscaled)
+	return m
+}
+
+// SetAvgVerticalRatio sets AvgVerticalRatio value.
+//
+// Scale: 100; Units: percent
+func (m *Split) SetAvgVerticalRatio(v uint16) *Split {
+	m.AvgVerticalRatio = v
+	return m
+}
+
+// SetAvgVerticalRatioScaled is similar to SetAvgVerticalRatio except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Split) SetAvgVerticalRatioScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgVerticalRatio = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgVerticalRatio = uint16(unscaled)
+	return m
+}
+
+// SetAvgStanceTime sets AvgStanceTime value.
+//
+// Scale: 10; Units: ms
+func (m *Split) SetAvgStanceTime(v uint16) *Split {
+	m.AvgStanceTime = v
+	return m
+}
+
+// SetAvgStanceTimeScaled is similar to SetAvgStanceTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: ms
+func (m *Split) SetAvgStanceTimeScaled(v float64) *Split {
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStanceTime = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStanceTime = uint16(unscaled)
+	return m
+}
+
+// SetAvgStanceTimeBalance sets AvgStanceTimeBalance value.
+//
+// Scale: 100; Units: percent
+func (m *Split) SetAvgStanceTimeBalance(v uint16) *Split {
+	m.AvgStanceTimeBalance = v
+	return m
+}
+
+// SetAvgStanceTimeBalanceScaled is similar to SetAvgStanceTimeBalance except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Split) SetAvgStanceTimeBalanceScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStanceTimeBalance = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStanceTimeBalance = uint16(unscaled)
+	return m
+}
+
+// SetAvgStepLength sets AvgStepLength value.
+//
+// Scale: 10; Units: mm
+func (m *Split) SetAvgStepLength(v uint16) *Split {
+	m.AvgStepLength = v
+	return m
+}
+
+// SetAvgStepLengthScaled is similar to SetAvgStepLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: mm
+func (m *Split) SetAvgStepLengthScaled(v float64) *Split {
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStepLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStepLength = uint16(unscaled)
+	return m
+}
+
+// SetAvgPower sets AvgPower value.
+//
+// Units: watts
+func (m *Split) SetAvgPower(v uint16) *Split {
+	m.AvgPower = v
+	return m
+}
+
+// SetMaxPower sets MaxPower value.
+//
+// Units: watts
+func (m *Split) SetMaxPower(v uint16) *Split {
+	m.MaxPower = v
+	return m
+}
+
+// SetNormalizedPower sets NormalizedPower value.
+//
+// Units: watts
+func (m *Split) SetNormalizedPower(v uint16) *Split {
+	m.NormalizedPower = v
+	return m
+}
+
+// SetLeftRightBalance sets LeftRightBalance value.
+func (m *Split) SetLeftRightBalance(v typedef.LeftRightBalance100) *Split {
+	m.LeftRightBalance = v
+	return m
+}
+
+// SetTimeStanding sets TimeStanding value.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
+func (m *Split) SetTimeStanding(v uint32) *Split {
+	m.TimeStanding = v
+	return m
+}
+
+// SetTimeStandingScaled is similar to SetTimeStanding except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s; Total time spent in the standing position
+func (m *Split) SetTimeStandingScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TimeStanding = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TimeStanding = uint32(unscaled)
+	return m
+}
+
+// SetAvgLeftPco sets AvgLeftPco value.
+//
+// Units: mm; Average left platform center offset
+func (m *Split) SetAvgLeftPco(v int8) *Split {
+	m.AvgLeftPco = v
+	return m
+}
+
+// SetAvgRightPco sets AvgRightPco value.
+//
+// Units: mm; Average right platform center offset
+func (m *Split) SetAvgRightPco(v int8) *Split {
+	m.AvgRightPco = v
+	return m
+}
+
+// SetAvgLeftPowerPhase sets AvgLeftPowerPhase value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgLeftPowerPhase(v []uint8) *Split {
+	m.AvgLeftPowerPhase = v
+	return m
+}
+
+// SetAvgLeftPowerPhaseScaled is similar to SetAvgLeftPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgLeftPowerPhaseScaled(vs []float64) *Split {
+	if vs == nil {
+		m.AvgLeftPowerPhase = nil
+		return m
+	}
+	m.AvgLeftPowerPhase = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgLeftPowerPhase[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgLeftPowerPhase[i] = uint8(unscaled)
+	}
+	return m
+}
+
+// SetAvgLeftPowerPhasePeak sets AvgLeftPowerPhasePeak value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgLeftPowerPhasePeak(v []uint8) *Split {
+	m.AvgLeftPowerPhasePeak = v
+	return m
+}
+
+// SetAvgLeftPowerPhasePeakScaled is similar to SetAvgLeftPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average left power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgLeftPowerPhasePeakScaled(vs []float64) *Split {
+	if vs == nil {
+		m.AvgLeftPowerPhasePeak = nil
+		return m
+	}
+	m.AvgLeftPowerPhasePeak = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgLeftPowerPhasePeak[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgLeftPowerPhasePeak[i] = uint8(unscaled)
+	}
+	return m
+}
+
+// SetAvgRightPowerPhase sets AvgRightPowerPhase value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgRightPowerPhase(v []uint8) *Split {
+	m.AvgRightPowerPhase = v
+	return m
+}
+
+// SetAvgRightPowerPhaseScaled is similar to SetAvgRightPowerPhase except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgRightPowerPhaseScaled(vs []float64) *Split {
+	if vs == nil {
+		m.AvgRightPowerPhase = nil
+		return m
+	}
+	m.AvgRightPowerPhase = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgRightPowerPhase[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgRightPowerPhase[i] = uint8(unscaled)
+	}
+	return m
+}
+
+// SetAvgRightPowerPhasePeak sets AvgRightPowerPhasePeak value.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgRightPowerPhasePeak(v []uint8) *Split {
+	m.AvgRightPowerPhasePeak = v
+	return m
+}
+
+// SetAvgRightPowerPhasePeakScaled is similar to SetAvgRightPowerPhasePeak except it accepts a scaled value.
+// This method automatically converts the given value to its []uint8 form, discarding any applied scale and offset.
+//
+// Array: [N]; Scale: 0.7111111; Units: degrees; Average right power phase peak angles. Data value indexes defined by power_phase_type.
+func (m *Split) SetAvgRightPowerPhasePeakScaled(vs []float64) *Split {
+	if vs == nil {
+		m.AvgRightPowerPhasePeak = nil
+		return m
+	}
+	m.AvgRightPowerPhasePeak = make([]uint8, len(vs))
+	for i := range vs {
+		unscaled := (vs[i] + 0) * 0.7111111
+		if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+			m.AvgRightPowerPhasePeak[i] = uint8(basetype.Uint8Invalid)
+			continue
+		}
+		m.AvgRightPowerPhasePeak[i] = uint8(unscaled)
+	}
+	return m
+}
+
+// SetAvgPowerPosition sets AvgPowerPosition value.
+//
+// Array: [N]; Units: watts; Average power by position. Data value indexes defined by rider_position_type.
+func (m *Split) SetAvgPowerPosition(v []uint16) *Split {
+	m.AvgPowerPosition = v
+	return m
+}
+
+// SetMaxPowerPosition sets MaxPowerPosition value.
+//
+// Array: [N]; Units: watts; Maximum power by position. Data value indexes defined by rider_position_type.
+func (m *Split) SetMaxPowerPosition(v []uint16) *Split {
+	m.MaxPowerPosition = v
+	return m
+}
+
+// SetAvgLeftTorqueEffectiveness sets AvgLeftTorqueEffectiveness value.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgLeftTorqueEffectiveness(v uint8) *Split {
+	m.AvgLeftTorqueEffectiveness = v
+	return m
+}
+
+// SetAvgLeftTorqueEffectivenessScaled is similar to SetAvgLeftTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgLeftTorqueEffectivenessScaled(v float64) *Split {
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgLeftTorqueEffectiveness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgLeftTorqueEffectiveness = uint8(unscaled)
+	return m
+}
+
+// SetAvgRightTorqueEffectiveness sets AvgRightTorqueEffectiveness value.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgRightTorqueEffectiveness(v uint8) *Split {
+	m.AvgRightTorqueEffectiveness = v
+	return m
+}
+
+// SetAvgRightTorqueEffectivenessScaled is similar to SetAvgRightTorqueEffectiveness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgRightTorqueEffectivenessScaled(v float64) *Split {
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgRightTorqueEffectiveness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgRightTorqueEffectiveness = uint8(unscaled)
+	return m
+}
+
+// SetAvgLeftPedalSmoothness sets AvgLeftPedalSmoothness value.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgLeftPedalSmoothness(v uint8) *Split {
+	m.AvgLeftPedalSmoothness = v
+	return m
+}
+
+// SetAvgLeftPedalSmoothnessScaled is similar to SetAvgLeftPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgLeftPedalSmoothnessScaled(v float64) *Split {
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgLeftPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgLeftPedalSmoothness = uint8(unscaled)
+	return m
+}
+
+// SetAvgRightPedalSmoothness sets AvgRightPedalSmoothness value.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgRightPedalSmoothness(v uint8) *Split {
+	m.AvgRightPedalSmoothness = v
+	return m
+}
+
+// SetAvgRightPedalSmoothnessScaled is similar to SetAvgRightPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgRightPedalSmoothnessScaled(v float64) *Split {
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgRightPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgRightPedalSmoothness = uint8(unscaled)
+	return m
+}
+
+// SetAvgCombinedPedalSmoothness sets AvgCombinedPedalSmoothness value.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgCombinedPedalSmoothness(v uint8) *Split {
+	m.AvgCombinedPedalSmoothness = v
+	return m
+}
+
+// SetAvgCombinedPedalSmoothnessScaled is similar to SetAvgCombinedPedalSmoothness except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 2; Units: percent
+func (m *Split) SetAvgCombinedPedalSmoothnessScaled(v float64) *Split {
+	unscaled := (v + 0) * 2
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.AvgCombinedPedalSmoothness = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.AvgCombinedPedalSmoothness = uint8(unscaled)
+	return m
+}
+
+// SetAvgFlow sets AvgFlow value.
+//
+// Units: Flow; The flow score estimates how long distance wise a cyclist deaccelerates over intervals where deacceleration is unnecessary such as smooth turns or small grade angle intervals.
+func (m *Split) SetAvgFlow(v float32) *Split {
+	m.AvgFlow = v
+	return m
+}
+
+// SetTotalGrit sets TotalGrit value.
+//
+// Units: kGrit; The grit score estimates how challenging a route could be for a cyclist in terms of time spent going over sharp turns or large grade slopes.
+func (m *Split) SetTotalGrit(v float32) *Split {
+	m.TotalGrit = v
+	return m
+}
+
+// SetSwimStroke sets SwimStroke value.
+func (m *Split) SetSwimStroke(v typedef.SwimStroke) *Split {
+	m.SwimStroke = v
+	return m
+}
+
+// SetNumActiveLengths sets NumActiveLengths value.
+//
+// Units: lengths; # of active lengths of swim pool
+func (m *Split) SetNumActiveLengths(v uint16) *Split {
+	m.NumActiveLengths = v
+	return m
+}
+
+// SetAvgSwolf sets AvgSwolf value.
+func (m *Split) SetAvgSwolf(v uint16) *Split {
+	m.AvgSwolf = v
+	return m
+}
+
+// SetAvgStrokeDistance sets AvgStrokeDistance value.
+//
+// Scale: 100; Units: m
+func (m *Split) SetAvgStrokeDistance(v uint16) *Split {
+	m.AvgStrokeDistance = v
+	return m
+}
+
+// SetAvgStrokeDistanceScaled is similar to SetAvgStrokeDistance except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m
+func (m *Split) SetAvgStrokeDistanceScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStrokeDistance = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStrokeDistance = uint16(unscaled)
+	return m
+}
+
+// SetAvgStrokesPerLength sets AvgStrokesPerLength value.
+//
+// Scale: 10; Units: strokes / length
+func (m *Split) SetAvgStrokesPerLength(v uint16) *Split {
+	m.AvgStrokesPerLength = v
+	return m
+}
+
+// SetAvgStrokesPerLengthScaled is similar to SetAvgStrokesPerLength except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 10; Units: strokes / length
+func (m *Split) SetAvgStrokesPerLengthScaled(v float64) *Split {
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStrokesPerLength = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStrokesPerLength = uint16(unscaled)
+	return m
+}
+
+// SetFirstLapIndex sets FirstLapIndex value.
+//
+// This is only set for split types that will trigger the end of a lap when the split ends
+func (m *Split) SetFirstLapIndex(v uint16) *Split {
+	m.FirstLapIndex = v
+	return m
+}
+
+// SetNumLaps sets NumLaps value.
+//
+// This is only set for split types that will trigger the end of a lap when the split ends
+func (m *Split) SetNumLaps(v uint16) *Split {
+	m.NumLaps = v
+	return m
+}
+
+// SetClimbGradingScale sets ClimbGradingScale value.
+func (m *Split) SetClimbGradingScale(v typedef.ClimbGradingScale) *Split {
+	m.ClimbGradingScale = v
+	return m
+}
+
+// SetClimbGradeValue sets ClimbGradeValue value.
+func (m *Split) SetClimbGradeValue(v uint32) *Split {
+	m.ClimbGradeValue = v
+	return m
+}
+
+// SetStatus sets Status value.
+//
+// Use with indoor climbing activities only
+func (m *Split) SetStatus(v typedef.SplitStatus) *Split {
+	m.Status = v
+	return m
+}
+
+// SetNumFalls sets NumFalls value.
+//
+// Use with indoor climbing activities only
+func (m *Split) SetNumFalls(v uint16) *Split {
+	m.NumFalls = v
+	return m
+}
+
+// SetClimbSend sets ClimbSend value.
+//
+// Use with indoor climbing activities only
+func (m *Split) SetClimbSend(v typedef.Bool) *Split {
+	m.ClimbSend = v
+	return m
+}
+
 // SetStartElevation sets StartElevation value.
 //
 // Scale: 5; Offset: 500; Units: m
@@ -642,6 +2544,180 @@ func (m *Split) SetActiveTimeScaled(v float64) *Split {
 	return m
 }
 
+// SetMetabolicCalories sets MetabolicCalories value.
+//
+// Units: kcal
+func (m *Split) SetMetabolicCalories(v uint16) *Split {
+	m.MetabolicCalories = v
+	return m
+}
+
+// SetTotalFractionalAscent sets TotalFractionalAscent value.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
+func (m *Split) SetTotalFractionalAscent(v uint8) *Split {
+	m.TotalFractionalAscent = v
+	return m
+}
+
+// SetTotalFractionalAscentScaled is similar to SetTotalFractionalAscent except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; fractional part of total_ascent
+func (m *Split) SetTotalFractionalAscentScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalFractionalAscent = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalFractionalAscent = uint8(unscaled)
+	return m
+}
+
+// SetTotalFractionalDescent sets TotalFractionalDescent value.
+//
+// Scale: 100; Units: m; fractional part of total_descent
+func (m *Split) SetTotalFractionalDescent(v uint8) *Split {
+	m.TotalFractionalDescent = v
+	return m
+}
+
+// SetTotalFractionalDescentScaled is similar to SetTotalFractionalDescent except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: m; fractional part of total_descent
+func (m *Split) SetTotalFractionalDescentScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalFractionalDescent = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalFractionalDescent = uint8(unscaled)
+	return m
+}
+
+// SetAvgGrade sets AvgGrade value.
+//
+// Scale: 100; Units: %
+func (m *Split) SetAvgGrade(v int16) *Split {
+	m.AvgGrade = v
+	return m
+}
+
+// SetAvgGradeScaled is similar to SetAvgGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Split) SetAvgGradeScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.AvgGrade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.AvgGrade = int16(unscaled)
+	return m
+}
+
+// SetMaxGrade sets MaxGrade value.
+//
+// Scale: 100; Units: %
+func (m *Split) SetMaxGrade(v int16) *Split {
+	m.MaxGrade = v
+	return m
+}
+
+// SetMaxGradeScaled is similar to SetMaxGrade except it accepts a scaled value.
+// This method automatically converts the given value to its int16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: %
+func (m *Split) SetMaxGradeScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Sint16Invalid) {
+		m.MaxGrade = int16(basetype.Sint16Invalid)
+		return m
+	}
+	m.MaxGrade = int16(unscaled)
+	return m
+}
+
+// SetMinCadence sets MinCadence value.
+//
+// Scale: 128; Units: rpm
+func (m *Split) SetMinCadence(v uint16) *Split {
+	m.MinCadence = v
+	return m
+}
+
+// SetMinCadenceScaled is similar to SetMinCadence except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: rpm
+func (m *Split) SetMinCadenceScaled(v float64) *Split {
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.MinCadence = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.MinCadence = uint16(unscaled)
+	return m
+}
+
+// SetAvgGradeAdjustedSpeed sets AvgGradeAdjustedSpeed value.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgGradeAdjustedSpeed(v uint32) *Split {
+	m.AvgGradeAdjustedSpeed = v
+	return m
+}
+
+// SetAvgGradeAdjustedSpeedScaled is similar to SetAvgGradeAdjustedSpeed except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgGradeAdjustedSpeedScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgGradeAdjustedSpeed = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgGradeAdjustedSpeed = uint32(unscaled)
+	return m
+}
+
+// SetAvgStress sets AvgStress value.
+func (m *Split) SetAvgStress(v uint16) *Split {
+	m.AvgStress = v
+	return m
+}
+
+// SetAvgVam sets AvgVam value.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgVam(v uint16) *Split {
+	m.AvgVam = v
+	return m
+}
+
+// SetAvgVamScaled is similar to SetAvgVam except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgVamScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgVam = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgVam = uint16(unscaled)
+	return m
+}
+
+// SetJumpCount sets JumpCount value.
+func (m *Split) SetJumpCount(v uint8) *Split {
+	m.JumpCount = v
+	return m
+}
+
 // SetTotalMovingTime sets TotalMovingTime value.
 //
 // Scale: 1000; Units: s
@@ -661,6 +2737,310 @@ func (m *Split) SetTotalMovingTimeScaled(v float64) *Split {
 		return m
 	}
 	m.TotalMovingTime = uint32(unscaled)
+	return m
+}
+
+// SetDiveSectionType sets DiveSectionType value.
+func (m *Split) SetDiveSectionType(v typedef.DiveSectionType) *Split {
+	m.DiveSectionType = v
+	return m
+}
+
+// SetAvgAscentRate sets AvgAscentRate value.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgAscentRate(v uint32) *Split {
+	m.AvgAscentRate = v
+	return m
+}
+
+// SetAvgAscentRateScaled is similar to SetAvgAscentRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgAscentRateScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgAscentRate = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgAscentRate = uint32(unscaled)
+	return m
+}
+
+// SetMaxAscentRate sets MaxAscentRate value.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetMaxAscentRate(v uint32) *Split {
+	m.MaxAscentRate = v
+	return m
+}
+
+// SetMaxAscentRateScaled is similar to SetMaxAscentRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetMaxAscentRateScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.MaxAscentRate = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.MaxAscentRate = uint32(unscaled)
+	return m
+}
+
+// SetAvgDescentRate sets AvgDescentRate value.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgDescentRate(v uint32) *Split {
+	m.AvgDescentRate = v
+	return m
+}
+
+// SetAvgDescentRateScaled is similar to SetAvgDescentRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetAvgDescentRateScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgDescentRate = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgDescentRate = uint32(unscaled)
+	return m
+}
+
+// SetMaxDescentRate sets MaxDescentRate value.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetMaxDescentRate(v uint32) *Split {
+	m.MaxDescentRate = v
+	return m
+}
+
+// SetMaxDescentRateScaled is similar to SetMaxDescentRate except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m/s
+func (m *Split) SetMaxDescentRateScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.MaxDescentRate = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.MaxDescentRate = uint32(unscaled)
+	return m
+}
+
+// SetTotalAscentTime sets TotalAscentTime value.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalAscentTime(v uint32) *Split {
+	m.TotalAscentTime = v
+	return m
+}
+
+// SetTotalAscentTimeScaled is similar to SetTotalAscentTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalAscentTimeScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalAscentTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalAscentTime = uint32(unscaled)
+	return m
+}
+
+// SetTotalDescentTime sets TotalDescentTime value.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalDescentTime(v uint32) *Split {
+	m.TotalDescentTime = v
+	return m
+}
+
+// SetTotalDescentTimeScaled is similar to SetTotalDescentTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalDescentTimeScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalDescentTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalDescentTime = uint32(unscaled)
+	return m
+}
+
+// SetTotalHangTime sets TotalHangTime value.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalHangTime(v uint32) *Split {
+	m.TotalHangTime = v
+	return m
+}
+
+// SetTotalHangTimeScaled is similar to SetTotalHangTime except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: s
+func (m *Split) SetTotalHangTimeScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.TotalHangTime = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.TotalHangTime = uint32(unscaled)
+	return m
+}
+
+// SetApneaDiscipline sets ApneaDiscipline value.
+func (m *Split) SetApneaDiscipline(v typedef.ApneaDiscipline) *Split {
+	m.ApneaDiscipline = v
+	return m
+}
+
+// SetAvgDepth sets AvgDepth value.
+//
+// Scale: 1000; Units: m; Average depth. 0 if above water
+func (m *Split) SetAvgDepth(v uint32) *Split {
+	m.AvgDepth = v
+	return m
+}
+
+// SetAvgDepthScaled is similar to SetAvgDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; Average depth. 0 if above water
+func (m *Split) SetAvgDepthScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.AvgDepth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.AvgDepth = uint32(unscaled)
+	return m
+}
+
+// SetMaxDepth sets MaxDepth value.
+//
+// Scale: 1000; Units: m; Max depth. 0 if above water
+func (m *Split) SetMaxDepth(v uint32) *Split {
+	m.MaxDepth = v
+	return m
+}
+
+// SetMaxDepthScaled is similar to SetMaxDepth except it accepts a scaled value.
+// This method automatically converts the given value to its uint32 form, discarding any applied scale and offset.
+//
+// Scale: 1000; Units: m; Max depth. 0 if above water
+func (m *Split) SetMaxDepthScaled(v float64) *Split {
+	unscaled := (v + 0) * 1000
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint32Invalid) {
+		m.MaxDepth = uint32(basetype.Uint32Invalid)
+		return m
+	}
+	m.MaxDepth = uint32(unscaled)
+	return m
+}
+
+// SetMinHeartRate sets MinHeartRate value.
+//
+// Units: bpm
+func (m *Split) SetMinHeartRate(v uint8) *Split {
+	m.MinHeartRate = v
+	return m
+}
+
+// SetSurfaceInterval sets SurfaceInterval value.
+//
+// Units: s; Time since end of last dive
+func (m *Split) SetSurfaceInterval(v uint32) *Split {
+	m.SurfaceInterval = v
+	return m
+}
+
+// SetTotalFractionalCycles sets TotalFractionalCycles value.
+//
+// Scale: 128; Units: cycles
+func (m *Split) SetTotalFractionalCycles(v uint8) *Split {
+	m.TotalFractionalCycles = v
+	return m
+}
+
+// SetTotalFractionalCyclesScaled is similar to SetTotalFractionalCycles except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 128; Units: cycles
+func (m *Split) SetTotalFractionalCyclesScaled(v float64) *Split {
+	unscaled := (v + 0) * 128
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalFractionalCycles = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalFractionalCycles = uint8(unscaled)
+	return m
+}
+
+// SetAvgStanceTimePercent sets AvgStanceTimePercent value.
+//
+// Scale: 100; Units: percent
+func (m *Split) SetAvgStanceTimePercent(v uint16) *Split {
+	m.AvgStanceTimePercent = v
+	return m
+}
+
+// SetAvgStanceTimePercentScaled is similar to SetAvgStanceTimePercent except it accepts a scaled value.
+// This method automatically converts the given value to its uint16 form, discarding any applied scale and offset.
+//
+// Scale: 100; Units: percent
+func (m *Split) SetAvgStanceTimePercentScaled(v float64) *Split {
+	unscaled := (v + 0) * 100
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint16Invalid) {
+		m.AvgStanceTimePercent = uint16(basetype.Uint16Invalid)
+		return m
+	}
+	m.AvgStanceTimePercent = uint16(unscaled)
+	return m
+}
+
+// SetTotalAnaerobicTrainingEffect sets TotalAnaerobicTrainingEffect value.
+//
+// Scale: 10
+func (m *Split) SetTotalAnaerobicTrainingEffect(v uint8) *Split {
+	m.TotalAnaerobicTrainingEffect = v
+	return m
+}
+
+// SetTotalAnaerobicTrainingEffectScaled is similar to SetTotalAnaerobicTrainingEffect except it accepts a scaled value.
+// This method automatically converts the given value to its uint8 form, discarding any applied scale and offset.
+//
+// Scale: 10
+func (m *Split) SetTotalAnaerobicTrainingEffectScaled(v float64) *Split {
+	unscaled := (v + 0) * 10
+	if math.IsNaN(unscaled) || math.IsInf(unscaled, 0) || unscaled > float64(basetype.Uint8Invalid) {
+		m.TotalAnaerobicTrainingEffect = uint8(basetype.Uint8Invalid)
+		return m
+	}
+	m.TotalAnaerobicTrainingEffect = uint8(unscaled)
+	return m
+}
+
+// SetFrontGearShiftCount sets FrontGearShiftCount value.
+func (m *Split) SetFrontGearShiftCount(v uint16) *Split {
+	m.FrontGearShiftCount = v
+	return m
+}
+
+// SetRearGearShiftCount sets RearGearShiftCount value.
+func (m *Split) SetRearGearShiftCount(v uint16) *Split {
+	m.RearGearShiftCount = v
 	return m
 }
 

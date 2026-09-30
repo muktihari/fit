@@ -224,6 +224,19 @@ const (
 	SplitType
 	ClimbProEvent
 	GasConsumptionRateType
+	ClimbGradingScale
+	YdsGradingScale
+	UiaaGradingScale
+	FrenchGradingScale
+	BritishAdjectivalGradingScale
+	BritishTechnicalGradingScale
+	EwbankGradingScale
+	BrazilianGradingScale
+	SaxonGradingScale
+	VerminGradingScale
+	FontGradingScale
+	DankyuGradingScale
+	SplitStatus
 	TapSensitivity
 	RadarThreatLevelType
 	SleepDisruptionSeverity
@@ -233,6 +246,8 @@ const (
 	MaxMetHeartRateSource
 	HrvStatus
 	NoFlyTimeMode
+	DiveSectionType
+	ApneaDiscipline
 	Invalid ProfileType = 65535
 )
 
@@ -658,6 +673,32 @@ func (p ProfileType) String() string {
 		return "climb_pro_event"
 	case GasConsumptionRateType:
 		return "gas_consumption_rate_type"
+	case ClimbGradingScale:
+		return "climb_grading_scale"
+	case YdsGradingScale:
+		return "yds_grading_scale"
+	case UiaaGradingScale:
+		return "uiaa_grading_scale"
+	case FrenchGradingScale:
+		return "french_grading_scale"
+	case BritishAdjectivalGradingScale:
+		return "british_adjectival_grading_scale"
+	case BritishTechnicalGradingScale:
+		return "british_technical_grading_scale"
+	case EwbankGradingScale:
+		return "ewbank_grading_scale"
+	case BrazilianGradingScale:
+		return "brazilian_grading_scale"
+	case SaxonGradingScale:
+		return "saxon_grading_scale"
+	case VerminGradingScale:
+		return "vermin_grading_scale"
+	case FontGradingScale:
+		return "font_grading_scale"
+	case DankyuGradingScale:
+		return "dankyu_grading_scale"
+	case SplitStatus:
+		return "split_status"
 	case TapSensitivity:
 		return "tap_sensitivity"
 	case RadarThreatLevelType:
@@ -676,6 +717,10 @@ func (p ProfileType) String() string {
 		return "hrv_status"
 	case NoFlyTimeMode:
 		return "no_fly_time_mode"
+	case DiveSectionType:
+		return "dive_section_type"
+	case ApneaDiscipline:
+		return "apnea_discipline"
 	default:
 		return "ProfileTypeInvalid(" + strconv.FormatUint(uint64(p), 10) + ")"
 	}
@@ -1102,6 +1147,32 @@ func ProfileTypeFromString(s string) ProfileType {
 		return ClimbProEvent
 	case "gas_consumption_rate_type":
 		return GasConsumptionRateType
+	case "climb_grading_scale":
+		return ClimbGradingScale
+	case "yds_grading_scale":
+		return YdsGradingScale
+	case "uiaa_grading_scale":
+		return UiaaGradingScale
+	case "french_grading_scale":
+		return FrenchGradingScale
+	case "british_adjectival_grading_scale":
+		return BritishAdjectivalGradingScale
+	case "british_technical_grading_scale":
+		return BritishTechnicalGradingScale
+	case "ewbank_grading_scale":
+		return EwbankGradingScale
+	case "brazilian_grading_scale":
+		return BrazilianGradingScale
+	case "saxon_grading_scale":
+		return SaxonGradingScale
+	case "vermin_grading_scale":
+		return VerminGradingScale
+	case "font_grading_scale":
+		return FontGradingScale
+	case "dankyu_grading_scale":
+		return DankyuGradingScale
+	case "split_status":
+		return SplitStatus
 	case "tap_sensitivity":
 		return TapSensitivity
 	case "radar_threat_level_type":
@@ -1120,6 +1191,10 @@ func ProfileTypeFromString(s string) ProfileType {
 		return HrvStatus
 	case "no_fly_time_mode":
 		return NoFlyTimeMode
+	case "dive_section_type":
+		return DiveSectionType
+	case "apnea_discipline":
+		return ApneaDiscipline
 	default:
 		return Invalid
 	}
@@ -1337,6 +1412,19 @@ func ListProfileType() []ProfileType {
 		SplitType,
 		ClimbProEvent,
 		GasConsumptionRateType,
+		ClimbGradingScale,
+		YdsGradingScale,
+		UiaaGradingScale,
+		FrenchGradingScale,
+		BritishAdjectivalGradingScale,
+		BritishTechnicalGradingScale,
+		EwbankGradingScale,
+		BrazilianGradingScale,
+		SaxonGradingScale,
+		VerminGradingScale,
+		FontGradingScale,
+		DankyuGradingScale,
+		SplitStatus,
 		TapSensitivity,
 		RadarThreatLevelType,
 		SleepDisruptionSeverity,
@@ -1346,6 +1434,8 @@ func ListProfileType() []ProfileType {
 		MaxMetHeartRateSource,
 		HrvStatus,
 		NoFlyTimeMode,
+		DiveSectionType,
+		ApneaDiscipline,
 	}
 }
 
@@ -1809,6 +1899,32 @@ func (p ProfileType) BaseType() basetype.BaseType {
 		return basetype.Enum
 	case GasConsumptionRateType:
 		return basetype.Enum
+	case ClimbGradingScale:
+		return basetype.Enum
+	case YdsGradingScale:
+		return basetype.Enum
+	case UiaaGradingScale:
+		return basetype.Enum
+	case FrenchGradingScale:
+		return basetype.Enum
+	case BritishAdjectivalGradingScale:
+		return basetype.Enum
+	case BritishTechnicalGradingScale:
+		return basetype.Enum
+	case EwbankGradingScale:
+		return basetype.Enum
+	case BrazilianGradingScale:
+		return basetype.Enum
+	case SaxonGradingScale:
+		return basetype.Enum
+	case VerminGradingScale:
+		return basetype.Enum
+	case FontGradingScale:
+		return basetype.Enum
+	case DankyuGradingScale:
+		return basetype.Enum
+	case SplitStatus:
+		return basetype.Enum
 	case TapSensitivity:
 		return basetype.Enum
 	case RadarThreatLevelType:
@@ -1826,6 +1942,10 @@ func (p ProfileType) BaseType() basetype.BaseType {
 	case HrvStatus:
 		return basetype.Enum
 	case NoFlyTimeMode:
+		return basetype.Enum
+	case DiveSectionType:
+		return basetype.Enum
+	case ApneaDiscipline:
 		return basetype.Enum
 	}
 
