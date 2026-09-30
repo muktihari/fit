@@ -13,7 +13,6 @@ import (
 	"github.com/muktihari/fit/cmd/fitactivity/aggregator"
 	"github.com/muktihari/fit/kit/datetime"
 	"github.com/muktihari/fit/profile/basetype"
-	"github.com/muktihari/fit/profile/factory"
 	"github.com/muktihari/fit/profile/mesgdef"
 	"github.com/muktihari/fit/profile/typedef"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
@@ -202,20 +201,8 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 	lastTimestamp := getLastTimestamp(result.Messages)
 
 	for _, v := range splitSummaries {
-		mesg := v.ToMesg(nil)
-
-		// Split Summary does not have timestamp, but Garmin devices produce timestamp for this message
-		// and Garmin Connect will reject our files if we don't include it.
-		// Discussion: https://forums.garmin.com/developer/fit-sdk/f/discussion/385625/timestamp-field-in-split_summary-messages
-
-		mesg.RemoveFieldByNum(proto.FieldNumTimestamp)
-
-		field := factory.CreateField(mesgnum.Session, proto.FieldNumTimestamp).WithValue(lastTimestamp)
-		mesg.Fields = append(mesg.Fields, proto.Field{})
-		copy(mesg.Fields[1:], mesg.Fields)
-		mesg.Fields[0] = field // Put timestamp as first field
-
-		result.Messages = append(result.Messages, mesg)
+		v.Timestamp = datetime.ToTime(lastTimestamp)
+		result.Messages = append(result.Messages, v.ToMesg(nil))
 	}
 
 	for _, v := range sessions {
