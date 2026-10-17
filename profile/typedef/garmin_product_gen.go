@@ -479,6 +479,8 @@ const (
 	GarminProductFr170Music                  GarminProduct = 4814
 	GarminProductFr170                       GarminProduct = 4815
 	GarminProductApproachJ1                  GarminProduct = 4825
+	GarminProductApproachS7243Mm             GarminProduct = 4874
+	GarminProductApproachS7247Mm             GarminProduct = 4875
 	GarminProductD2Mach2                     GarminProduct = 4879
 	GarminProductFr702026                    GarminProduct = 4916
 	GarminProductFenix9Pro43Mm               GarminProduct = 4952
@@ -492,6 +494,7 @@ const (
 	GarminProductD2AirX15                    GarminProduct = 4944
 	GarminProductCirqaSmartBand              GarminProduct = 5019
 	GarminProductD2Mach2Pro                  GarminProduct = 5056
+	GarminProductEnduro4                     GarminProduct = 5169
 	GarminProductSdm4                        GarminProduct = 10007 // SDM4 footpod
 	GarminProductEdgeRemote                  GarminProduct = 10014
 	GarminProductTacxTrainingAppWin          GarminProduct = 20533
@@ -1448,6 +1451,10 @@ func (g GarminProduct) String() string {
 		return "fr170"
 	case GarminProductApproachJ1:
 		return "approach_j1"
+	case GarminProductApproachS7243Mm:
+		return "approach_s72_43mm"
+	case GarminProductApproachS7247Mm:
+		return "approach_s72_47mm"
 	case GarminProductD2Mach2:
 		return "d2_mach2"
 	case GarminProductFr702026:
@@ -1474,6 +1481,8 @@ func (g GarminProduct) String() string {
 		return "cirqa_smart_band"
 	case GarminProductD2Mach2Pro:
 		return "d2_mach2_pro"
+	case GarminProductEnduro4:
+		return "enduro4"
 	case GarminProductSdm4:
 		return "sdm4"
 	case GarminProductEdgeRemote:
@@ -2448,6 +2457,10 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductFr170
 	case "approach_j1":
 		return GarminProductApproachJ1
+	case "approach_s72_43mm":
+		return GarminProductApproachS7243Mm
+	case "approach_s72_47mm":
+		return GarminProductApproachS7247Mm
 	case "d2_mach2":
 		return GarminProductD2Mach2
 	case "fr70_2026":
@@ -2474,6 +2487,8 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductCirqaSmartBand
 	case "d2_mach2_pro":
 		return GarminProductD2Mach2Pro
+	case "enduro4":
+		return GarminProductEnduro4
 	case "sdm4":
 		return GarminProductSdm4
 	case "edge_remote":
@@ -2982,6 +2997,8 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductFr170Music,
 		GarminProductFr170,
 		GarminProductApproachJ1,
+		GarminProductApproachS7243Mm,
+		GarminProductApproachS7247Mm,
 		GarminProductD2Mach2,
 		GarminProductFr702026,
 		GarminProductFenix9Pro43Mm,
@@ -2995,6 +3012,7 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductD2AirX15,
 		GarminProductCirqaSmartBand,
 		GarminProductD2Mach2Pro,
+		GarminProductEnduro4,
 		GarminProductSdm4,
 		GarminProductEdgeRemote,
 		GarminProductTacxTrainingAppWin,
