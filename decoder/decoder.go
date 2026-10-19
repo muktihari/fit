@@ -670,7 +670,19 @@ func (d *Decoder) decodeMessageData(header byte) (err error) {
 		d.developerDataIndexSeen[x>>6] |= 1 << (x & 63)
 	case mesgnum.FieldDescription:
 		// These messages must occur in the file before any related developer data is written to the proto.
-		d.fieldDescriptions = append(d.fieldDescriptions, mesgdef.NewFieldDescription(&mesg))
+		// Ensure no duplicate lookup data.
+		fieldDesc := mesgdef.NewFieldDescription(&mesg)
+		var ok bool
+		for _, f := range d.fieldDescriptions {
+			if f.DeveloperDataIndex == fieldDesc.DeveloperDataIndex &&
+				f.FieldDefinitionNumber == fieldDesc.FieldDefinitionNumber {
+				*f, ok = *fieldDesc, true
+				break
+			}
+		}
+		if !ok {
+			d.fieldDescriptions = append(d.fieldDescriptions, fieldDesc)
+		}
 	}
 
 	if len(mesgDef.DeveloperFieldDefinitions) != 0 {
