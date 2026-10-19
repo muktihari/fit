@@ -2348,6 +2348,66 @@ func TestExpandMutipleComponentsDynamicField(t *testing.T) {
 	}
 }
 
+func TestNewFieldDescriptionReplaceDuplicate(t *testing.T) {
+	dec := New(
+		bytes.NewReader([]byte{
+			// field description 1
+			1,                     // developer_data_index
+			1,                     // field_definition_number
+			byte(basetype.Uint16), // base_type,
+			// field description 2
+			1,                     // developer_data_index
+			1,                     // field_definition_number
+			byte(basetype.Uint32), // base_type
+		}),
+	)
+
+	dec.localMessageDefinitions[0] = proto.MessageDefinition{
+		Header:  proto.MesgDefinitionMask,
+		MesgNum: mesgnum.FieldDescription,
+		FieldDefinitions: []proto.FieldDefinition{
+			{
+				Num:      fieldnum.FieldDescriptionDeveloperDataIndex,
+				Size:     1,
+				BaseType: basetype.Uint8,
+			},
+			{
+				Num:      fieldnum.FieldDescriptionFieldDefinitionNumber,
+				Size:     1,
+				BaseType: basetype.Uint8,
+			},
+			{
+				Num:      fieldnum.FieldDescriptionFitBaseTypeId,
+				Size:     1,
+				BaseType: basetype.Uint8,
+			},
+		},
+	}
+
+	if err := dec.decodeMessageData(0); err != nil {
+		t.Fatalf("expected error nil, got: %v", err)
+	}
+
+	fieldDesc := mesgdef.NewFieldDescription(nil)
+	fieldDesc.DeveloperDataIndex = 1
+	fieldDesc.FieldDefinitionNumber = 1
+	fieldDesc.FitBaseTypeId = basetype.Uint16
+	fieldDesc.UnknownFields = dec.fieldDescriptions[0].UnknownFields
+
+	if diff := cmp.Diff(dec.fieldDescriptions[0], fieldDesc); diff != "" {
+		t.Fatal(diff)
+	}
+
+	if err := dec.decodeMessageData(0); err != nil {
+		t.Fatalf("expected error nil, got: %v", err)
+	}
+
+	fieldDesc.FitBaseTypeId = basetype.Uint32
+	if diff := cmp.Diff(dec.fieldDescriptions[0], fieldDesc); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
 func TestDecodeDeveloperFields(t *testing.T) {
 	tt := []struct {
 		name                 string
