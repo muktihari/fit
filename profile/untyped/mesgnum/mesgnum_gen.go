@@ -125,6 +125,9 @@ const (
 	TankUpdate                       = 319
 	TankSummary                      = 323
 	SleepAssessment                  = 346
+	TsbSonarMessageEvent             = 364 // Message type for individual sonar event
+	TsbSettings                      = 365 // Message type for storing Top-Side-Bouy (TSB) Settings
+	TsbDiverConfig                   = 366 // Message type for storing saved Top-Side-Bouy (TSB) Diver Configuration
 	HrvStatusSummary                 = 370
 	HrvValue                         = 371
 	RawBbi                           = 372

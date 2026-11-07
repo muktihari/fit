@@ -116,7 +116,7 @@ func (b *Builder) Build() ([]generator.Data, error) {
 				FixedArraySize:  fixedArraySize,
 				Units:           parserField.Units,
 			}
-			field.ComparableValue = b.transformComparableValue(parserField.Type, parserField.Array, field.PrimitiveValue)
+			field.ComparableValue = b.transformComparableValue(field.Name, parserField.Type, parserField.Array, fixedArraySize, field.PrimitiveValue)
 
 			// Special case
 			if isTypeTime(parserField.Type) {
@@ -495,6 +495,19 @@ func (b *Builder) transformTypedValue(num byte, fieldType, array string, fixedAr
 		value = fmt.Sprintf("vals[%d].%s()", num, typ)
 	} else if fixedArraySize > 0 { // Array
 		goTyp := strings.ToLower(strings.TrimSuffix(typ, "z"))
+		arrItem := strings.Repeat(
+			fmt.Sprintf("basetype.%sInvalid,\n", baseTypeTitleCase),
+			int(fixedArraySize),
+		)
+
+		if strings.HasPrefix(fieldType, "float") {
+			bits := fieldType[5:]
+			arrItem = strings.Repeat(
+				fmt.Sprintf("math.Float%sfrombits(basetype.%sInvalid),\n", bits, baseTypeTitleCase),
+				int(fixedArraySize),
+			)
+		}
+
 		value = fmt.Sprintf(`func() (arr [%d]%s) {
 			arr = [%d]%s{
 				%s
@@ -503,10 +516,7 @@ func (b *Builder) transformTypedValue(num byte, fieldType, array string, fixedAr
 			return arr
 		}()`, fixedArraySize, goTyp,
 			fixedArraySize, goTyp,
-			strings.Repeat(
-				fmt.Sprintf("basetype.%sInvalid,\n", baseTypeTitleCase),
-				int(fixedArraySize),
-			),
+			arrItem,
 			fmt.Sprintf("vals[%d].Slice%s()", num, typ),
 		)
 	} else {
@@ -530,16 +540,26 @@ func (b *Builder) transformTypedValue(num byte, fieldType, array string, fixedAr
 		}()`, typdef, value, typdef)
 }
 
-func (b *Builder) transformComparableValue(fieldType, array, primitiveValue string) string {
-	if array == "" {
-		switch b.lookup.BaseType(fieldType).String() {
-		case "float32":
-			return fmt.Sprintf("math.Float32bits(%s)", primitiveValue)
-		case "float64":
-			return fmt.Sprintf("math.Float32bits(%s)", primitiveValue)
+func (b *Builder) transformComparableValue(fieldName, fieldType, array string, fixedArraySize uint8, primitiveValue string) string {
+	if strings.HasPrefix(b.lookup.BaseType(fieldType).String(), "float") {
+		bits := fieldType[5:]
+		if array != "" {
+			if fixedArraySize == 0 { // Slice
+				return primitiveValue
+			}
+			// Fixed Array
+			return fmt.Sprintf(`func() (arr [%d]uint%s) {
+				for i := range arr {
+					arr[i] = math.Float%sbits(m.%s[i])
+				}
+				return arr
+			}()`,
+				fixedArraySize, bits,
+				bits, fieldName,
+			)
 		}
+		return fmt.Sprintf("math.Float%sbits(%s)", bits, primitiveValue)
 	}
-
 	return primitiveValue
 }
 
@@ -559,6 +579,11 @@ func (b *Builder) invalidValueOf(fieldType, array string, fixedArraySize byte) s
 		typ := baseTypeReplacer.Replace(baseTypeTitleCase)
 		typ = strings.TrimSuffix(typ, "z")
 		goTyp := strings.ToLower(typ)
+
+		if strings.HasPrefix(fieldType, "float") {
+			bits := fieldType[5:]
+			goTyp = fmt.Sprintf("uint%s", bits)
+		}
 
 		return fmt.Sprintf(`[%d]%s{
 			%s

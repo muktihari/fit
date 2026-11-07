@@ -125,6 +125,9 @@ const (
 	MesgNumTankUpdate                       MesgNum = 319
 	MesgNumTankSummary                      MesgNum = 323
 	MesgNumSleepAssessment                  MesgNum = 346
+	MesgNumTsbSonarMessageEvent             MesgNum = 364 // Message type for individual sonar event
+	MesgNumTsbSettings                      MesgNum = 365 // Message type for storing Top-Side-Bouy (TSB) Settings
+	MesgNumTsbDiverConfig                   MesgNum = 366 // Message type for storing saved Top-Side-Bouy (TSB) Diver Configuration
 	MesgNumHrvStatusSummary                 MesgNum = 370
 	MesgNumHrvValue                         MesgNum = 371
 	MesgNumRawBbi                           MesgNum = 372
@@ -373,6 +376,12 @@ func (m MesgNum) String() string {
 		return "tank_summary"
 	case MesgNumSleepAssessment:
 		return "sleep_assessment"
+	case MesgNumTsbSonarMessageEvent:
+		return "tsb_sonar_message_event"
+	case MesgNumTsbSettings:
+		return "tsb_settings"
+	case MesgNumTsbDiverConfig:
+		return "tsb_diver_config"
 	case MesgNumHrvStatusSummary:
 		return "hrv_status_summary"
 	case MesgNumHrvValue:
@@ -638,6 +647,12 @@ func MesgNumFromString(s string) MesgNum {
 		return MesgNumTankSummary
 	case "sleep_assessment":
 		return MesgNumSleepAssessment
+	case "tsb_sonar_message_event":
+		return MesgNumTsbSonarMessageEvent
+	case "tsb_settings":
+		return MesgNumTsbSettings
+	case "tsb_diver_config":
+		return MesgNumTsbDiverConfig
 	case "hrv_status_summary":
 		return MesgNumHrvStatusSummary
 	case "hrv_value":
@@ -792,6 +807,9 @@ func ListMesgNum() []MesgNum {
 		MesgNumTankUpdate,
 		MesgNumTankSummary,
 		MesgNumSleepAssessment,
+		MesgNumTsbSonarMessageEvent,
+		MesgNumTsbSettings,
+		MesgNumTsbDiverConfig,
 		MesgNumHrvStatusSummary,
 		MesgNumHrvValue,
 		MesgNumRawBbi,
@@ -1043,6 +1061,12 @@ func MesgNumRegister(v MesgNum, s string) error {
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumTankSummary", v)
 	case MesgNumSleepAssessment:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumSleepAssessment", v)
+	case MesgNumTsbSonarMessageEvent:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTsbSonarMessageEvent", v)
+	case MesgNumTsbSettings:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTsbSettings", v)
+	case MesgNumTsbDiverConfig:
+		return fmt.Errorf("duplicate: %d is already exist for MesgNumTsbDiverConfig", v)
 	case MesgNumHrvStatusSummary:
 		return fmt.Errorf("duplicate: %d is already exist for MesgNumHrvStatusSummary", v)
 	case MesgNumHrvValue:

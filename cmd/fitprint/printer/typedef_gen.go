@@ -17,7 +17,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21218] }
+func _() { _ = [1]struct{}{}[profile.Version-21221] }
 
 func TypedefString(pt profile.ProfileType, v proto.Value) string {
 	switch pt {
@@ -475,6 +475,14 @@ func TypedefString(pt profile.ProfileType, v proto.Value) string {
 		return typedef.NapPeriodFeedback(v.Uint8()).String()
 	case profile.NapSource:
 		return typedef.NapSource(v.Uint8()).String()
+	case profile.SonarPacketId:
+		return typedef.SonarPacketId(v.Uint8()).String()
+	case profile.SonarHeading:
+		return typedef.SonarHeading(v.Uint8()).String()
+	case profile.SonarMessageType:
+		return typedef.SonarMessageType(v.Uint8()).String()
+	case profile.SonarMessageSource:
+		return typedef.SonarMessageSource(v.Uint8()).String()
 	case profile.MaxMetSpeedSource:
 		return typedef.MaxMetSpeedSource(v.Uint8()).String()
 	case profile.MaxMetHeartRateSource:
