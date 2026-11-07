@@ -13,7 +13,7 @@ import (
 
 // Compile-time assertion, build will fail if profile.Version is updated
 // but this code is not yet regenerated, ensuring we are generating safer code.
-func _() { _ = [1]struct{}{}[profile.Version-21218] }
+func _() { _ = [1]struct{}{}[profile.Version-21221] }
 
 var mesgNumLookup = map[string]typedef.MesgNum{
 	"file_id":                             0,
@@ -127,6 +127,9 @@ var mesgNumLookup = map[string]typedef.MesgNum{
 	"tank_update":                         319,
 	"tank_summary":                        323,
 	"sleep_assessment":                    346,
+	"tsb_sonar_message_event":             364,
+	"tsb_settings":                        365,
+	"tsb_diver_config":                    366,
 	"hrv_status_summary":                  370,
 	"hrv_value":                           371,
 	"raw_bbi":                             372,
@@ -1852,6 +1855,39 @@ var fieldNumLookup = [...]map[string]byte{
 		"awakenings_count":            11,
 		"interruptions_score":         14,
 		"average_stress_during_sleep": 15,
+	},
+	364: {
+		"sonar_packet_id":         0,
+		"diver_location_accuracy": 21,
+		"message_type":            22,
+		"message_source":          23,
+	},
+	365: {
+		"tx_enable":          0,
+		"proportional_gain":  1,
+		"integral_gain":      2,
+		"fixed_gain":         3,
+		"rssi_setpoint":      4,
+		"plt_thresh_mult":    5,
+		"plt_thresh":         6,
+		"transducer_spacing": 7,
+		"calib_accel":        8,
+		"calib_gyro":         9,
+		"calib_mag":          10,
+		"calib_mag_soft_x":   11,
+		"calib_mag_soft_y":   12,
+		"calib_mag_soft_z":   13,
+		"max_tx_duty_cycle":  14,
+		"tx_chan":            15,
+		"search_gain":        16,
+	},
+	366: {
+		"ant_id":            0,
+		"diver_name":        1,
+		"t1_tankpod_sw_ver": 2,
+		"location_enabled":  3,
+		"messaging_enabled": 4,
+		"t1_owner_ant_id":   5,
 	},
 	370: {
 		"timestamp":               253,

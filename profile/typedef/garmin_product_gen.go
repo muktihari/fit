@@ -490,9 +490,14 @@ const (
 	GarminProductFenix9ProSolar51Mm          GarminProduct = 4956
 	GarminProductFenix943Mm                  GarminProduct = 5133
 	GarminProductFenix9                      GarminProduct = 5134 // 47mm & 57mm
+	GarminProductEdge1060                    GarminProduct = 4962
 	GarminProductInstinctCrossoverAmoled     GarminProduct = 4678
+	GarminProductEdgeExplore3                GarminProduct = 4970
+	GarminProductEdgeExplore3Plus            GarminProduct = 4972
 	GarminProductD2AirX15                    GarminProduct = 4944
+	GarminProductMarq3                       GarminProduct = 5000
 	GarminProductCirqaSmartBand              GarminProduct = 5019
+	GarminProductDescentX10                  GarminProduct = 5026
 	GarminProductD2Mach2Pro                  GarminProduct = 5056
 	GarminProductEnduro4                     GarminProduct = 5169
 	GarminProductSdm4                        GarminProduct = 10007 // SDM4 footpod
@@ -1473,12 +1478,22 @@ func (g GarminProduct) String() string {
 		return "fenix9_43mm"
 	case GarminProductFenix9:
 		return "fenix9"
+	case GarminProductEdge1060:
+		return "edge_1060"
 	case GarminProductInstinctCrossoverAmoled:
 		return "instinct_crossover_amoled"
+	case GarminProductEdgeExplore3:
+		return "edge_explore3"
+	case GarminProductEdgeExplore3Plus:
+		return "edge_explore3_plus"
 	case GarminProductD2AirX15:
 		return "d2_air_x15"
+	case GarminProductMarq3:
+		return "marq3"
 	case GarminProductCirqaSmartBand:
 		return "cirqa_smart_band"
+	case GarminProductDescentX10:
+		return "descent_x10"
 	case GarminProductD2Mach2Pro:
 		return "d2_mach2_pro"
 	case GarminProductEnduro4:
@@ -2479,12 +2494,22 @@ func GarminProductFromString(s string) GarminProduct {
 		return GarminProductFenix943Mm
 	case "fenix9":
 		return GarminProductFenix9
+	case "edge_1060":
+		return GarminProductEdge1060
 	case "instinct_crossover_amoled":
 		return GarminProductInstinctCrossoverAmoled
+	case "edge_explore3":
+		return GarminProductEdgeExplore3
+	case "edge_explore3_plus":
+		return GarminProductEdgeExplore3Plus
 	case "d2_air_x15":
 		return GarminProductD2AirX15
+	case "marq3":
+		return GarminProductMarq3
 	case "cirqa_smart_band":
 		return GarminProductCirqaSmartBand
+	case "descent_x10":
+		return GarminProductDescentX10
 	case "d2_mach2_pro":
 		return GarminProductD2Mach2Pro
 	case "enduro4":
@@ -3008,9 +3033,14 @@ func ListGarminProduct() []GarminProduct {
 		GarminProductFenix9ProSolar51Mm,
 		GarminProductFenix943Mm,
 		GarminProductFenix9,
+		GarminProductEdge1060,
 		GarminProductInstinctCrossoverAmoled,
+		GarminProductEdgeExplore3,
+		GarminProductEdgeExplore3Plus,
 		GarminProductD2AirX15,
+		GarminProductMarq3,
 		GarminProductCirqaSmartBand,
+		GarminProductDescentX10,
 		GarminProductD2Mach2Pro,
 		GarminProductEnduro4,
 		GarminProductSdm4,

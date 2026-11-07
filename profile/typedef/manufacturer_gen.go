@@ -259,6 +259,10 @@ const (
 	ManufacturerTymewear                   Manufacturer = 352
 	ManufacturerExposureLights             Manufacturer = 353
 	ManufacturerFortoCycling               Manufacturer = 354
+	ManufacturerFairWeatherAthletics       Manufacturer = 356
+	ManufacturerHatchFactory               Manufacturer = 357
+	ManufacturerTorqano                    Manufacturer = 358
+	ManufacturerRockbros                   Manufacturer = 359
 	ManufacturerActigraphcorp              Manufacturer = 5759
 	ManufacturerInvalid                    Manufacturer = 0xFFFF
 )
@@ -759,6 +763,14 @@ func (m Manufacturer) String() string {
 		return "exposure_lights"
 	case ManufacturerFortoCycling:
 		return "forto_cycling"
+	case ManufacturerFairWeatherAthletics:
+		return "fair_weather_athletics"
+	case ManufacturerHatchFactory:
+		return "hatch_factory"
+	case ManufacturerTorqano:
+		return "torqano"
+	case ManufacturerRockbros:
+		return "rockbros"
 	case ManufacturerActigraphcorp:
 		return "actigraphcorp"
 	default:
@@ -1261,6 +1273,14 @@ func ManufacturerFromString(s string) Manufacturer {
 		return ManufacturerExposureLights
 	case "forto_cycling":
 		return ManufacturerFortoCycling
+	case "fair_weather_athletics":
+		return ManufacturerFairWeatherAthletics
+	case "hatch_factory":
+		return ManufacturerHatchFactory
+	case "torqano":
+		return ManufacturerTorqano
+	case "rockbros":
+		return ManufacturerRockbros
 	case "actigraphcorp":
 		return ManufacturerActigraphcorp
 	default:
@@ -1517,6 +1537,10 @@ func ListManufacturer() []Manufacturer {
 		ManufacturerTymewear,
 		ManufacturerExposureLights,
 		ManufacturerFortoCycling,
+		ManufacturerFairWeatherAthletics,
+		ManufacturerHatchFactory,
+		ManufacturerTorqano,
+		ManufacturerRockbros,
 		ManufacturerActigraphcorp,
 	}
 }

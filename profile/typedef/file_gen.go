@@ -32,6 +32,8 @@ const (
 	FileSegment          File = 34   // Read/write/erase. Multiple Files. Directory=Segments
 	FileSegmentList      File = 35   // Read/write/erase. Single File. Directory=Segments
 	FileExdConfiguration File = 40   // Read/write/erase. Single File. Directory=Settings
+	FileTsbSonarEvents   File = 66   // Read/write/erase, multiple files. Directory=Events. Top-Side-Bouy (TSB).
+	FileTsbDiverConfig   File = 67   // Read/write/erase, single file. Top-Side-Bouy (TSB).
 	FileMfgRangeMin      File = 0xF7 // 0xF7 - 0xFE reserved for manufacturer specific file types
 	FileMfgRangeMax      File = 0xFE // 0xF7 - 0xFE reserved for manufacturer specific file types
 	FileInvalid          File = 0xFF
@@ -80,6 +82,10 @@ func (f File) String() string {
 		return "segment_list"
 	case FileExdConfiguration:
 		return "exd_configuration"
+	case FileTsbSonarEvents:
+		return "tsb_sonar_events"
+	case FileTsbDiverConfig:
+		return "tsb_diver_config"
 	case FileMfgRangeMin:
 		return "mfg_range_min"
 	case FileMfgRangeMax:
@@ -131,6 +137,10 @@ func FileFromString(s string) File {
 		return FileSegmentList
 	case "exd_configuration":
 		return FileExdConfiguration
+	case "tsb_sonar_events":
+		return FileTsbSonarEvents
+	case "tsb_diver_config":
+		return FileTsbDiverConfig
 	case "mfg_range_min":
 		return FileMfgRangeMin
 	case "mfg_range_max":
@@ -164,6 +174,8 @@ func ListFile() []File {
 		FileSegment,
 		FileSegmentList,
 		FileExdConfiguration,
+		FileTsbSonarEvents,
+		FileTsbDiverConfig,
 		FileMfgRangeMin,
 		FileMfgRangeMax,
 	}
@@ -215,6 +227,10 @@ func FileRegister(v File, s string) error {
 		return fmt.Errorf("duplicate: %d is already exist for FileSegmentList", v)
 	case FileExdConfiguration:
 		return fmt.Errorf("duplicate: %d is already exist for FileExdConfiguration", v)
+	case FileTsbSonarEvents:
+		return fmt.Errorf("duplicate: %d is already exist for FileTsbSonarEvents", v)
+	case FileTsbDiverConfig:
+		return fmt.Errorf("duplicate: %d is already exist for FileTsbDiverConfig", v)
 	case FileMfgRangeMin:
 		return fmt.Errorf("duplicate: %d is already exist for FileMfgRangeMin", v)
 	case FileMfgRangeMax:

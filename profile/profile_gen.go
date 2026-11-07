@@ -242,6 +242,10 @@ const (
 	SleepDisruptionSeverity
 	NapPeriodFeedback
 	NapSource
+	SonarPacketId
+	SonarHeading
+	SonarMessageType
+	SonarMessageSource
 	MaxMetSpeedSource
 	MaxMetHeartRateSource
 	HrvStatus
@@ -709,6 +713,14 @@ func (p ProfileType) String() string {
 		return "nap_period_feedback"
 	case NapSource:
 		return "nap_source"
+	case SonarPacketId:
+		return "sonar_packet_id"
+	case SonarHeading:
+		return "sonar_heading"
+	case SonarMessageType:
+		return "sonar_message_type"
+	case SonarMessageSource:
+		return "sonar_message_source"
 	case MaxMetSpeedSource:
 		return "max_met_speed_source"
 	case MaxMetHeartRateSource:
@@ -1183,6 +1195,14 @@ func ProfileTypeFromString(s string) ProfileType {
 		return NapPeriodFeedback
 	case "nap_source":
 		return NapSource
+	case "sonar_packet_id":
+		return SonarPacketId
+	case "sonar_heading":
+		return SonarHeading
+	case "sonar_message_type":
+		return SonarMessageType
+	case "sonar_message_source":
+		return SonarMessageSource
 	case "max_met_speed_source":
 		return MaxMetSpeedSource
 	case "max_met_heart_rate_source":
@@ -1430,6 +1450,10 @@ func ListProfileType() []ProfileType {
 		SleepDisruptionSeverity,
 		NapPeriodFeedback,
 		NapSource,
+		SonarPacketId,
+		SonarHeading,
+		SonarMessageType,
+		SonarMessageSource,
 		MaxMetSpeedSource,
 		MaxMetHeartRateSource,
 		HrvStatus,
@@ -1934,6 +1958,14 @@ func (p ProfileType) BaseType() basetype.BaseType {
 	case NapPeriodFeedback:
 		return basetype.Enum
 	case NapSource:
+		return basetype.Enum
+	case SonarPacketId:
+		return basetype.Enum
+	case SonarHeading:
+		return basetype.Enum
+	case SonarMessageType:
+		return basetype.Enum
+	case SonarMessageSource:
 		return basetype.Enum
 	case MaxMetSpeedSource:
 		return basetype.Enum
