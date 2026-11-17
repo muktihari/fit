@@ -494,16 +494,14 @@ func (d *Decoder) decodeFileHeader() error {
 		_, _ = d.crc16.Write(b[:11])
 	}
 
-	// If size is 12, checksum both file header and data together.
-	// If size is 14, checksum file header and data separately.
 	if size == 14 {
 		d.fileHeader.CRC = binary.LittleEndian.Uint16(b[11:13])
 		calculated := d.crc16.Sum16()
-		d.crc16.Reset() // Reset since checksuming file header for size 14 ends here.
 		if d.options.shouldChecksum && d.fileHeader.CRC != 0 && d.fileHeader.CRC != calculated {
 			return fmt.Errorf("expected file header's crc: %d, got: %d: %w",
 				d.fileHeader.CRC, calculated, ErrCRCChecksumMismatch)
 		}
+		d.crc16.Write(b[11:13])
 	}
 
 	return nil
