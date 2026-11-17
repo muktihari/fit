@@ -1097,6 +1097,37 @@ func makeDecodeTableTest() []decodeTestCase {
 			fit: fit,
 			err: ErrCRCChecksumMismatch,
 		},
+		{
+			name: "decode file header 14 crc 0",
+			r: func() io.Reader {
+				buf := []byte{
+					14, 16, 229, 82, 11, 0, 0, 0, 46, 70, 73, 84, 0, 0, // file header
+					64, 0, 0, 0, 0, 1, 0, 1, 0, // message definition
+					0, 4, // message data
+					171, 134, // file crc
+				}
+				return bytes.NewReader(buf)
+			}(),
+			fit: proto.FIT{
+				FileHeader: proto.FileHeader{
+					Size:            14,
+					ProtocolVersion: proto.V1,
+					ProfileVersion:  binary.LittleEndian.Uint16([]byte{229, 82}),
+					DataSize:        11,
+					DataType:        ".FIT",
+					CRC:             0,
+				},
+				Messages: []proto.Message{
+					{
+						Num: mesgnum.FileId,
+						Fields: []proto.Field{
+							factory.CreateField(mesgnum.FileId, fieldnum.FileIdType).WithValue(typedef.FileActivity.Byte()),
+						},
+					},
+				},
+				CRC: binary.LittleEndian.Uint16([]byte{171, 134}),
+			},
+		},
 	}
 }
 
@@ -1243,12 +1274,6 @@ func TestDecodeFileHeader(t *testing.T) {
 				header.CRC = 0
 				return header
 			}(),
-			validateFn: func(d *Decoder) error {
-				if crc := d.crc16.Sum16(); crc != 0 {
-					return fmt.Errorf("expected zero, got: %d", crc)
-				}
-				return nil
-			},
 		},
 		{
 			name: "decode crc mismatch",
