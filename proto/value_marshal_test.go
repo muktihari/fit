@@ -94,7 +94,6 @@ func TestValueMarshalAppend(t *testing.T) {
 					fmt.Printf("value: %v, b: %v, buf: %v\n", tc.value.Any(), b, buf.Bytes())
 					t.Fatal(diff)
 				}
-
 			})
 		}
 	}
@@ -126,7 +125,7 @@ func marshalValueWithReflectionForTest(w io.Writer, value Value, arch byte) erro
 				return err
 			}
 		}
-		if rv.Len() == 0 && rv.Type() == reflect.TypeOf([]string{}) {
+		if rv.Len() == 0 && rv.Type() == reflect.TypeFor[[]string]() {
 			w.Write([]byte{0})
 		}
 		return nil
@@ -137,7 +136,7 @@ func marshalValueWithReflectionForTest(w io.Writer, value Value, arch byte) erro
 		if len(b) == 0 {
 			b = []byte{0x0}
 		} else if b[len(b)-1] != '\x00' {
-			b = append([]byte(b), '\x00')
+			b = append(b, '\x00')
 		}
 		if arch == 0 {
 			return binary.Write(w, binary.LittleEndian, b)

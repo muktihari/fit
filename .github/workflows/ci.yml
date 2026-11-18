@@ -40,9 +40,10 @@ jobs:
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  misspell:
+  golangci-lint:
     runs-on: ubuntu-latest
-    needs: test
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -51,8 +52,7 @@ jobs:
         with:
           go-version: stable
 
-      - name: Set up misspell
-        run: go install github.com/client9/misspell/cmd/misspell@b90dc15cfd220ecf8bbc9043ecb928cef381f011 # v0.3.4
-
-      - name: Test misspelled words
-        run: misspell -error .
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.15.0

@@ -315,7 +315,7 @@ func TestRecordReset(t *testing.T) {
 	distance := uint32(1000)
 	mesg := &proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 		factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
-		factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(distance)),
+		factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(distance),
 	}}
 
 	r1 := NewRecord(mesg)

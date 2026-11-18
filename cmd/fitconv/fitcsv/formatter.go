@@ -40,7 +40,7 @@ func format(val proto.Value) string {
 	case proto.TypeInt64:
 		return strconv.FormatInt(int64(val.Uint64()), 10)
 	case proto.TypeUint64:
-		return strconv.FormatUint(uint64(val.Uint64()), 10)
+		return strconv.FormatUint(val.Uint64(), 10)
 	case proto.TypeFloat32:
 		value := val.Float32()
 		if value == float32(int64(value)) {

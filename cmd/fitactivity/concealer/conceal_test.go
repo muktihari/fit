@@ -124,7 +124,7 @@ func TestConceal(t *testing.T) {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			Conceal(tc.mesgs, tc.startThreshold, tc.endThreshold)
 			if diff := cmp.Diff(tc.mesgs, tc.expected,
-				cmp.Transformer("Value", func(v proto.Value) interface{} { return v.Any() }),
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -261,7 +261,7 @@ func TestConcealStartPosition(t *testing.T) {
 					tc.expectedIndex, lastConcealStartIndex)
 			}
 			if diff := cmp.Diff(tc.mesgs, tc.expected,
-				cmp.Transformer("Value", func(v proto.Value) interface{} { return v.Any() }),
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -422,7 +422,7 @@ func TestUpdateStartPosition(t *testing.T) {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			updateStartPosition(tc.mesgs, tc.indices, tc.fieldNums, tc.recordIndex)
 			if diff := cmp.Diff(tc.mesgs, tc.expected,
-				cmp.Transformer("Value", func(v proto.Value) interface{} { return v.Any() }),
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -548,7 +548,7 @@ func TestConcealEndPosition(t *testing.T) {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			concealEndPosition(tc.mesgs, tc.lapIndices, tc.sessionIndices, 0, tc.threshold)
 			if diff := cmp.Diff(tc.mesgs, tc.expected,
-				cmp.Transformer("Value", func(v proto.Value) interface{} { return v.Any() }),
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
 			}
@@ -663,7 +663,7 @@ func TestUpdateEndPosition(t *testing.T) {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
 			updateEndPosition(tc.mesgs, tc.indices, tc.fieldNums, tc.startRecordIndex, tc.recordIndex)
 			if diff := cmp.Diff(tc.mesgs, tc.expected,
-				cmp.Transformer("Value", func(v proto.Value) interface{} { return v.Any() }),
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 			); diff != "" {
 				t.Fatal(diff)
 			}

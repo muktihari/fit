@@ -159,7 +159,7 @@ func TestValueUnmarshalValueSliceAlloc(t *testing.T) {
 	}
 
 	for i, tc := range tt {
-		for arch := byte(0); arch < 2; arch++ {
+		for arch := range byte(2) {
 			t.Run(fmt.Sprintf("[%d] arch: %d: %v", i, arch, tc.profileType.String()), func(t *testing.T) {
 				b, _ := tc.value.MarshalAppend(nil, arch)
 				alloc := testing.AllocsPerRun(10, func() {

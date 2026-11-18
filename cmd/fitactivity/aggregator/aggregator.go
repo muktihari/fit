@@ -33,7 +33,7 @@ func Aggregate[T any](dst, src T) {
 		if !f.IsExported() {
 			continue
 		}
-		if f.Type != reflect.TypeOf(time.Time{}) && reflect.Indirect(dv.Field(i)).Kind() == reflect.Struct {
+		if f.Type != reflect.TypeFor[time.Time]() && reflect.Indirect(dv.Field(i)).Kind() == reflect.Struct {
 			Aggregate(dv.Field(i).Interface(), sv.Field(i).Interface())
 			continue
 		}
@@ -48,7 +48,7 @@ func Aggregate[T any](dst, src T) {
 			min(dv.Field(i), sv.Field(i)) // MinHeartRate, MinCadence, EnhancedMinAltitude, etc.
 		case strings.HasPrefix(f.Name, "Avg") || strings.HasPrefix(f.Name, "EnhancedAvg"):
 			avg(dv.Field(i), sv.Field(i)) // AvgHeartRate, AvgCadence, EnhancedAvgSpeed, etc..
-		case f.Type == reflect.TypeOf([]proto.Field{}):
+		case f.Type == reflect.TypeFor[[]proto.Field]():
 			dFields, sFields := dv.Field(i), sv.Field(i) // UnknownFields
 			for j := 0; j < sFields.Len(); j++ {
 				sNum := sFields.Index(j).FieldByName("Num").Uint()
@@ -74,14 +74,14 @@ var sInvalids = [...]int64{
 	reflect.Int8:  int64(basetype.Sint8Invalid),
 	reflect.Int16: int64(basetype.Sint16Invalid),
 	reflect.Int32: int64(basetype.Sint32Invalid),
-	reflect.Int64: int64(basetype.Sint64Invalid),
+	reflect.Int64: basetype.Sint64Invalid,
 }
 
 var uInvalids = [...]uint64{
 	reflect.Uint8:  uint64(basetype.Uint8Invalid),
 	reflect.Uint16: uint64(basetype.Uint16Invalid),
 	reflect.Uint32: uint64(basetype.Uint32Invalid),
-	reflect.Uint64: uint64(basetype.Uint64Invalid),
+	reflect.Uint64: basetype.Uint64Invalid,
 }
 
 func sum(dst, src reflect.Value) {
@@ -316,7 +316,7 @@ func fill(dst, src reflect.Value) {
 			fill(dst.Index(i), src.Index(i))
 		}
 	case reflect.Struct:
-		if dst.IsZero() && dst.Type() == reflect.TypeOf(time.Time{}) {
+		if dst.IsZero() && dst.Type() == reflect.TypeFor[time.Time]() {
 			dst.Set(src)
 			return
 		}

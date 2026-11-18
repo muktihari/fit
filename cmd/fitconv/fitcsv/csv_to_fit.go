@@ -62,7 +62,6 @@ func NewCSVToFITConv(fitWriter io.Writer, csvReader io.Reader) *CSVToFITConv {
 		return &CSVToFITConv{streamEnc: streamEnc, csv: csvr}
 	}
 	return &CSVToFITConv{enc: encoder.New(fitWriter, opts...), csv: csvr}
-
 }
 
 type CSVToFITConvInfo struct {

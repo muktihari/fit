@@ -5,6 +5,8 @@
 package concealer
 
 import (
+	"slices"
+
 	"github.com/muktihari/fit/profile/basetype"
 	"github.com/muktihari/fit/profile/untyped/fieldnum"
 	"github.com/muktihari/fit/profile/untyped/mesgnum"
@@ -166,9 +168,9 @@ func updateEndPosition(mesgs []proto.Message, indices []int, ph placeholder, las
 		recLat       = rec.FieldValueByNum(fieldnum.RecordPositionLat).Int32()
 		recLong      = rec.FieldValueByNum(fieldnum.RecordPositionLong).Int32()
 	)
-	for i := len(indices) - 1; i >= 0; i-- {
+	for _, idx := range slices.Backward(indices) {
 		var (
-			mesg      = &mesgs[indices[i]]
+			mesg      = &mesgs[idx]
 			startTime = mesg.FieldValueByNum(ph.startTime).Uint32()
 		)
 		if startTime == basetype.Uint32Invalid || startTime > recTimestamp {

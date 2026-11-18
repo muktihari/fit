@@ -33,7 +33,7 @@ func (discardAt) WriteAt(p []byte, off int64) (n int, err error) {
 
 var DiscardAt = discardAt{}
 
-func createFitForBenchmark(recodSize int) *proto.FIT {
+func createFitForBenchmark(recordSize int) *proto.FIT {
 	now := time.Now()
 	fit := &proto.FIT{
 		Messages: []proto.Message{
@@ -79,7 +79,7 @@ func createFitForBenchmark(recodSize int) *proto.FIT {
 		},
 	}
 
-	for i := 0; i < recodSize-len(fit.Messages); i++ {
+	for i := 0; i < recordSize-len(fit.Messages); i++ {
 		now = now.Add(time.Second) // only time is moving forward
 		if i%100 == 0 {            // add event every 100 message
 			fit.Messages = append(fit.Messages, proto.Message{Num: mesgnum.Event, Fields: []proto.Field{

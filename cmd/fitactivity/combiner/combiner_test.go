@@ -508,7 +508,7 @@ func TestCombine(t *testing.T) {
 				return
 			}
 			if diff := cmp.Diff(fit, tc.expected,
-				cmp.Transformer("Value", func(v proto.Value) interface{} { return v.Any() }),
+				cmp.Transformer("Value", func(v proto.Value) any { return v.Any() }),
 				cmp.Transformer("Fields", func(fields []proto.Field) []proto.Field {
 					slices.SortStableFunc(fields, func(f1, f2 proto.Field) int {
 						if f1.Num < f2.Num {
@@ -652,15 +652,15 @@ func TestGetLastDistanceOrZero(t *testing.T) {
 			name: "happy flow",
 			mesgs: []proto.Message{
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now))),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(1)),
 				}},
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now) + 1)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(2)),
 				}},
 				{Num: mesgnum.Session, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(uint32(datetime.ToUint32(now) + 1)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 1),
 				}},
 			},
 			dist: 2,
@@ -669,10 +669,10 @@ func TestGetLastDistanceOrZero(t *testing.T) {
 			name: "return zero",
 			mesgs: []proto.Message{
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now))),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
 				}},
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now) + 1)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
 				}},
 			},
 			dist: 0,
@@ -700,15 +700,15 @@ func TestGetFirstTimestamp(t *testing.T) {
 			name: "happy flow",
 			mesgs: []proto.Message{
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now))),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(1)),
 				}},
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now) + 1)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(2)),
 				}},
 				{Num: mesgnum.Session, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(uint32(datetime.ToUint32(now) + 1)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 1),
 				}},
 			},
 			timestamp: datetime.ToUint32(now),
@@ -748,15 +748,15 @@ func TestGetLastTimestamp(t *testing.T) {
 			name: "happy flow",
 			mesgs: []proto.Message{
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now))),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(1)),
 				}},
 				{Num: mesgnum.Record, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(uint32(datetime.ToUint32(now) + 1)),
+					factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now) + 1),
 					factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32(2)),
 				}},
 				{Num: mesgnum.Session, Fields: []proto.Field{
-					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(uint32(datetime.ToUint32(now) + 2)),
+					factory.CreateField(mesgnum.Session, fieldnum.SessionTimestamp).WithValue(datetime.ToUint32(now) + 2),
 				}},
 			},
 			timestamp: datetime.ToUint32(now) + 2,

@@ -1,0 +1,22 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - govet
+    - copyloopvar
+    - misspell
+    - modernize
+    - unconvert
+    - whitespace
+  
+  settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

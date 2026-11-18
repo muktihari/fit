@@ -169,7 +169,7 @@ loop:
 	}
 }
 
-func fatalf(format string, args ...interface{}) {
+func fatalf(format string, args ...any) {
 	fmt.Printf(format, args...)
 	os.Exit(1)
 }

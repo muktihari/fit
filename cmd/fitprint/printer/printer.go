@@ -147,7 +147,7 @@ func New(w io.Writer) *printer {
 	p.reset()
 
 	p.poolc = make(chan proto.Message, channelBuffer)
-	for i := 0; i < channelBuffer; i++ {
+	for range channelBuffer {
 		p.poolc <- proto.Message{}
 	}
 
@@ -255,7 +255,6 @@ func (p *printer) print(m message) {
 		} else {
 			nExpandedField++
 		}
-
 	}
 
 	fmt.Fprintf(p.w, "%s (num: %d, arch: %d, size: %d, fields[-]: %d, expandedFields[x]: %d, developerFields[+]: %d) [%d]:\n",
@@ -443,7 +442,6 @@ func formatFieldValue(
 	}
 
 	return valstr
-
 }
 
 func formatCast[S []E, E any](s S, bt basetype.BaseType, pt profile.ProfileType) string {
@@ -487,7 +485,7 @@ func castValue(val proto.Value, baseType basetype.BaseType) proto.Value {
 	case proto.TypeInt64:
 		value = uint64(val.Int64())
 	case proto.TypeUint64:
-		value = uint64(val.Uint64())
+		value = val.Uint64()
 	}
 
 	switch baseType {
@@ -506,7 +504,7 @@ func castValue(val proto.Value, baseType basetype.BaseType) proto.Value {
 	case basetype.Sint64:
 		return proto.Int64(int64(value))
 	case basetype.Uint64, basetype.Uint64z:
-		return proto.Uint64(uint64(value))
+		return proto.Uint64(value)
 	}
 
 	return val

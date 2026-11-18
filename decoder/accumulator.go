@@ -32,7 +32,7 @@ func (a *accumulator) Collect(mesgNum typedef.MesgNum, fieldNum byte, val proto.
 	case proto.TypeInt64:
 		a.collect(mesgNum, fieldNum, uint64(val.Int64()))
 	case proto.TypeUint64:
-		a.collect(mesgNum, fieldNum, uint64(val.Uint64()))
+		a.collect(mesgNum, fieldNum, val.Uint64())
 	case proto.TypeFloat32:
 		a.collect(mesgNum, fieldNum, uint64(val.Float32()))
 	case proto.TypeFloat64:
@@ -75,7 +75,7 @@ func (a *accumulator) Collect(mesgNum typedef.MesgNum, fieldNum byte, val proto.
 	case proto.TypeSliceUint64:
 		vals := val.SliceUint64()
 		if n := len(vals); n > 0 {
-			a.collect(mesgNum, fieldNum, uint64(vals[n-1]))
+			a.collect(mesgNum, fieldNum, vals[n-1])
 		}
 	case proto.TypeSliceFloat32:
 		vals := val.SliceFloat32()

@@ -137,7 +137,7 @@ func TestReadBufferReadN(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				for i := 0; i < 10_000; i++ {
+				for i := range 10_000 {
 					_, err = buf.ReadN(1)
 					if err != nil {
 						return fmt.Errorf("[%d]: %w", i, err)
