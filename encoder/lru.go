@@ -14,7 +14,7 @@ import (
 // replaced with a new item, which is then marked as the most recently used item.
 // This way, interleaving between `message definitions` is optimized.
 type lru struct {
-	// Holds the actual items representated in bytes.
+	// Holds the actual items represented in bytes.
 	items [][]byte
 
 	// Holds items's indexes as its value. The order of value will be shifted based on recent write.

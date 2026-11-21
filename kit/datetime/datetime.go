@@ -41,7 +41,7 @@ func ToLocalTime(t time.Time, tzOffsetHours int) time.Time {
 
 // TzOffsetHours calculates time zone offset.
 //
-// formula ilustration: (activity.LocalTimestamp - activity.Timestamp) / 3600
+// formula illustration: (activity.LocalTimestamp - activity.Timestamp) / 3600
 func TzOffsetHours(localDateTime, dateTime time.Time) int {
 	return int(localDateTime.Sub(dateTime).Seconds()) / 3600
 }

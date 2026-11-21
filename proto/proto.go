@@ -108,7 +108,7 @@ func (m *Message) FieldByNum(num byte) *Field {
 	return nil
 }
 
-// FieldValueByNum returns the value of the Field in a Messsage, if not found return invalid value.
+// FieldValueByNum returns the value of the Field in a Message, if not found return invalid value.
 func (m *Message) FieldValueByNum(num byte) Value {
 	for i := range m.Fields {
 		if m.Fields[i].Num == num {
@@ -131,8 +131,8 @@ func (m *Message) RemoveFieldByNum(num byte) {
 // FieldBase acts as a fundamental representation of a field as defined in the Global FIT Profile.
 // The value of this representation should not be altered, except in the case of an unknown field.
 type FieldBase struct {
-	Name       string              // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific name (defined by manufacturer).
-	Num        byte                // Defined in the Global FIT profile for the specified FIT message, otherwise its a manufaturer specific number (defined by manufacturer). (255 == invalid)
+	Name       string              // Defined in the Global FIT profile for the specified FIT message, otherwise it is a manufacturer-specific name (defined by manufacturer).
+	Num        byte                // Defined in the Global FIT profile for the specified FIT message, otherwise it is a manufacturer-specific number (defined by manufacturer). (255 == invalid)
 	Type       profile.ProfileType // Type is defined type that serves as an abstraction layer above base types (primitive-types), e.g. DateTime is a time representation in uint32.
 	BaseType   basetype.BaseType   // BaseType is the base of the ProfileType. E.g. profile.DateTime -> basetype.Uint32.
 	Array      bool                // Flag whether the value of this field is an array

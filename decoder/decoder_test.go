@@ -813,7 +813,7 @@ func TestDiscard(t *testing.T) {
 				return
 			}
 			if dec.cur != 0 || dec.fileHeader.DataSize != 0 {
-				t.Fatalf("dec.cur and dec.fileHeader.DataSize should be resetted")
+				t.Fatalf("dec.cur and dec.fileHeader.DataSize should be reset")
 			}
 		})
 	}
@@ -1885,7 +1885,7 @@ func TestDecodeFields(t *testing.T) {
 			},
 		},
 		{
-			name: "subfield subtitution",
+			name: "subfield substitution",
 			r:    fnReaderOK,
 			mesgdef: &proto.MessageDefinition{
 				Header:  proto.MesgDefinitionMask,
@@ -2284,7 +2284,7 @@ func TestExpandComponents(t *testing.T) {
 	}
 }
 
-func TestExpandMutipleComponentsDynamicField(t *testing.T) {
+func TestExpandMultipleComponentsDynamicField(t *testing.T) {
 	// Test expand component's components that have dynamic field
 	// Since we don't have real world example, message from Profile.xlsx doesn't not have this but it is possible,
 	// Let's create our own custom message.
@@ -2882,12 +2882,12 @@ func TestLogs(t *testing.T) {
 	fieldDef := proto.FieldDefinition{Num: fieldnum.RecordTimestamp, Size: 4, BaseType: basetype.Uint32}
 	devFieldDef := proto.DeveloperFieldDefinition{Num: fieldnum.RecordTimestamp, Size: 4, DeveloperDataIndex: 0}
 
-	t.Run("logField: nil log writter", func(t *testing.T) {
+	t.Run("logField: nil log writer", func(t *testing.T) {
 		dec := New(nil)
 		dec.logField(&mesg, &fieldDef, "msg")
 	})
 
-	t.Run("logField: with log writter", func(t *testing.T) {
+	t.Run("logField: with log writer", func(t *testing.T) {
 		buf := bytes.NewBuffer(nil)
 		dec := New(nil, WithLogWriter(buf))
 		dec.logField(&mesg, &fieldDef, "msg")
@@ -2896,12 +2896,12 @@ func TestLogs(t *testing.T) {
 		}
 	})
 
-	t.Run("logDeveloperField: nil log writter", func(t *testing.T) {
+	t.Run("logDeveloperField: nil log writer", func(t *testing.T) {
 		dec := New(nil)
 		dec.logDeveloperField(&mesg, &devFieldDef, basetype.Uint32, "msg")
 	})
 
-	t.Run("logDeveloperField: with log writter", func(t *testing.T) {
+	t.Run("logDeveloperField: with log writer", func(t *testing.T) {
 		buf := bytes.NewBuffer(nil)
 		dec := New(nil, WithLogWriter(buf))
 		dec.logDeveloperField(&mesg, &devFieldDef, basetype.Uint32, "msg")

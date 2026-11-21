@@ -68,7 +68,7 @@ func TestToLocalTime(t *testing.T) {
 		result time.Time
 	}{
 		{
-			name:   "unsupported tipe",
+			name:   "unsupported type",
 			value:  time.Time{},
 			result: time.Time{},
 		},

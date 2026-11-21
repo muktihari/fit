@@ -1184,7 +1184,7 @@ func TestEncodeMessageWithMultipleLocalMessageType(t *testing.T) {
 
 	for i, tc := range tt {
 		t.Run(fmt.Sprintf("[%d] %s", i, tc.name), func(t *testing.T) {
-			// We have 3 messages with differents field definitions,
+			// We have 3 messages with different field definitions,
 			// this should produces different localMesgNum in header.
 
 			mesgs := append(mesgs[:0:0], mesgs...) // clone

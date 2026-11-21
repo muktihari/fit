@@ -13,7 +13,7 @@ import (
 	"github.com/muktihari/fit/proto"
 )
 
-// RawFlag is the kind of the incomming bytes, the size of the incomming bytes is vary but
+// RawFlag is the kind of the incoming bytes, the size of the incoming bytes varies but
 // the the size is guaranteed by the corresponding RawFlag.
 type RawFlag byte
 
@@ -79,7 +79,7 @@ func NewRaw() *RawDecoder {
 	return &RawDecoder{}
 }
 
-// Decode decodes r reader into sequence of FIT bytes splitted by its corresponding RawFlag (FileHeader,
+// Decode decodes r reader into sequence of FIT bytes split by its corresponding RawFlag (FileHeader,
 // MessageDefinition, MessageData and CRC) for every FIT sequences in the reader, until it reaches EOF.
 // It returns the number of bytes read and any error encountered. When fn returns an error, Decode will
 // immediately return the error.

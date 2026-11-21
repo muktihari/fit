@@ -36,7 +36,7 @@ The first file will be the base for the resulting file and we will combine all m
 The common messages in an Activity File:
 
 - Activity: we use activity message from first FIT file then update it accordingly.
-- Session: fields will be aggregated with the correspoding session of the next FIT file.
+- Session: fields will be aggregated with the corresponding session of the next FIT file.
 - Lap: append as it is.
 - Event: append as it is
 - Record: accumulable fields such as `distance` and `accumulated_power` will be accumulated before appending, the rest will be appended as they are.

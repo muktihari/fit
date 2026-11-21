@@ -98,7 +98,7 @@ var _ decoder.MesgListener = (*Listener)(nil)
 
 // NewListener creates new common file types listener that implement decoder.MesgListener.
 // This will handle message conversion from proto.Message received from Decoder into
-// mesgdef's structure and group it by its correspoding defined file types.
+// mesgdef's structure and group it by its corresponding defined file types.
 func NewListener(opts ...Option) *Listener {
 	l := new(Listener)
 	l.Reset(opts...)
@@ -106,7 +106,7 @@ func NewListener(opts ...Option) *Listener {
 }
 
 // Reset resets the Listener for reuse. It resets options to default options so any
-// options needs to be inputed again. It is similar to NewListener() but it retains
+// options need to be input again. It is similar to NewListener() but it retains
 // the underlying storage for use by future decode to reduce memory allocs.
 func (l *Listener) Reset(opts ...Option) {
 	l.Close()

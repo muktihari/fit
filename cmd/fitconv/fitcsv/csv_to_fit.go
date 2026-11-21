@@ -40,7 +40,7 @@ type CSVToFITConv struct {
 
 	unknownMesg         int
 	unknownField        int
-	unknwonDynamicField int
+	unknownDynamicField int
 	seq                 int
 	line                int
 	col                 int
@@ -75,7 +75,7 @@ func (c *CSVToFITConv) ResultInfo() CSVToFITConvInfo {
 	return CSVToFITConvInfo{
 		UnknownMesg:         c.unknownMesg,
 		UnknownField:        c.unknownField,
-		UnknownDynamicField: c.unknwonDynamicField,
+		UnknownDynamicField: c.unknownDynamicField,
 		Sequence:            c.seq,
 	}
 }
@@ -272,12 +272,12 @@ func (c *CSVToFITConv) createMesg(num typedef.MesgNum, record []string) (proto.M
 	}
 
 	for _, ref := range dynamicFieldRefs {
-		if err := c.revertSubFieldSubtitution(&mesg, ref); err != nil {
+		if err := c.revertSubFieldSubstitution(&mesg, ref); err != nil {
 			return proto.Message{}, err
 		}
 	}
 
-	// Remove remaining field placeholders if it can't be subtituted.
+	// Remove remaining field placeholders if it can't be substituted.
 	var valid int
 	for i := range mesg.Fields {
 		if mesg.Fields[i].Name == placeholderField.Name {
@@ -403,7 +403,7 @@ func (c *CSVToFITConv) createDeveloperField(name, strValue, units string) (devFi
 	return
 }
 
-func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dynamicFieldRef) (err error) {
+func (c *CSVToFITConv) revertSubFieldSubstitution(mesgRef *proto.Message, ref dynamicFieldRef) (err error) {
 	mesgLookup := factory.CreateMesg(mesgRef.Num)
 	for _, fieldRef := range mesgLookup.Fields {
 		for _, subField := range fieldRef.SubFields {
@@ -438,7 +438,7 @@ func (c *CSVToFITConv) revertSubFieldSubtitution(mesgRef *proto.Message, ref dyn
 		}
 	}
 
-	c.unknwonDynamicField++
+	c.unknownDynamicField++
 	return nil
 }
 

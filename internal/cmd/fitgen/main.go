@@ -99,9 +99,9 @@ func main() {
 
 	if !confirm {
 		fmt.Printf("fitgen will generate files relative to given path: %q.\nDo you want to continue? [y/n]: ", generatePath)
-		var confimation string
-		fmt.Scanf("%s\n", &confimation)
-		if strings.ToLower(confimation)[0] != 'y' {
+		var confirmation string
+		fmt.Scanf("%s\n", &confirmation)
+		if strings.ToLower(confirmation)[0] != 'y' {
 			fatalf("aborted.\n")
 		}
 	}

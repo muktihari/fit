@@ -14,7 +14,7 @@ import (
 	"golang.org/x/text/language"
 )
 
-// ToTitle tranforms s into TitleCase and remove non-alphanumeric characters.
+// ToTitle transforms s into TitleCase and removes non-alphanumeric characters.
 func ToTitle(s string) string {
 	s = strings.Map(func(r rune) rune {
 		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
@@ -27,14 +27,14 @@ func ToTitle(s string) string {
 	return s
 }
 
-// ToCamel tranforms s into camelCase and remove non-alphanumeric characters.
+// ToCamel transforms s into camelCase and removes non-alphanumeric characters.
 func ToCamel(s string) string {
 	s = ToTitle(s)
 	s = strings.ToLower(string(s[0])) + s[1:]
 	return s
 }
 
-// ToLower tranforms s into lowercase and remove non-alphanumeric characters.
+// ToLower transforms s into lowercase and removes non-alphanumeric characters.
 func ToLower(s string) string {
 	s = strings.ToLower(s)
 	s = strings.Map(func(r rune) rune {
@@ -46,7 +46,7 @@ func ToLower(s string) string {
 	return s
 }
 
-// ToSnake tranforms s into snake_case and replace non-alphanumeric characters with underscore '_'
+// ToSnake transforms s into snake_case and replaces non-alphanumeric characters with underscore '_'
 func ToSnake(s string) string {
 	s = strings.ToLower(s)
 	s = strings.Map(func(r rune) rune {

@@ -177,7 +177,7 @@ func New(w io.Writer, opts ...Option) *Encoder {
 }
 
 // Reset resets the Encoder to write its output to w and reset previous options to
-// default options so any options needs to be inputed again. It is similar to New()
+// default options so any options need to be input again. It is similar to New()
 // but it retains the underlying storage for use by future encode to reduce memory allocs.
 func (e *Encoder) Reset(w io.Writer, opts ...Option) {
 	if e.buf == nil {

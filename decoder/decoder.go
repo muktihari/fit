@@ -193,7 +193,7 @@ func New(r io.Reader, opts ...Option) *Decoder {
 }
 
 // Reset resets the Decoder to read its input from r, clear any error and
-// reset previous options to default options so any options needs to be inputed again.
+// reset previous options to default options so any options need to be input again.
 // It is similar to New() but it retains the underlying storage for use by
 // future decode to reduce memory allocs.
 func (d *Decoder) Reset(r io.Reader, opts ...Option) {
