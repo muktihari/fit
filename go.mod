@@ -3,7 +3,6 @@ module github.com/muktihari/fit
 go 1.26.0
 
 require (
-	github.com/client9/misspell v0.3.4
 	github.com/google/go-cmp v0.7.0
 	github.com/muktihari/carto v0.1.1
 	github.com/thedatashed/xlsxreader v1.2.8

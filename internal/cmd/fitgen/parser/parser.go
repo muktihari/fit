@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/client9/misspell"
 	"github.com/muktihari/fit/internal/cmd/fitgen/pkg/xlsxlite"
 )
 
@@ -22,14 +21,13 @@ const (
 
 // Parser is Profile.xlsx parser
 type Parser struct {
-	xl               *xlsxlite.XlsxLite
-	sheets           map[Sheet]string
-	misspellReplacer *misspell.Replacer
+	xl     *xlsxlite.XlsxLite
+	sheets map[Sheet]string
 }
 
 // New creates new Parser.
 func New(xl *xlsxlite.XlsxLite, sheetNames map[Sheet]string) *Parser {
-	return &Parser{xl: xl, sheets: sheetNames, misspellReplacer: misspell.New()}
+	return &Parser{xl: xl, sheets: sheetNames}
 }
 
 // ParseTypes parse sheet "Types" in Profile.xlsx
@@ -38,7 +36,6 @@ func (p *Parser) ParseTypes() ([]Type, error) {
 	var cur = -1
 	row := p.xl.RowIterator(p.sheets[SheetTypes])
 
-	var diff []misspell.Diff
 	for row.Next() {
 		if row.Index() == 1 { // header
 			continue
@@ -48,11 +45,7 @@ func (p *Parser) ParseTypes() ([]Type, error) {
 				name     = row.Cell("A")
 				baseType = row.Cell("B")
 			)
-			name, diff = p.misspellReplacer.Replace(name)
-			if len(diff) > 0 {
-				fmt.Printf("parser: misspell: sheet: %q, row index: %d: type: type name: %v\n",
-					"Types", row.Index(), formatMisspellDiff(diff))
-			}
+			name = fixTypos(name, "Types", row.Index(), "type: type name")
 			ts = append(ts, Type{
 				Name:     name,
 				BaseType: baseType,
@@ -66,16 +59,8 @@ func (p *Parser) ParseTypes() ([]Type, error) {
 			value   = row.Cell("D")
 			comment = row.Cell("E")
 		)
-		name, diff = p.misspellReplacer.Replace(name)
-		if len(diff) > 0 {
-			fmt.Printf("parser: misspell: sheet: %q, row index: %d: type: value name: %v\n",
-				"Types", row.Index(), formatMisspellDiff(diff))
-		}
-		comment, diff = p.misspellReplacer.Replace(comment)
-		if len(diff) > 0 {
-			fmt.Printf("parser: misspell: sheet: %q, row index: %d: type: comment: %v\n",
-				"Types", row.Index(), formatMisspellDiff(diff))
-		}
+		name = fixTypos(name, "Types", row.Index(), "type: value name")
+		comment = fixTypos(comment, "Types", row.Index(), "type: comment")
 
 		ts[cur].Values = append(ts[cur].Values, Value{
 			Name:    name,
@@ -97,7 +82,6 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 	var cur = -1 // message cursor
 	row := p.xl.RowIterator(p.sheets[SheetMessages])
 
-	var misspellDiff []misspell.Diff
 	for row.Next() {
 		if row.Index() == 1 { // header
 			continue
@@ -108,16 +92,8 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 				name    = row.Cell("A")
 				comment = row.Cell("N")
 			)
-			name, misspellDiff = p.misspellReplacer.Replace(name)
-			if len(misspellDiff) > 0 {
-				fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Name: %v\n",
-					"Messages", row.Index(), formatMisspellDiff(misspellDiff))
-			}
-			comment, misspellDiff = p.misspellReplacer.Replace(comment)
-			if len(misspellDiff) > 0 {
-				fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Comment: %v\n",
-					"Messages", row.Index(), formatMisspellDiff(misspellDiff))
-			}
+			name = fixTypos(name, "Messages", row.Index(), "mesg.Name")
+			comment = fixTypos(comment, "Messages", row.Index(), "mesg.Comment")
 			ms = append(ms, Message{
 				Name:    name,
 				Comment: comment,
@@ -131,11 +107,7 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 		}
 
 		fieldName := row.Cell("C")
-		fieldName, misspellDiff = p.misspellReplacer.Replace(fieldName)
-		if len(misspellDiff) > 0 {
-			fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Name: %s: field.Name: %v\n",
-				"Messages", row.Index(), ms[cur].Name, formatMisspellDiff(misspellDiff))
-		}
+		fieldName = fixTypos(fieldName, "Messages", row.Index(), "mesg.Name: "+ms[cur].Name+": field.Name")
 		fieldType := row.Cell("D")
 		array := row.Cell("E")
 		components := splitStringOrNil(row.Cell("F"))
@@ -163,11 +135,7 @@ func (p *Parser) ParseMessages() ([]Message, error) {
 		}
 
 		comment := row.Cell("N")
-		comment, misspellDiff = p.misspellReplacer.Replace(comment)
-		if len(misspellDiff) > 0 {
-			fmt.Printf("parser: misspell: sheet: %q, row index: %d: mesg.Name: %s: field.Comment: %v\n",
-				"Messages", row.Index(), ms[cur].Name, formatMisspellDiff(misspellDiff))
-		}
+		comment = fixTypos(comment, "Messages", row.Index(), "mesg.Name: "+ms[cur].Name+": field.Comment")
 
 		product := row.Cell("O")
 		example := row.Cell("P")
@@ -305,16 +273,23 @@ func splitBoolsOrNil(s string) ([]bool, error) {
 	return bs, nil
 }
 
-func formatMisspellDiff(diff []misspell.Diff) string {
-	strbuf := new(strings.Builder)
-	fmt.Fprintf(strbuf, "[\n")
-	for i := range diff {
-		fullLine := "full text: <omitted: too long> -> "
-		if len(diff[i].FullLine) <= 50 {
-			fullLine = fmt.Sprintf("full text: %q -> ", diff[i].FullLine)
-		}
-		fmt.Fprintf(strbuf, "- %s%q is a misspelling of %q\n", fullLine, diff[i].Original, diff[i].Corrected)
+// typoReplacer fixes known typos in Profile.xlsx so the generated identifiers and comments are spelled correctly.
+//
+//nolint:misspell // intentional typos
+var typoReplacer = strings.NewReplacer(
+	"accross", "across",
+	"bondary", "boundary",
+	"compatability", "compatibility",
+	"corrosponding", "corresponding",
+	"decribing", "describing",
+	"farenheit", "fahrenheit",
+	"managment", "management",
+)
+
+func fixTypos(s, sheet string, rowIndex int, location string) string {
+	fixed := typoReplacer.Replace(s)
+	if fixed != s {
+		fmt.Printf("parser: typo: sheet: %q, row index: %d: %s: %q -> %q\n", sheet, rowIndex, location, s, fixed)
 	}
-	fmt.Fprintf(strbuf, "]")
-	return strbuf.String()
+	return fixed
 }
