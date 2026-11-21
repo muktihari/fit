@@ -200,7 +200,7 @@ func main() {
 
 Decode into Common File Types enables us to interact with FIT files through common file types such as Activity Files, Course Files, Workout Files, and [more](../profile/filedef/doc.go), which group protocol messages based on specific purposes.
 
-1. To get started, the simpliest (but least efficient) way to create an common file type is to decode the FIT file in its protocol messages then pass the messages to create the desired common file type.
+1. To get started, the simplest (but least efficient) way to create a common file type is to decode the FIT file in its protocol messages then pass the messages to create the desired common file type.
 
 ```go
 package main
@@ -568,7 +568,7 @@ func main() {
 
 ### Discard FIT File Sequences
 
-When handling a chained FIT file, sometimes we only want to decode a certain file type, let's say a Course File, while discarding other file types. Instead of unecessarily decode all the file types but we don't use all of them, we can just discard it. Discard directs the Decoder to efficiently just discard the bytes without doing unnecessary work.
+When handling a chained FIT file, sometimes we only want to decode a certain file type, let's say a Course File, while discarding other file types. Instead of unnecessarily decoding file types we don't use, we can just discard them. Discard directs the Decoder to efficiently just discard the bytes without doing unnecessary work.
 
 ```go
     ...

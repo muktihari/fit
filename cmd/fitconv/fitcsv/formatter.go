@@ -16,7 +16,7 @@ import (
 
 // format formats given val into string
 //
-//	custom formating:
+//	custom formatting:
 //	- float64: 0 -> 0.0, 1,2300 -> 1.23, 1,2340001 -> 1,2340001
 //
 //	slice formatting: every value element will be separated by '|' pipe symbol.

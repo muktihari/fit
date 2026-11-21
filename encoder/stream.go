@@ -71,7 +71,7 @@ func (e *StreamEncoder) SequenceCompleted() error {
 }
 
 // Reset resets the Stream Encoder and the underlying Encoder to write its output to w
-// and reset previous options to default options so any options needs to be inputed again.
+// and reset previous options to default options so any options need to be input again.
 // It is similar to New() but it retains the underlying storage for use by future encode to reduce memory allocs.
 // If w does not implement io.WriterAt or io.WriteSeeker, error will be returned.
 func (e *StreamEncoder) Reset(w io.Writer, opts ...Option) error {

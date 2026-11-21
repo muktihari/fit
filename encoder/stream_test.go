@@ -88,7 +88,7 @@ func TestNewStream(t *testing.T) {
 
 			if diff := cmp.Diff(streamEnc.enc.options, tc.expectedOptions,
 				cmp.AllowUnexported(options{}),
-				cmp.Transformer("MessaveValidator", func(mv MessageValidator) uintptr {
+				cmp.Transformer("MessageValidator", func(mv MessageValidator) uintptr {
 					return reflect.ValueOf(mv).Pointer()
 				}),
 			); diff != "" {

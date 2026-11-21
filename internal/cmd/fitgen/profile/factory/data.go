@@ -7,6 +7,6 @@ package factory
 // Data represent factory.tmpl
 type Data struct {
 	Package  string // Package name
-	Messages string // string formated struct [...]message{...}
+	Messages string // string formatted struct [...]message{...}
 	LenMesgs uint16
 }

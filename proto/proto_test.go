@@ -241,7 +241,7 @@ func TestFieldFormat(t *testing.T) {
 	}
 }
 
-func TestFieldSubFieldSubtitution(t *testing.T) {
+func TestFieldSubFieldSubstitution(t *testing.T) {
 	tt := []struct {
 		name         string
 		mesg         proto.Message
@@ -250,7 +250,7 @@ func TestFieldSubFieldSubtitution(t *testing.T) {
 		ok           bool
 	}{
 		{
-			name: "SubFieldSubtitution ok, main field can be interpreted.",
+			name: "SubFieldSubstitution ok, main field can be interpreted.",
 			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(10)),
 			}},
@@ -259,7 +259,7 @@ func TestFieldSubFieldSubtitution(t *testing.T) {
 			ok:           true,
 		},
 		{
-			name: "SubFieldSubtitution not ok, can't interpret main field.",
+			name: "SubFieldSubstitution not ok, can't interpret main field.",
 			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventEvent).WithValue(uint8(100)),
 			}},
@@ -267,7 +267,7 @@ func TestFieldSubFieldSubtitution(t *testing.T) {
 			ok:    false,
 		},
 		{
-			name: "SubFieldSubtitution field reference not found",
+			name: "SubFieldSubstitution field reference not found",
 			mesg: proto.Message{Num: mesgnum.Event, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Event, fieldnum.EventActivityType).WithValue(uint8(10)),
 			}},
