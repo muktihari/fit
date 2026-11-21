@@ -127,7 +127,7 @@ func (d *RawDecoder) Decode(r io.Reader, fn func(flag RawFlag, b []byte) error) 
 		}
 
 		// 2. Decode Messages
-		var pos = int64(n)
+		var pos = n
 		for uint32(n-pos) < fileHeaderDataSize {
 			nr, err = io.ReadFull(r, d.BytesArray[:1])
 			n += int64(nr)

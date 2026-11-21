@@ -327,10 +327,7 @@ func TestPeekFileHeader(t *testing.T) {
 					if cur >= 14 {
 						return 0, io.EOF
 					}
-					m := 14
-					if cur+len(b) < m {
-						m = cur + len(b)
-					}
+					m := min(cur+len(b), 14)
 					n = copy(b, buf[cur:m])
 					cur += n
 					return n, nil
@@ -383,10 +380,7 @@ func TestPeekFileId(t *testing.T) {
 					if cur >= len(buf) {
 						return 0, io.EOF
 					}
-					m := len(buf)
-					if cur+len(b) < m {
-						m = cur + len(b)
-					}
+					m := min(cur+len(b), len(buf))
 					n = copy(b, buf[cur:m])
 					cur += n
 					return n, nil
@@ -674,7 +668,7 @@ func createFitForTest() (proto.FIT, []byte) {
 		},
 	}
 
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		fit.Messages = append(fit.Messages,
 			proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 				factory.CreateField(mesgnum.Record, fieldnum.RecordDistance).WithValue(uint32((i + 1) * 1000)),
@@ -1370,7 +1364,7 @@ func TestDecodeMessage(t *testing.T) {
 			dec := New(tc.r)
 			dec.timestamp = tc.timestampReference
 			dec.lastTimeOffset = byte(tc.timestampReference & proto.CompressedTimeMask)
-			for i := 0; i < 2; i++ {
+			for range 2 {
 				err := dec.decodeMessage()
 				if !errors.Is(err, tc.err) {
 					t.Fatalf("expected error: %v, got: %v", tc.err, err)
@@ -2196,10 +2190,10 @@ func TestExpandComponents(t *testing.T) {
 		{
 			name: "expand components do not expand when containing field's value is invalid",
 			mesg: proto.Message{Num: mesgnum.Session, Fields: []proto.Field{
-				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
+				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(basetype.Uint16Invalid),
 			}},
 			fieldsAfterExpansion: []proto.Field{
-				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(uint16(basetype.Uint16Invalid)),
+				factory.CreateField(mesgnum.Session, fieldnum.SessionAvgSpeed).WithValue(basetype.Uint16Invalid),
 			},
 		},
 		{

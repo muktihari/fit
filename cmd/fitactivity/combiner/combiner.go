@@ -225,7 +225,7 @@ func Combine(fits []*proto.FIT) (result *proto.FIT, err error) {
 
 	activity.Timestamp = datetime.ToTime(lastTimestamp)
 	activity.LocalTimestamp = activity.Timestamp.Add(time.Duration(timezone) * time.Hour)
-	activity.TotalTimerTime = uint32((lastTimestamp - firstTimestamp) * 1000) // Scale: 1000
+	activity.TotalTimerTime = (lastTimestamp - firstTimestamp) * 1000 // Scale: 1000
 	activity.NumSessions = uint16(len(sessions))
 
 	result.Messages = append(result.Messages, activity.ToMesg(nil))

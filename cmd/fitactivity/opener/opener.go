@@ -23,17 +23,14 @@ func Open(ctx context.Context, paths []string) (fits []*proto.FIT, err error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	n := len(paths)
-	if n > numCPU {
-		n = numCPU
-	}
+	n := min(len(paths), numCPU)
 
 	var (
 		jobs    = make(chan string, n)
 		results = make(chan result, n)
 	)
 
-	for i := 0; i < n; i++ {
+	for range n {
 		go worker(ctx, jobs, results)
 	}
 
@@ -46,7 +43,7 @@ func Open(ctx context.Context, paths []string) (fits []*proto.FIT, err error) {
 
 	// Most files has one sequence of FIT activity, grow as needed.
 	fits = make([]*proto.FIT, 0, len(paths))
-	for i := 0; i < len(paths); i++ {
+	for range paths {
 		res := <-results
 		if res.err != nil {
 			return nil, res.err
@@ -69,7 +66,7 @@ func worker(ctx context.Context, jobs <-chan string, results chan<- result) {
 	}
 }
 
-var pool = sync.Pool{New: func() interface{} { return decoder.New(nil) }}
+var pool = sync.Pool{New: func() any { return decoder.New(nil) }}
 
 func decode(ctx context.Context, path string) (fits []*proto.FIT, err error) {
 	f, err := os.Open(path)

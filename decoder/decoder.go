@@ -1066,7 +1066,7 @@ func convertUint64ToValue(val uint64, baseType basetype.BaseType) proto.Value {
 	case basetype.Sint64:
 		return proto.Int64(int64(val))
 	case basetype.Uint64, basetype.Uint64z:
-		return proto.Uint64(uint64(val))
+		return proto.Uint64(val)
 	case basetype.Float32:
 		return proto.Float32(float32(val))
 	case basetype.Float64:

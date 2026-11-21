@@ -295,7 +295,7 @@ func (v Value) Uint64z() uint64 {
 	if v.ptr != ptrUint64 {
 		return basetype.Uint64zInvalid
 	}
-	return uint64(v.num)
+	return v.num
 }
 
 // Float32 returns Value as float32, if it's not a valid float32 value, it returns basetype.Float32Invalid (0xFFFFFFFF) in float32 value.
@@ -955,9 +955,9 @@ func Any(v any) Value {
 	case reflect.Uint32:
 		return Uint32(uint32(rv.Uint()))
 	case reflect.Int64:
-		return Int64(int64(rv.Int()))
+		return Int64(rv.Int())
 	case reflect.Uint64:
-		return Uint64(uint64(rv.Uint()))
+		return Uint64(rv.Uint())
 	case reflect.Float32:
 		return Float32(float32(rv.Float()))
 	case reflect.Float64:

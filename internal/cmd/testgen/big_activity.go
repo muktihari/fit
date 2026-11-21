@@ -74,7 +74,7 @@ func createBigActivityFile(ctx context.Context) error {
 	}
 
 	n := RecordSize - len(fit.Messages)
-	for i := 0; i < n; i++ {
+	for range n {
 		now = now.Add(time.Second) // only time is moving forward
 		record := proto.Message{Num: mesgnum.Record, Fields: []proto.Field{
 			factory.CreateField(mesgnum.Record, fieldnum.RecordTimestamp).WithValue(datetime.ToUint32(now)),

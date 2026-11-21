@@ -59,9 +59,9 @@ func (v Value) MarshalAppend(b []byte, arch byte) ([]byte, error) {
 		return b, nil
 	case TypeInt64:
 		if arch == LittleEndian {
-			b = binary.LittleEndian.AppendUint64(b, uint64(v.num))
+			b = binary.LittleEndian.AppendUint64(b, v.num)
 		} else {
-			b = binary.BigEndian.AppendUint64(b, uint64(v.num))
+			b = binary.BigEndian.AppendUint64(b, v.num)
 		}
 		return b, nil
 	case TypeUint64:

@@ -100,7 +100,7 @@ func TestFindFragment(t *testing.T) {
 func TestDefragment(t *testing.T) {
 	makeSeq := func(n uint16) []proto.Message {
 		ms := make([]proto.Message, n)
-		for i := uint16(0); i < n; i++ {
+		for i := range n {
 			ms[i].Num = typedef.MesgNum(i)
 		}
 		return ms

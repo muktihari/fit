@@ -6,6 +6,7 @@ package encoder
 
 import (
 	"bytes"
+	"slices"
 )
 
 // Lru is an opinionated `local_mesg_num` redefiner whose algorithm mimics
@@ -87,8 +88,7 @@ func (l *lru) storeAt(item []byte, itemIndex byte) {
 }
 
 func (l *lru) bucketIndex(item []byte) int {
-	for i := len(l.bucket) - 1; i >= 0; i-- {
-		cur := l.bucket[i]
+	for i, cur := range slices.Backward(l.bucket) {
 		if bytes.Equal(l.items[cur], item) {
 			return i
 		}

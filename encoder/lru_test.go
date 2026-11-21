@@ -15,9 +15,9 @@ func TestLRU(t *testing.T) {
 	l := newLRU(size)
 
 	// place (size * 10) different items, the lru will be shifted in roundroubin order.
-	for i := byte(0); i < size*10; i++ {
+	for i := range size * 10 {
 		b := make([]byte, i+1)
-		b[0] = byte(i)
+		b[0] = i
 		localMesgNum, isNew := l.Put(b)
 		if localMesgNum != i%size {
 			t.Fatalf("expected: %d, got: %d", i, localMesgNum)
@@ -29,7 +29,7 @@ func TestLRU(t *testing.T) {
 	}
 
 	// put same items should shift the lru bucket
-	for i := byte(0); i < size; i++ {
+	for i := range size {
 		item := l.items[i]
 		localMesgNUm, _ := l.Put(item)
 		if localMesgNUm != i {
@@ -141,7 +141,7 @@ func BenchmarkLRUReset(b *testing.B) {
 func TestResetWithSize(t *testing.T) {
 	l := newLRU(1)
 	l.ResetWithNewSize(10)
-	for i := byte(0); i < 10; i++ {
+	for i := range byte(10) {
 		index, isNew := l.Put([]byte{i})
 		if index != i && isNew != true {
 			t.Fatalf("expected index: %d, got: %d, expected newItem: %t, got: %t",

@@ -466,7 +466,6 @@ func (b *Builder) transformPrimitiveValue(fieldName, fieldType string) string {
 	}
 
 	return fmt.Sprintf("m.%s", fieldName)
-
 }
 
 func (b *Builder) transformTypedValue(num byte, fieldType, array string, fixedArraySize uint8) string {

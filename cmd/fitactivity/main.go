@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -311,8 +312,8 @@ loop:
 		if countSelectedFlag(fs, flagNameRemoveUnknown, flagNameRemoveMesgNums, flagNameRemoveDevData) == 0 {
 			return fmt.Errorf("remove: argument is provided: %w", errBadArgument)
 		}
-		parts := strings.Split(removeMesgNums, ",")
-		for _, part := range parts {
+		parts := strings.SplitSeq(removeMesgNums, ",")
+		for part := range parts {
 			u16, err := strconv.ParseUint(part, 10, 16)
 			if err != nil {
 				return err
@@ -1036,12 +1037,7 @@ func countSelectedFlag(fs *flag.FlagSet, flagNames ...string) (count int) {
 }
 
 func subcommandProvided(subcommands []string, target string) bool {
-	for _, subcommand := range subcommands {
-		if target == subcommand {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(subcommands, target)
 }
 
 func expectdotfit(paths []string) error {
